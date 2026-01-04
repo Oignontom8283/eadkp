@@ -1,0 +1,77 @@
+cargo-features = ["profile-rustflags"]
+[package]
+name = "eadkp"
+version = "0.9.0"
+authors = ["Oignontom8283 <www.github.com/Oignontom8283>"]
+edition = "2021"
+description = "Rust library for developing applications for NumWorks calculators running Epsilon OS. Provides low-level hardware interaction and high-level abstractions for display, input, battery, storage, and more."
+license = "GPL-3.0"
+repository = "https://github.com/Oignontom8283/eadkp"
+documentation = "https://docs.rs/eadkp"
+homepage = "https://github.com/Oignontom8283/eadkp"
+readme = "README.md"
+keywords = ["numworks", "calculator", "embedded", "epsilon", "no-std"]
+categories = ["embedded", "no-std", "hardware-support"]
+exclude = [
+    "epsilon_simulator/",
+    "build/",
+    "target/",
+    ".git/",
+    ".github/",
+    "docs/README_IMAGES/"
+]
+
+[lib]
+path = "src/lib.rs"
+bench = false
+test = false
+crate-type = ["rlib", "cdylib"]
+name = "eadkp"
+
+[[example]]
+name = "device"
+path = "examples/eadkp_example.rs"
+test = false
+doctest = false
+bench = false
+
+[[example]]
+name = "simulator"
+path = "examples/eadkp_example.rs"
+test = false
+doctest = false
+bench = false
+crate-type = ["cdylib"]
+
+[profile.dev]
+panic="abort"
+strip=true
+opt-level= "z"
+lto = true
+codegen-units = 1
+
+[profile.release]
+panic="abort"
+strip = true
+opt-level = 3
+lto = true
+codegen-units = 1
+
+[dependencies]
+nalgebra = {version = "0.33.2", default-features = false, features = ["libm"]}
+libm = "0.2.15"
+format_no_std = "1.2.0"
+heapless = "0.8.0"
+cortex-m = {version="0.7.7", features=["critical-section-single-core"]}
+embedded-alloc = "0.6.0"
+fastnoise-lite = { version="1.1.1", default-features=false, features = ["libm"] }
+bresenham = "0.1.1"
+lz4_flex = {version="0.11.5", default-features=false}
+postcard = {version = "1.1.2", features=["alloc"]}
+serde = {version = "1.0.219", default-features=false}
+enum-iterator = "2.3.0"
+
+[build-dependencies]
+image = "0.25.6"
+cc = "1.2.27"
+regex = "1.11.1"

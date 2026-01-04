@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  eadkp-dev:
+    build: 
+      context: .
+      dockerfile: dockerfile
+    image: nraddi1:latest # N.R.A.D.D.I.1. = Numworks Rust Application Development Docker Image v1
+    container_name: eadkp
+    working_dir: /workspace/eadkp
+    volumes:
+      - ./:/workspace/eadkp
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      # Mount the entire USB bus to allow hotplug support
+      - /dev/bus/usb:/dev/bus/usb
+      # Provide access to GPU rendering (required for graphical apps / OpenGL)
+      - /dev/dri:/dev/dri
+    tty: true
+    stdin_open: true
+    environment:
+      - DISPLAY=${DISPLAY}
+      # Uncomment for detailed libusb debugging
+      # - LIBUSB_DEBUG=3
+    device_cgroup_rules:
+      - 'c 189:* rmw'   # All USB devices (major 189)
+      - 'c 166:* rmw'   # ttyACM devices (kernel-dependent / not always required)
+      - 'c 204:* rmw'   # ttyAMA or alternatives (kernel-dependent)
+
+# Ne fonctionne que sous linux hôte (ou via WSL avec X serveur pour windows) avec X11.
+# Wayland n'est pas supporté pour l'instant.
+# Pour MacOS, il faudrait probablement utiliser un serveur X11 externe (XQuartz) et monter le socket adéquat. (non testé)
