@@ -149,24 +149,31 @@ fn main() {
 
     // Compilation et linkage des fichiers C/C++ présent dans src/libs/, src/lib/, src/c ou src/cpp
     
-    if std::env::var("CARGO_CFG_TARGET_OS").unwrap() == "none" {
-        // Configuration du compilateur C pour ARM (architecture de la NumWorks)
+    let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap();
+    let is_embedded = target_os == "none";
+    
+    // Configuration du compilateur C pour ARM (architecture de la NumWorks) uniquement pour l'embarqué
+    if is_embedded {
         unsafe { std::env::set_var("CC", "arm-none-eabi-gcc") };
+    }
 
-        // Récupération des flags de compilation spécifiques à EADK via nwlink
-        // Ces flags incluent les chemins d'inclusion et les options de compilation
+    // Récupération des flags de compilation spécifiques à EADK via nwlink (uniquement pour l'embarqué)
+    let nwlink_flags = if is_embedded {
         let program = "npx";
-        let nwlink_flags = String::from_utf8(
+        String::from_utf8(
             Command::new(program)
                 .args(["--yes", "--", "nwlink@0.0.19", "eadk-cflags"])
                 .output()
                 .expect("Failed to get nwlink eadk-cflags")
                 .stdout,
         )
-        .expect("Invalid UTF-8 in nwlink flags");
-        
-        let mut build = cc::Build::new();
-        let mut has_files = false;
+        .expect("Invalid UTF-8 in nwlink flags")
+    } else {
+        String::new()
+    };
+    
+    let mut build = cc::Build::new();
+    let mut has_files = false;
         
         // Fonction récursive pour ajouter les fichiers C/C++ d'un répertoire
         fn add_c_files_recursive(dir: &std::path::Path, build: &mut cc::Build) -> Result<bool, std::io::Error> {
@@ -208,48 +215,53 @@ fn main() {
             // You may want to implement the recursive logic here, or leave as is.
             Ok(found)
         }
-        
-        // Parcourir chaque répertoire racine pour trouver les fichiers C/C++
-        for dir_path in &POSSIBLE_C_DIRS {
+    
+    // Parcourir chaque répertoire racine pour trouver les fichiers C/C++
+    for dir_path in &POSSIBLE_C_DIRS {
 
-            let libs_dir = std::path::Path::new(dir_path);
+        let libs_dir = std::path::Path::new(dir_path);
 
-            if libs_dir.exists() {
-                // Ajouter les fichiers trouvés dans ce répertoire
-                has_files |= match add_c_files_recursive(libs_dir, &mut build) {
-                    Ok(found) => found, // True si des fichiers ont été trouvés
-                    Err(e) => panic!("Failed to read C/C++ files from {}: {}", dir_path, e), // Panique en cas d'erreur
-                };   
-            };
+        if libs_dir.exists() {
+            // Ajouter les fichiers trouvés dans ce répertoire
+            has_files |= match add_c_files_recursive(libs_dir, &mut build) {
+                Ok(found) => found, // True si des fichiers ont été trouvés
+                Err(e) => panic!("Failed to read C/C++ files from {}: {}", dir_path, e), // Panique en cas d'erreur
+            };   
         };
-        
-        // Configuration des flags de compilation C
-        build.flag("-std=c99");      // Standard C99
+    };
+    
+    // Configuration des flags de compilation C
+    build.flag("-std=c99");      // Standard C99
+    build.flag("-Wall");         // Tous les avertissements
+    build.flag("-ggdb");         // Informations de debug pour GDB
+    build.warnings(false);       // Ne pas traiter les warnings comme des erreurs
+    
+    // Flags spécifiques à l'embarqué (optimisation taille et sections séparées)
+    if is_embedded {
         build.flag("-Os");           // Optimisation pour la taille (important pour l'embarqué)
-        build.flag("-Wall");         // Tous les avertissements
-        build.flag("-ggdb");         // Informations de debug pour GDB
         build.flag("-ffunction-sections");  // Chaque fonction dans sa propre section
         build.flag("-fdata-sections");      // Chaque variable dans sa propre section
-        build.warnings(false);       // Ne pas traiter les warnings comme des erreurs
         
         // Ajouter les flags spécifiques à EADK (chemins d'include, macros, etc.)
         for flag in nwlink_flags.split_whitespace() {
             build.flag(flag);
-        };
-        
-        // Si aucun fichier C/C++ n'a été trouvé, créer un fichier vide
-        // pour éviter les erreurs du linker (qui attend une bibliothèque)
-        if !has_files {
-            let out_dir = std::env::var("OUT_DIR").unwrap();
-            let empty_c = format!("{}/empty.c", out_dir);
-            fs::write(&empty_c, "// Empty C file to satisfy linker when no C/C++ files are present\n").unwrap();
-            build.file(&empty_c);
         }
-        
-        // Compiler et créer la bibliothèque statique libnative_libs.a
-        // Ce nom doit correspondre au flag -lnative_libs dans .cargo/config.toml
-        build.compile("native_libs");
-    } else {
+    }
+    
+    // Si aucun fichier C/C++ n'a été trouvé, créer un fichier vide
+    // pour éviter les erreurs du linker (qui attend une bibliothèque)
+    if !has_files {
+        let out_dir = std::env::var("OUT_DIR").unwrap();
+        let empty_c = format!("{}/empty.c", out_dir);
+        fs::write(&empty_c, "// Empty C file to satisfy linker when no C/C++ files are present\n").unwrap();
+        build.file(&empty_c);
+    }
+    
+    // Compiler et créer la bibliothèque statique libnative_libs.a
+    // Ce nom doit correspondre au flag -lnative_libs dans .cargo/config.toml
+    build.compile("native_libs");
+    
+    if std::env::var("CARGO_CFG_TARGET_OS").unwrap() != "none" {
 
         cargo_changed!(KEYBOARD_MAPPING_FILE);
         
