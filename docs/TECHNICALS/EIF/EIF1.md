@@ -9,7 +9,6 @@
 - **Format initial** : Première version du format EIF
 - **Structure du fichier** : En-tête suivi des données d'image en RGB 565
 
-
 ## Structure du fichier
 
 Structure de fichier Format EIF1 (Eadkp. Image. Format. 1.) :
