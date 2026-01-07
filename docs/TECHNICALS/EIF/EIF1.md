@@ -32,4 +32,4 @@ L'en-tête du fichier occupe donc un total de 8 octets, suivi des données des p
 
 Comme tout ceci n'est pas très parlant, voici un schéma explicatif de la structure du fichier EIF1 :
 
-![Schéma de la structure du fichier EIF1](./schemas/eif1-format-v3.jpg)
+![Schéma de la structure du fichier EIF1](./assets/schemas/eif1-format-v3.jpg)

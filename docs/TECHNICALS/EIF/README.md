@@ -17,3 +17,7 @@ Le format de fichier `.eif` est un format d'image binaire non compressé utilis�
 La version actuelle du format EIF est la version **1**.
 
 - [Version 1 : Ne supporte pas la transparence.](./EIF1.md)
+
+## Ressources supplémentaires
+
+- [Comprendre le format de couleur RGB 565](./RGB565.md)
