@@ -228,6 +228,8 @@ fn main() {
         build.flag("-Os");           // Optimisation pour la taille (important pour l'embarqué)
         build.flag("-Wall");         // Tous les avertissements
         build.flag("-ggdb");         // Informations de debug pour GDB
+        build.flag("-ffunction-sections");  // Chaque fonction dans sa propre section
+        build.flag("-fdata-sections");      // Chaque variable dans sa propre section
         build.warnings(false);       // Ne pas traiter les warnings comme des erreurs
         
         // Ajouter les flags spécifiques à EADK (chemins d'include, macros, etc.)
