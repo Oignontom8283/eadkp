@@ -175,46 +175,46 @@ fn main() {
     let mut build = cc::Build::new();
     let mut has_files = false;
         
-        // Fonction récursive pour ajouter les fichiers C/C++ d'un répertoire
-        fn add_c_files_recursive(dir: &std::path::Path, build: &mut cc::Build) -> Result<bool, std::io::Error> {
-            let mut found = false;
+    // Fonction récursive pour ajouter les fichiers C/C++ d'un répertoire
+    fn add_c_files_recursive(dir: &std::path::Path, build: &mut cc::Build) -> Result<bool, std::io::Error> {
+        let mut found = false;
 
-            // Obtenir la liste du contenu du répertoire
-            let entries = match fs::read_dir(dir) {
-                Ok(entries) => entries,
-                Err(e) => return Err(e),
-            };
-            
-            // Parcourir chaque entrée dans le répertoire
-            for entry in entries.flatten() {
-                let path = entry.path();
+        // Obtenir la liste du contenu du répertoire
+        let entries = match fs::read_dir(dir) {
+            Ok(entries) => entries,
+            Err(e) => return Err(e),
+        };
+        
+        // Parcourir chaque entrée dans le répertoire
+        for entry in entries.flatten() {
+            let path = entry.path();
 
-                // Si l'entrée est un répertoire, descendre récursivement
-                if path.is_dir() {
-                    
-                    // Descendre récursivement dans les sous-répertoires
-                    match add_c_files_recursive(&path, build) {
-                        Ok(sub_found) => found |= sub_found, // True si 'found' est déja true alors que 'sub_found' est false. Sinon, prend la valeur de 'sub_found'.
-                        Err(e) => return Err(e), // Propager l'erreur vers l'appelant
-                    };
-                }
-                // Sinon, vérifier l'extension du fichier
-                else if let Some(ext) = path.extension() {
+            // Si l'entrée est un répertoire, descendre récursivement
+            if path.is_dir() {
+                
+                // Descendre récursivement dans les sous-répertoires
+                match add_c_files_recursive(&path, build) {
+                    Ok(sub_found) => found |= sub_found, // True si 'found' est déja true alors que 'sub_found' est false. Sinon, prend la valeur de 'sub_found'.
+                    Err(e) => return Err(e), // Propager l'erreur vers l'appelant
+                };
+            }
+            // Sinon, vérifier l'extension du fichier
+            else if let Some(ext) = path.extension() {
 
-                    // Vérifier si le fichier est un .c ou .cpp
-                    if ext == "c" || ext == "cpp" {
-                        // Indiquer à Cargo de relancer le build si ce fichier change
-                        cargo_changed!(path.display());
-                        // Ajouter le fichier à la liste de compilation
-                        build.file(path);
-                        found = true;
-                    };
+                // Vérifier si le fichier est un .c ou .cpp
+                if ext == "c" || ext == "cpp" {
+                    // Indiquer à Cargo de relancer le build si ce fichier change
+                    cargo_changed!(path.display());
+                    // Ajouter le fichier à la liste de compilation
+                    build.file(path);
+                    found = true;
                 };
             };
+        };
 
-            // You may want to implement the recursive logic here, or leave as is.
-            Ok(found)
-        }
+        // You may want to implement the recursive logic here, or leave as is.
+        Ok(found)
+    }
     
     // Parcourir chaque répertoire racine pour trouver les fichiers C/C++
     for dir_path in &POSSIBLE_C_DIRS {
