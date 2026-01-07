@@ -1,7 +1,7 @@
 
 # Format de fichier EIF (Eadkp Image Format)
 
-Le format de fichier `.eif` est un format d'image binaire non compressé utilisé pour l'integration des images dans les builds des application Numworks utilisant la librairie eadkp. 
+Le format de fichier `.eif` est un format d'image binaire non compressé utilisé pour l'intégration des images dans les builds des applications Numworks utilisant la librairie eadkp. 
 
 ## Spécifications
 
