@@ -1,6 +1,7 @@
 
 - Documentation sur le support des fichiers C et C++
 
+- Changer l'extension des fichiers binaire d'images 
 
 ## Bugs
 
