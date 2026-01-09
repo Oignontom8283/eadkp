@@ -29,7 +29,7 @@ La construction de l'image Docker peut prendre quelques minutes lors du premier 
 
 Une fois le conteneur lancé, vous pouvez vous y connecter via VSCode en utilisant l'extension "Dev Containers".
 
-![Connect to container](../README_IMAGES/Tuto_dev-container_1.png)
+![Connect to container](.//assets/Tuto_dev-container_1.png)
 
 ### Étape 4: Redéfinir la cible de compilation
 
