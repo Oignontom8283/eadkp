@@ -3,7 +3,7 @@ use regex::Regex;
 use std::{fs, process::Command};
 
 const ASSETS_DIR: &str = "assets/";
-const POSSIBLE_C_DIRS: [&str; 2] = ["src/libs", "src/lib", "src/c", "src/cpp"];
+const POSSIBLE_C_DIRS: [&str; 4] = ["src/libs", "src/lib", "src/c", "src/cpp"];
 const KEYBOARD_MAPPING_FILE: &str = "epsilon_simulator/ion/src/simulator/shared/keyboard.cpp";
 
 const ICON_WIDTH: u32 = 55;
