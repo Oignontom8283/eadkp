@@ -17,6 +17,6 @@ pub fn millis() -> u64 {
 
 unsafe extern "C" {
     fn eadk_timing_usleep(us: u32);
-    fn eadk_timing_msleep(us: u32);
+    fn eadk_timing_msleep(ms: u32);
     fn eadk_timing_millis() -> u64;
 }
