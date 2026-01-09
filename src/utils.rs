@@ -1,5 +1,6 @@
 
-pub const EIF1_MAGIC_NUMBER: u32 = u32::from_le_bytes(*b"EIF1"); // Magic number for EIF1 format. Magic number in hex `0x31464945`
+/// Magic number for EIF1 format. Magic number in hex `0x31464945`
+pub const EIF1_MAGIC_NUMBER: u32 = u32::from_le_bytes(*b"EIF1"); 
 
 
 #[repr(C)]
