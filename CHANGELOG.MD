@@ -5,3 +5,5 @@
 - Support du C/C++ dans le simulateur :
     - Le code C/C++ sera désormais compilé et lié lors de l'exécution dans le simulateur, et non plus uniquement sur l'appareil réel.
 - Support des dossiers c/ et cpp/ pour le code C/C++.
+- Changement de l'extension des fichiers EIF :
+    - Les fichiers EIF utilisent désormais l'extension `.eif` au lieu de `.bin`.
