@@ -140,7 +140,7 @@ macro_rules! include_image {
             env!("OUT_DIR"),
             "/assets/",
             $path,
-            ".bin",
+            ".eif",
         ))
     };
 }

@@ -56,7 +56,7 @@ fn convert_image(file_path: &std::path::Path) {
         .expect("Failed to create output assets/ directory");
 
     // Écrire le fichier converti au format .bin
-    fs::write(format!("{}/{}.bin", out_dir, out_name), converted_pixels.as_slice())
+    fs::write(format!("{}/{}.eif", out_dir, out_name), converted_pixels.as_slice())
         .expect("Failed to write converted image file");
 }
 
