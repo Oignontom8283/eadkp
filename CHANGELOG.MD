@@ -7,3 +7,4 @@
 - Support des dossiers c/ et cpp/ pour le code C/C++.
 - Changement de l'extension des fichiers EIF :
     - Les fichiers EIF utilisent désormais l'extension `.eif` au lieu de `.bin`.
+- Ajout des éditeurs de texte Micro et Nano dans l'image Docker pour faciliter l'édition de fichiers directement depuis le shell.
