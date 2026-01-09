@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     libgl1-mesa-dev libglu1-mesa-dev \
     libpng-dev libjpeg-dev python3-lz4 \
     imagemagick lz4 \
+    micro nano \
     && rm -rf /var/lib/apt/lists/*
 
 
