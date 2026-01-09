@@ -1,5 +1,7 @@
 
-# eadkp – Epsilon Application Development Kit Plus
+<h1>
+    <img src="docs/assets/eadkp.svg" alt="eadkp logo" style="vertical-align: middle;"/>
+</h1>
 
 `eadkp` est une bibliothèque Rust destinée au développement d’applications pour
 les calculatrices **NumWorks** sous **Epsilon**.
