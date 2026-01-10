@@ -10,3 +10,4 @@
 - Ajout des éditeurs de texte Micro et Nano dans l'image Docker pour faciliter l'édition de fichiers directement depuis le shell.
 - Déplacement du script de build a l'intérieur de la bibliothèque EADKP :
     - Le script de build est maintenant intégré dans la bibliothèque EADKP, simplifiant son utilisation et son intégration dans les projets.
+- Suppression des dépendances inutilisées.

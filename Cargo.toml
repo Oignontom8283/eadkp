@@ -61,18 +61,11 @@ codegen-units = 1
 build-tools = ["dep:image", "dep:cc", "dep:regex"]
 
 [dependencies]
-nalgebra = {version = "0.33.2", default-features = false, features = ["libm"]}
-libm = "0.2.15"
-format_no_std = "1.2.0"
 heapless = "0.8.0"
-cortex-m = {version="0.7.7", features=["critical-section-single-core"]}
 embedded-alloc = "0.6.0"
-fastnoise-lite = { version="1.1.1", default-features=false, features = ["libm"] }
-bresenham = "0.1.1"
-lz4_flex = {version="0.11.5", default-features=false}
+enum-iterator = "2.3.0"
 postcard = {version = "1.1.2", features=["alloc"]}
 serde = {version = "1.0.219", default-features=false}
-enum-iterator = "2.3.0"
 image = {version = "0.25.6", optional = true}
 cc = {version = "1.2.27", optional = true}
 regex = {version = "1.11.1", optional = true}
