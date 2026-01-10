@@ -26,6 +26,10 @@ pub mod battery;
 pub mod input;
 pub mod storage;
 
+// Module builder uniquement disponible pour les build scripts (OS hôte, pas embarqué)
+#[cfg(all(not(target_os = "none"), feature = "build-tools"))]
+pub mod builder;
+
 // Réexportations du contenu des modules
 pub use utils::*;
 pub use color::*;
