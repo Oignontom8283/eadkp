@@ -1,5 +1,5 @@
-// Pour le build.rs d'eadkp lui-même, on inclut directement le module builder
-// Les utilisateurs de la lib pourront faire : eadkp::builder::setup()
+// For eadkp's own build.rs, we directly include the builder module
+// Library users will be able to do: eadkp::builder::setup()
 mod builder {
     include!("src/builder.rs");
 }

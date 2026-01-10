@@ -1,7 +1,7 @@
 
 - Documentation sur le support des fichiers C et C++
 
-- Changer l'extension des fichiers binaire d'images 
+- Repertoire de travail dinamiquement configurable pour le script de build.
 
 ## Bugs
 
