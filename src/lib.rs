@@ -12,10 +12,6 @@ For more information, visit the [eadkp repository on GitHub](https://github.com/
 #[cfg(target_os = "none")]
 extern crate alloc;
 
-// Réexportation d'embedded_alloc pour qu'elle soit accessible via la macro eadk_setup!
-#[cfg(target_os = "none")]
-pub use embedded_alloc;
-
 #[macro_use]
 pub mod r#macro;
 
