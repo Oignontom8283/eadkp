@@ -5,9 +5,10 @@ mod builder {
 }
 
 fn main() {
-    // Si le projet est utilisé comme dépendance, ne rien faire
-    if std::env::var_os("CARGO_PRIMARY_PACKAGE").is_none() {
-        return;
+    // Ne s'exécute que si la variable EADKP_PRIMARY_BUILD est définie
+    // Cette variable est définie dans docker-compose.yml lors de la compilation du projet eadkp
+    // Quand eadkp est utilisé comme dépendance, cette variable ne sera pas définie
+    if std::env::var("EADKP_PRIMARY_BUILD").is_ok() {
+        builder::setup();
     }
-    builder::setup();
 }

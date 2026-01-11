@@ -3,7 +3,7 @@
 #[macro_export]
 macro_rules! eadk_setup {
     (name = $app_name:expr) => {
-        eadk_setup!(name = $app_name, icon = "../target/icon.nwi", api_level = 0);
+        eadk_setup!(name = $app_name, icon = concat!(env!("OUT_DIR"), "/icon.nwi"), api_level = 0);
     };
     (name = $app_name:expr, icon = $icon_path:expr, api_level = $api_level:expr) => {
         // Import necessary crates for embedded targets

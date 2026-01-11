@@ -156,12 +156,14 @@ pub fn setup_with_options(
             assert_eq!(height, ICON_HEIGHT, "Icon height must be {} pixels", ICON_HEIGHT); // Stoper le build si la hauteur est incorrecte
             
             // Utiliser nwlink pour convertir l'image en .nwi
+            // Définir le chemin de sortie dans OUT_DIR
+            let out_dir = std::env::var("OUT_DIR").unwrap();
+            let icon_out_path = format!("{}/icon.nwi", out_dir);
             let output = Command::new("sh")
                 .arg("-c")
-                .arg(format!("npx --yes -- nwlink@0.0.19 png-nwi {} target/icon.nwi", path.display()))
+                .arg(format!("npx --yes -- nwlink@0.0.19 png-nwi {} {}", path.display(), icon_out_path))
                 .output()
                 .expect("Failed to run nwlink for icon.nwi");
-            
             // Stoper le build si nwlink retourne une erreur
             assert!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
         } else {
