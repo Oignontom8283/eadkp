@@ -12,6 +12,7 @@ homepage = "https://github.com/Oignontom8283/eadkp"
 readme = "README.md"
 keywords = ["numworks", "calculator", "embedded", "epsilon", "no-std"]
 categories = ["embedded", "no-std", "hardware-support"]
+
 exclude = [
     "epsilon_simulator/",
     "build/",
