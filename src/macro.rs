@@ -8,7 +8,7 @@ macro_rules! eadk_setup {
     (name = $app_name:expr, icon = $icon_path:expr, api_level = $api_level:expr) => {
         // Import necessary crates for embedded targets
         #[cfg(target_os = "none")]
-        use embedded_alloc::LlffHeap as Heap;
+        use $crate::embedded_alloc::LlffHeap as Heap;
 
         // Set up global allocator
         #[global_allocator]
