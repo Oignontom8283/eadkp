@@ -76,15 +76,25 @@ pub fn setup_with_options(
     keyboard_mapping_file: Option<&str>
 ) {
 
-    let asset_dir = std::path::Path::new(asset_dir.unwrap_or(ASSETS_DIR));
-    let c_dirs = c_dirs.unwrap_or(POSSIBLE_C_DIRS.iter().map(|s| *s).collect());
-    let keyboard_mapping_file = keyboard_mapping_file.unwrap_or(KEYBOARD_MAPPING_FILE);
+
+    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR not set");
+    let asset_dir = std::path::Path::new(&manifest_dir).join(asset_dir.unwrap_or(ASSETS_DIR));
+    let c_dirs: Vec<String> = c_dirs
+        .unwrap_or(POSSIBLE_C_DIRS.iter().map(|s| *s).collect())
+        .into_iter()
+        .map(|d| std::path::Path::new(&manifest_dir).join(d).to_string_lossy().to_string())
+        .collect();
+    let keyboard_mapping_file = std::path::Path::new(&manifest_dir)
+        .join(keyboard_mapping_file.unwrap_or(KEYBOARD_MAPPING_FILE))
+        .to_string_lossy()
+        .to_string();
 
     // Créer le dossier assets/ s'il n'existe pas
-    fs::create_dir_all(asset_dir)
+
+    fs::create_dir_all(&asset_dir)
         .expect("Failed to create assets/ directory");
 
-    let entries = fs::read_dir(asset_dir)
+    let entries = fs::read_dir(&asset_dir)
         .expect("Failed to read assets/ directory");
 
     for entry_result in entries {
@@ -234,9 +244,7 @@ pub fn setup_with_options(
     
     // Parcourir chaque répertoire racine pour trouver les fichiers C/C++
     for dir_path in c_dirs {
-
-        let libs_dir = std::path::Path::new(dir_path);
-
+        let libs_dir = std::path::Path::new(&dir_path);
         if libs_dir.exists() {
             // Ajouter les fichiers trouvés dans ce répertoire
             has_files |= match add_c_files_recursive(libs_dir, &mut build) {
@@ -280,8 +288,7 @@ pub fn setup_with_options(
 
     // Remapper les touches du simulateur NumWorks en modifiant keyboard.cpp
     if std::env::var("CARGO_CFG_TARGET_OS").unwrap() != "none" {
-        if let Some(keyboard_file) = Some(keyboard_mapping_file) {
-
+        if let Some(keyboard_file) = Some(&keyboard_mapping_file) {
         cargo_changed!(keyboard_file);
         
         // Nouveau mapping de touches personnalisé pour le simulateur
@@ -306,7 +313,7 @@ pub fn setup_with_options(
 };";
 
         // Lire le fichier de configuration dukeyboard_filer
-        let file_content = fs::read_to_string(KEYBOARD_MAPPING_FILE)
+        let file_content = fs::read_to_string(keyboard_file)
         .expect("Cannot open keyboard.cpp file from emulator. Please check if the simulator is clonned properly.");
 
         // Vérifier si le mapping n'est pas déjà appliqué pour éviter les réécritures inutiles
