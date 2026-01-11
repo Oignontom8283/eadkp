@@ -5,5 +5,9 @@ mod builder {
 }
 
 fn main() {
+    // Si le projet est utilisé comme dépendance, ne rien faire
+    if std::env::var_os("CARGO_PRIMARY_PACKAGE").is_none() {
+        return;
+    }
     builder::setup();
 }
