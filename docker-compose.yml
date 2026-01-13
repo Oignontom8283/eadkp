@@ -4,8 +4,8 @@ services:
   eadkp-dev:
     build: 
       context: template/docker
-      dockerfile: nraddi1.dockerfile
-    image: nraddi1:latest # N.R.A.D.D.I.1. = Numworks Rust Application Development Docker Image v1
+      dockerfile: nraddi.dockerfile
+    image: nraddi:latest # N.R.A.D.D.I. = Numworks Rust Application Development Docker Image
     container_name: eadkp
     working_dir: /workspace/eadkp
     volumes:
