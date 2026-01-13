@@ -15,3 +15,4 @@
     - Le script de build d'eadkp ne s'exécute désormais que si la variable d'environnement `EADKP_PRIMARY_BUILD` est définie.
     - Déplacement de la génération de l'icône `icon.nwi` dans le dossier de sortie spécifié par `OUT_DIR` pour éviter les conflits lors de l'utilisation d'eadkp comme dépendance.
     - Déclaration d'`embedded-alloc` comme dépendance publique, permettant à la macro `eadk_setup!` de l'utiliser sans nécessiter de déclaration manuelle dans le `Cargo.toml` de l'utilisateur.
+- Déplacement du dockerfile dans template/docker/ pour accéder plus facilement pour les projets utilisant eadkp.
