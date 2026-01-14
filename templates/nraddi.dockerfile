@@ -27,7 +27,7 @@ RUN rustup show
 RUN cargo install just
 RUN rustup toolchain install nightly
 
-RUN rustup target add thumbv7em-none-eabihf
+RUN rustup target add thumbv7em-none-eabihf --toolchain nightly
 
 RUN usermod -aG dialout root
 
