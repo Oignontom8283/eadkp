@@ -25,6 +25,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN rustup target add thumbv7em-none-eabihf
 RUN rustup show 
 RUN cargo install just
+RUN rustup toolchain install nightly
 
 RUN rustup target add thumbv7em-none-eabihf
 
