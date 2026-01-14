@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     libx11-dev libxext-dev libxrender-dev libxrandr-dev libxinerama-dev \
     libgl1-mesa-dev libglu1-mesa-dev \
     libpng-dev libjpeg-dev python3-lz4 \
-    imagemagick lz4 \
+    imagemagick lz4 jq \
     micro nano \
     && rm -rf /var/lib/apt/lists/*
 
