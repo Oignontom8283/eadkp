@@ -50,6 +50,7 @@ fn convert_image(file_path: &std::path::Path) {
         if pix.2.0[3] == 0 {
             // Pixel transparent, le convertir en blanc
             converted_pixels.extend(0xFFFFu16.to_le_bytes()); // Blanc en RGB565
+            continue;
         }
 
         let rgb565 = ((pix.2.0[0] as u16 & 0b11111000) << 8) // Mettre les bits rouges a 15-11
