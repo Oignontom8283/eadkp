@@ -18,8 +18,7 @@ exclude = [
     "build/",
     "target/",
     ".git/",
-    ".github/",
-    "docs/README_IMAGES/"
+    "docs/"
 ]
 
 [lib]
