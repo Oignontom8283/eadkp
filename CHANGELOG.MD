@@ -17,3 +17,4 @@
     - Déclaration d'`embedded-alloc` comme dépendance publique, permettant à la macro `eadk_setup!` de l'utiliser sans nécessiter de déclaration manuelle dans le `Cargo.toml` de l'utilisateur.
 - Ajoute du fichier `.vscode/extensions.json` pour recommander les extension VSCode utiles pour le développement d'eadkp.
 - Ajout de la fonction `push_image()` dans `display` pour afficher une image à partir d'un objet `Image`.
+- La couleur de des pixels totalement transparents des images inclut est désormais le blanc (`0xFFFF`) au lieu du noir.
