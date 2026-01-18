@@ -16,3 +16,4 @@
     - Déplacement de la génération de l'icône `icon.nwi` dans le dossier de sortie spécifié par `OUT_DIR` pour éviter les conflits lors de l'utilisation d'eadkp comme dépendance.
     - Déclaration d'`embedded-alloc` comme dépendance publique, permettant à la macro `eadk_setup!` de l'utiliser sans nécessiter de déclaration manuelle dans le `Cargo.toml` de l'utilisateur.
 - Ajoute du fichier `.vscode/extensions.json` pour recommander les extension VSCode utiles pour le développement d'eadkp.
+- Ajout de la fonction `push_image()` dans `display` pour afficher une image à partir d'un objet `Image`.

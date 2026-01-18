@@ -66,7 +66,6 @@ pub fn draw_string(
 }
 
 pub fn push_image(image: &Image, point: Point) {
-
     push_rect(
         image.for_coordinates(point.x, point.y),
         &image.get_pixels()
