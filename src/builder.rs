@@ -44,6 +44,14 @@ fn convert_image(file_path: &std::path::Path) {
 
     // Ensuite ajouter les pixels RGB565
     for pix in img.pixels() { // Convert to RGB565
+
+        // TODO: Utiliser une méthode configuration pour indiquer la couleur de transparence
+        // Si le pixel est complètement transparent (ex: background PNG)
+        if pix.2.0[3] == 0 {
+            // Pixel transparent, le convertir en blanc
+            converted_pixels.extend(0xFFFFu16.to_le_bytes()); // Blanc en RGB565
+        }
+
         let rgb565 = ((pix.2.0[0] as u16 & 0b11111000) << 8) // Mettre les bits rouges a 15-11
                         | ((pix.2.0[1] as u16 & 0b11111100) << 3) // Mettre les bits verts a 10-5
                         | (pix.2.0[2] as u16 >> 3);               // Mettre les bits bleus a 4-0
