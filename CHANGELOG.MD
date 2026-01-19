@@ -1,20 +1,19 @@
-
-- Test du support C/C++
+- Test du support C/C++.
 - Optimisation de la génération des binaires :
-    - Le code C/C++ non utilisé n'est plus compilé ni lié, réduisant la taille des binaires finaux.
-- Support du C/C++ dans le simulateur :
-    - Le code C/C++ sera désormais compilé et lié lors de l'exécution dans le simulateur, et non plus uniquement sur l'appareil réel.
-- Support des dossiers c/ et cpp/ pour le code C/C++.
-- Changement de l'extension des fichiers EIF :
+    - Le code C/C++ non utilisé n'est plus compilé ni lié, ce qui réduit la taille des binaires finaux.
+- Support du C/C++ dans le simulateur :
+    - Le code C/C++ est désormais compilé et lié lors de l'exécution dans le simulateur, et non plus uniquement sur l'appareil réel.
+- Prise en charge des dossiers `c/` et `cpp/` pour le code C/C++.
+- Changement de l'extension des fichiers EIF :
     - Les fichiers EIF utilisent désormais l'extension `.eif` au lieu de `.bin`.
 - Ajout des éditeurs de texte Micro et Nano dans l'image Docker pour faciliter l'édition de fichiers directement depuis le shell.
-- Déplacement du script de build a l'intérieur de la bibliothèque EADKP :
+- Déplacement du script de build à l'intérieur de la bibliothèque EADKP :
     - Le script de build est maintenant intégré dans la bibliothèque EADKP, simplifiant son utilisation et son intégration dans les projets.
 - Suppression des dépendances inutilisées.
-- [Critique] Modification du processus de build pour éviter les problèmes lors de l'utilisation d'eadkp comme dépendance dans d'autres projets Rust.
+- [Critique] Modification du processus de build pour éviter les problèmes lors de l'utilisation d'eadkp comme dépendance dans d'autres projets Rust :
     - Le script de build d'eadkp ne s'exécute désormais que si la variable d'environnement `EADKP_PRIMARY_BUILD` est définie.
     - Déplacement de la génération de l'icône `icon.nwi` dans le dossier de sortie spécifié par `OUT_DIR` pour éviter les conflits lors de l'utilisation d'eadkp comme dépendance.
     - Déclaration d'`embedded-alloc` comme dépendance publique, permettant à la macro `eadk_setup!` de l'utiliser sans nécessiter de déclaration manuelle dans le `Cargo.toml` de l'utilisateur.
-- Ajoute du fichier `.vscode/extensions.json` pour recommander les extension VSCode utiles pour le développement d'eadkp.
+- Ajout du fichier `.vscode/extensions.json` pour recommander les extensions VSCode utiles au développement d'eadkp.
 - Ajout de la fonction `push_image()` dans `display` pour afficher une image à partir d'un objet `Image`.
-- La couleur de des pixels totalement transparents des images inclut est désormais le blanc (`0xFFFF`) au lieu du noir.
+- La couleur des pixels totalement transparents des images incluses est désormais le blanc (`0xFFFF`) au lieu du noir.
