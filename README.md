@@ -24,7 +24,7 @@ des applications **NWA**.
 - [x] Gestion du stockage (lecture/écriture de fichiers)
 - [x] Macros pour déclarer les propriétés des applications NWA
 - [x] Gestion simple des images (inclusion et affichage) via macro
-- [x] Support des fichiers C et C++ (Non documenté)
+- [ ] Support des fichiers C et C++ (Non documenté) (Problème majeur)
 - [x] Support du simulateur officiel Numworks
 - [ ] Support des fichiers données a l'inclusion dans les applications NWA
 - [ ] Support des graphiques avancés
