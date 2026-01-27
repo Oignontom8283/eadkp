@@ -1,40 +1,40 @@
 
 
 /*!
-# Module de gestion du stockage pour applications Epsilon sur calculatrice Numworks.
+# Storage Management Module for Epsilon Applications on Numworks Calculators.
 
-Fournit des fonctions pour lire, écrire et gérer des fichiers dans le stockage embarqué.
+Provides functions to read, write, and manage files in the embedded storage.
 
-Ce module est à l’origine un portage en Rust de `storage.c` (Sous licence MIT) du projet
-**NumWorks Extapp Storage**. Toutefois, plusieurs modifications et ajouts de
-fonctionnalités ont été apportés au fil du développement. En conséquence,
-l’implémentation actuelle peut différer du code source original, tant sur le
-plan structurel que comportemental.
+This module is originally a Rust port of `storage.c` (MIT License) from the
+**NumWorks Extapp Storage** project. However, several modifications and
+feature additions have been made during development. As a result, the current
+implementation may differ from the original source code, both structurally and
+behaviorally.
 
-## Remarques importantes
+## Important Notes
 
-- Ce module est conçu pour fonctionner dans un environnement `no_std` sur
-  calculatrice NumWorks.
+- This module is designed to work in a `no_std` environment on NumWorks
+    calculators.
 
-- Les modèles de calculatrices supportés sont :
-  - **N0115** (testé et fonctionnel)
-  - **N0120** (non testé, mais théoriquement supporté)
-  - **N0110** (non testé, mais théoriquement supporté)
+- Supported calculator models:
+    - **N0115** (tested and functional)
+    - **N0120** (untested, but theoretically supported)
+    - **N0110** (untested, but theoretically supported)
 
-## Crédits
+## Credits
 
-Auteur original: **[Yaya Cout](https://framagit.org/Yaya.Cout)**
+Original author: **[Yaya Cout](https://framagit.org/Yaya.Cout)**
 
-Fichier source original: [numworks-extapp-storage/src/storage.c](https://framagit.org/Yaya.Cout/numworks-extapp-storage/-/blob/master/src/storage.c)
+Original source file: [numworks-extapp-storage/src/storage.c](https://framagit.org/Yaya.Cout/numworks-extapp-storage/-/blob/master/src/storage.c)
 
 ---
 
-Portage en Rust Original, adaptations et modifications original: **[Oignontom8283](https://github.com/Oignontom8283)**
+Rust port, adaptations, and modifications by: **[Oignontom8283](https://github.com/Oignontom8283)**
 
-## Remerciements
+## Acknowledgments
 
-Tout mes remerciements à Yaya Cout pour son travail d'ingénierie remarquable sur la manipulation du stockage,
-sans lequel ce module n'aurait probablement jamais vu le jour.
+Special thanks to Yaya Cout for his remarkable engineering work on storage
+manipulation, without which this module would probably never have come to life.
 */
 
 use core::ptr;
