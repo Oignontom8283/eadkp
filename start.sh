@@ -11,4 +11,4 @@ fi
 xhost +local:docker
 
 # Start the Docker container with GUI support and pass all arguments
-docker-compose up -d "$@"
+docker compose up -d "$@"
