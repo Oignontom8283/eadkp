@@ -5,8 +5,8 @@
 
 Fournit des fonctions pour lire, écrire et gérer des fichiers dans le stockage embarqué.
 
-Ce module est à l’origine un portage en Rust de `storage.c` du projet
-**NumWorks Extapp Storage** sous licence MIT. Toutefois, plusieurs modifications et ajouts de
+Ce module est à l’origine un portage en Rust de `storage.c` (Sous licence MIT) du projet
+**NumWorks Extapp Storage**. Toutefois, plusieurs modifications et ajouts de
 fonctionnalités ont été apportés au fil du développement. En conséquence,
 l’implémentation actuelle peut différer du code source original, tant sur le
 plan structurel que comportemental.
@@ -21,21 +21,15 @@ plan structurel que comportemental.
   - **N0120** (non testé, mais théoriquement supporté)
   - **N0110** (non testé, mais théoriquement supporté)
 
-- À l’avenir, ce module deviendra probablement dépendant de `eadkp`
-  afin d’améliorer l’organisation du code et la réutilisabilité des
-  fonctionnalités.
-
 ## Crédits
 
 Auteur original: **[Yaya Cout](https://framagit.org/Yaya.Cout)**
-
-Repository original: [numworks-extapp-storage](https://framagit.org/Yaya.Cout/numworks-extapp-storage)
 
 Fichier source original: [numworks-extapp-storage/src/storage.c](https://framagit.org/Yaya.Cout/numworks-extapp-storage/-/blob/master/src/storage.c)
 
 ---
 
-Portage en Rust, adaptations et modifications: **[Oignontom8283](https://github.com/Oignontom8283)**
+Portage en Rust Original, adaptations et modifications original: **[Oignontom8283](https://github.com/Oignontom8283)**
 
 ## Remerciements
 
