@@ -53,9 +53,9 @@ cargo add eadkp
 Les contributions sont les bienvenues ! N'hésitez pas à ouvrir des issues ou à soumettre des pull requests.
 
 Pour apprendre à utiliser le projet, consultez les guides suivants :
-- [Guide de setup du projet](docs/GUIDS/Setup.md)
-- [Guide de compilation de l'exemple de test](docs/GUIDS/BuildExample.md)
-- [Guide d'utilisation du simulateur](docs/GUIDS/Simulator.md)
+- [Guide de setup du projet](docs/SETUPS/Setup.md)
+- [Guide de compilation de l'exemple de test](docs/SETUPS/BuildExample.md)
+- [Guide d'utilisation du simulateur](docs/SETUPS/Simulator.md)
 
 ## Licence
 Ce projet est sous licence [GPL-3.0](./LICENSE) (GNU General Public License v3.0).
