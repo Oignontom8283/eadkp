@@ -172,15 +172,6 @@ fn format_duration_with_options(ms: u64, opts: &FormatDurationOptions) -> String
     unsafe { String::from_utf8_unchecked(buf[..len].to_vec()) }
 }
 
-// déclarer la fonction C calcul_complexe_en_c
-unsafe extern "C" {
-    fn calcul_c(a: i32, b: i32) -> i32;
-}
-
-unsafe extern "C" {
-    fn calcul_cpp(a: i32, b: i32) -> i32;
-}
-
 
 #[unsafe(no_mangle)]
 fn main() -> isize {
@@ -537,10 +528,6 @@ fn main() -> isize {
             bread_image.for_coordinates(eadkp::SCREEN_RECT.width - bread_image.width, eadkp::SCREEN_RECT.height - bread_image.height),
             bread_image.get_pixels(),
         );
-
-        // Afficher le résultat des calculs en C et C++ (Test d'intégration de code natif)
-        eadkp::display::draw_string(&format!("{}", unsafe { calcul_c(42, 24) }), eadkp::Point { x: 0, y: eadkp::SCREEN_RECT.height - eadkp::LARGE_FONT.height }, true, eadkp::Color::from_888(255, 255, 255), eadkp::Color::from_888(0, 0, 0));
-        eadkp::display::draw_string(&format!("{}", unsafe { calcul_cpp(42, 24) }), eadkp::Point { x: 0, y: eadkp::SCREEN_RECT.height - eadkp::LARGE_FONT.height*2 }, true, eadkp::Color::from_888(255, 255, 255), eadkp::Color::from_888(0, 0, 0));
 
         if just.key_down(eadkp::input::Key::Back) {
 
