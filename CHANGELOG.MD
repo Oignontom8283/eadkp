@@ -17,3 +17,6 @@
 - Ajout du fichier `.vscode/extensions.json` pour recommander les extensions VSCode utiles au développement d'eadkp.
 - Ajout de la fonction `push_image()` dans `display` pour afficher une image à partir d'un objet `Image`.
 - La couleur des pixels totalement transparents des images incluses est désormais le blanc (`0xFFFF`) au lieu du noir.
+- Problèmes majeurs identifiés :
+    - Échec du build des fichiers C/C++ lorsque le projet utilise eadkp comme dépendance.
+    - Suppression du premier caractère des fichiers sauvegardés.
