@@ -3,6 +3,8 @@
     <img src="docs/assets/eadkp_full_logo.svg" alt="eadkp logo" style="vertical-align: middle; width: 30%;"/>
 </h1>
 
+Version : **Alpha 1**
+
 **Eadkp** est une bibliothèque Rust destinée au développement d’applications pour
 les calculatrices **NumWorks** sous **Epsilon**.
 
