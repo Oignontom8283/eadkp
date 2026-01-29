@@ -4,8 +4,8 @@ services:
   eadkp-dev:
     build: 
       context: .
-      dockerfile: dockerfile
-    image: nraddi1:latest # N.R.A.D.D.I.1. = Numworks Rust Application Development Docker Image v1
+      dockerfile: dockerfile 
+    image: nraddi:latest # N.R.A.D.D.I. = Numworks Rust Application Development Docker Image
     container_name: eadkp
     working_dir: /workspace/eadkp
     volumes:
@@ -19,6 +19,8 @@ services:
     stdin_open: true
     environment:
       - DISPLAY=${DISPLAY}
+      # Variable pour indiquer que c'est la compilation principale d'eadkp
+      - EADKP_PRIMARY_BUILD=1
       # Uncomment for detailed libusb debugging
       # - LIBUSB_DEBUG=3
     device_cgroup_rules:

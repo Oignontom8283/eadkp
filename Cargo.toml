@@ -1,7 +1,7 @@
-cargo-features = ["profile-rustflags"]
+cargo-features = ["profile-rustflags", "public-dependency"]
 [package]
 name = "eadkp"
-version = "0.9.0"
+version = "0.10.0"
 authors = ["Oignontom8283 <www.github.com/Oignontom8283>"]
 edition = "2021"
 description = "Rust library for developing applications for NumWorks calculators running Epsilon OS. Provides low-level hardware interaction and high-level abstractions for display, input, battery, storage, and more."
@@ -12,13 +12,13 @@ homepage = "https://github.com/Oignontom8283/eadkp"
 readme = "README.md"
 keywords = ["numworks", "calculator", "embedded", "epsilon", "no-std"]
 categories = ["embedded", "no-std", "hardware-support"]
+
 exclude = [
     "epsilon_simulator/",
     "build/",
     "target/",
     ".git/",
-    ".github/",
-    "docs/README_IMAGES/"
+    "docs/"
 ]
 
 [lib]
@@ -57,19 +57,18 @@ opt-level = 3
 lto = true
 codegen-units = 1
 
+[features]
+build-tools = ["dep:image", "dep:cc", "dep:regex"]
+
 [dependencies]
-nalgebra = {version = "0.33.2", default-features = false, features = ["libm"]}
-libm = "0.2.15"
-format_no_std = "1.2.0"
-heapless = "0.8.0"
-cortex-m = {version="0.7.7", features=["critical-section-single-core"]}
-embedded-alloc = "0.6.0"
-fastnoise-lite = { version="1.1.1", default-features=false, features = ["libm"] }
-bresenham = "0.1.1"
-lz4_flex = {version="0.11.5", default-features=false}
+heapless = { version = "0.8.0", public = true }
+embedded-alloc = { version = "0.6.0", public = true }
+enum-iterator = "2.3.0"
 postcard = {version = "1.1.2", features=["alloc"]}
 serde = {version = "1.0.219", default-features=false}
-enum-iterator = "2.3.0"
+image = {version = "0.25.6", optional = true}
+cc = {version = "1.2.27", optional = true}
+regex = {version = "1.11.1", optional = true}
 
 [build-dependencies]
 image = "0.25.6"

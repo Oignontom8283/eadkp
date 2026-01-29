@@ -1,4 +1,5 @@
 current_target := shell("rustc -vV | grep \"host:\" | awk '{print $2}'")
+project_name := `cargo metadata --format-version 1 --no-deps | jq -r '.packages[0].name'`
 
 build:
     cargo build --release --example device --target=thumbv7em-none-eabihf

@@ -172,6 +172,7 @@ fn format_duration_with_options(ms: u64, opts: &FormatDurationOptions) -> String
     unsafe { String::from_utf8_unchecked(buf[..len].to_vec()) }
 }
 
+
 #[unsafe(no_mangle)]
 fn main() -> isize {
     // Initialize the heap

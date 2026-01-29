@@ -10,7 +10,8 @@ RUN apt-get update && apt-get install -y \
     libx11-dev libxext-dev libxrender-dev libxrandr-dev libxinerama-dev \
     libgl1-mesa-dev libglu1-mesa-dev \
     libpng-dev libjpeg-dev python3-lz4 \
-    imagemagick lz4 \
+    imagemagick lz4 jq \
+    micro nano \
     && rm -rf /var/lib/apt/lists/*
 
 
@@ -24,8 +25,9 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN rustup target add thumbv7em-none-eabihf
 RUN rustup show 
 RUN cargo install just
+RUN rustup toolchain install nightly
 
-RUN rustup target add thumbv7em-none-eabihf
+RUN rustup target add thumbv7em-none-eabihf --toolchain nightly
 
 RUN usermod -aG dialout root
 

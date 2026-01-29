@@ -1,5 +1,5 @@
 
-use super::{Color, Point, Rect};
+use super::{Color, Point, Rect, Image};
 
 #[cfg(target_os = "none")]
 use alloc::vec::Vec;
@@ -53,8 +53,7 @@ pub fn draw_string(
     text_color: Color,
     background_color: Color,
 ) {
-    let c_string =
-        CString::new(text).expect("Can't convert str to C_String. Maybe invalid caracter.");
+    let c_string = CString::new(text).expect("Can't convert str to C_String. Maybe invalid caracter.");
     unsafe {
         eadk_display_draw_string(
             c_string.as_ptr(),
@@ -64,6 +63,13 @@ pub fn draw_string(
             background_color,
         )
     }
+}
+
+pub fn push_image(image: &Image, point: Point) {
+    push_rect(
+        image.for_coordinates(point.x, point.y),
+        &image.get_pixels()
+    );
 }
 
 unsafe extern "C" {

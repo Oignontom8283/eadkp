@@ -1,7 +1,11 @@
 
-# eadkp – Epsilon Application Development Kit Plus
+<h1>
+    <img src="docs/assets/eadkp_full_logo.svg" alt="eadkp logo" style="vertical-align: middle; width: 30%;"/>
+</h1>
 
-`eadkp` est une bibliothèque Rust destinée au développement d’applications pour
+Version : **Alpha 1**
+
+**Eadkp** est une bibliothèque Rust destinée au développement d’applications pour
 les calculatrices **NumWorks** sous **Epsilon**.
 
 Elle fournit des fonctionnalités de bas niveau permettant d’interagir avec le
@@ -22,8 +26,9 @@ des applications **NWA**.
 - [x] Gestion du stockage (lecture/écriture de fichiers)
 - [x] Macros pour déclarer les propriétés des applications NWA
 - [x] Gestion simple des images (inclusion et affichage) via macro
-- [ ] Support des fichiers C et C++ (Implémenté, mais non testé et documenté)
+- [ ] Support des fichiers C et C++ (Non documenté) (Problème majeur)
 - [x] Support du simulateur officiel Numworks
+- [ ] Support des fichiers données a l'inclusion dans les applications NWA
 - [ ] Support des graphiques avancés
 - [ ] Débogage via USB (Pas encore évaluée la faisabilité)
 
@@ -50,9 +55,9 @@ cargo add eadkp
 Les contributions sont les bienvenues ! N'hésitez pas à ouvrir des issues ou à soumettre des pull requests.
 
 Pour apprendre à utiliser le projet, consultez les guides suivants :
-- [Guide de setup du projet](docs/GUIDS/Setup.md)
-- [Guide de compilation de l'exemple de test](docs/GUIDS/BuildExample.md)
-- [Guide d'utilisation du simulateur](docs/GUIDS/Simulator.md)
+- [Guide de setup du projet](docs/SETUPS/Setup.md)
+- [Guide de compilation de l'exemple de test](docs/SETUPS/BuildExample.md)
+- [Guide d'utilisation du simulateur](docs/SETUPS/Simulator.md)
 
 ## Licence
 Ce projet est sous licence [GPL-3.0](./LICENSE) (GNU General Public License v3.0).
