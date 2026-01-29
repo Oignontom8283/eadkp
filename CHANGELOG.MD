@@ -1,22 +1,22 @@
-- Test du support C/C++.
-- Optimisation de la génération des binaires :
-    - Le code C/C++ non utilisé n'est plus compilé ni lié, ce qui réduit la taille des binaires finaux.
-- Support du C/C++ dans le simulateur :
-    - Le code C/C++ est désormais compilé et lié lors de l'exécution dans le simulateur, et non plus uniquement sur l'appareil réel.
-- Prise en charge des dossiers `c/` et `cpp/` pour le code C/C++.
-- Changement de l'extension des fichiers EIF :
-    - Les fichiers EIF utilisent désormais l'extension `.eif` au lieu de `.bin`.
-- Ajout des éditeurs de texte Micro et Nano dans l'image Docker pour faciliter l'édition de fichiers directement depuis le shell.
-- Déplacement du script de build à l'intérieur de la bibliothèque EADKP :
-    - Le script de build est maintenant intégré dans la bibliothèque EADKP, simplifiant son utilisation et son intégration dans les projets.
-- Suppression des dépendances inutilisées.
-- [Critique] Modification du processus de build pour éviter les problèmes lors de l'utilisation d'eadkp comme dépendance dans d'autres projets Rust :
-    - Le script de build d'eadkp ne s'exécute désormais que si la variable d'environnement `EADKP_PRIMARY_BUILD` est définie.
-    - Déplacement de la génération de l'icône `icon.nwi` dans le dossier de sortie spécifié par `OUT_DIR` pour éviter les conflits lors de l'utilisation d'eadkp comme dépendance.
-    - Déclaration d'`embedded-alloc` comme dépendance publique, permettant à la macro `eadk_setup!` de l'utiliser sans nécessiter de déclaration manuelle dans le `Cargo.toml` de l'utilisateur.
-- Ajout du fichier `.vscode/extensions.json` pour recommander les extensions VSCode utiles au développement d'eadkp.
-- Ajout de la fonction `push_image()` dans `display` pour afficher une image à partir d'un objet `Image`.
-- La couleur des pixels totalement transparents des images incluses est désormais le blanc (`0xFFFF`) au lieu du noir.
-- Problèmes majeurs identifiés :
-    - Échec du build des fichiers C/C++ lorsque le projet utilise eadkp comme dépendance.
-    - Suppression du premier caractère des fichiers sauvegardés.
+- C/C++ support test.
+- Optimization of binary generation:
+    - Unused C/C++ code is no longer compiled or linked, reducing the size of the final binaries.
+- C/C++ support in the simulator:
+    - C/C++ code is now compiled and linked when running in the simulator, not just on the real device.
+- Support for `c/` and `cpp/` folders for C/C++ code.
+- Change of EIF file extension:
+    - EIF files now use the `.eif` extension instead of `.bin`.
+- Added Micro and Nano text editors to the Docker image to facilitate file editing directly from the shell.
+- Moved the build script inside the EADKP library:
+    - The build script is now integrated into the EADKP library, simplifying its use and integration into projects.
+- Removed unused dependencies.
+- [Critical] Modification of the build process to avoid issues when using eadkp as a dependency in other Rust projects:
+    - The eadkp build script now only runs if the `EADKP_PRIMARY_BUILD` environment variable is set.
+    - Moved the generation of the `icon.nwi` icon to the output folder specified by `OUT_DIR` to avoid conflicts when using eadkp as a dependency.
+    - Declared `embedded-alloc` as a public dependency, allowing the `eadk_setup!` macro to use it without requiring a manual declaration in the user's `Cargo.toml`.
+- Added the `.vscode/extensions.json` file to recommend useful VSCode extensions for eadkp development.
+- Added the `push_image()` function in `display` to show an image from an `Image` object.
+- The color of fully transparent pixels in included images is now white (`0xFFFF`) instead of black.
+- Major issues identified:
+    - Build failure of C/C++ files when the project uses eadkp as a dependency.
+    - Deletion of the first character of saved files.
