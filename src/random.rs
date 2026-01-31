@@ -1,5 +1,4 @@
 
-
 unsafe extern "C" {
     fn eadk_random() -> u32;
 }
