@@ -9,7 +9,6 @@ A Rust library to facilitate the development of external applications for NumWor
 For more information, visit the [eadkp repository on GitHub](https://github.com/Oignontom8283/eadkp).
 */
 
-#[cfg(target_os = "none")]
 extern crate alloc;
 
 #[macro_use]

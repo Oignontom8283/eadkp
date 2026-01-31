@@ -1,15 +1,8 @@
 
-use super::{Color, Point, Rect, Image};
+use super::*;
 
-#[cfg(target_os = "none")]
 use alloc::vec::Vec;
-
-#[cfg(target_os = "none")]
 use alloc::ffi::CString;
-
-#[cfg(not(target_os = "none"))]
-use std::ffi::CString;
-
 use core::ffi::c_char;
 
 pub fn push_rect(rect: Rect, pixels: &[Color]) {

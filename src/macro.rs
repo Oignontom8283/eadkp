@@ -1,3 +1,4 @@
+
 // Macro to set up EADK application boilerplate
 // This macro generates all the necessary embedded configuration
 #[macro_export]
@@ -16,17 +17,12 @@ macro_rules! eadk_setup {
         static HEAP: Heap = Heap::empty();
 
         // Import alloc for heap allocations
-        #[cfg(target_os = "none")]
         extern crate alloc;
 
         // Common imports for embedded development
-        #[cfg(target_os = "none")]
         use alloc::format;
-        
-        #[cfg(target_os = "none")]
-        use alloc::string::String;
 
-        #[cfg(target_os = "none")]
+        // Import panic handler traits
         use core::panic::PanicInfo;
 
         // Panic handler préconfiguré

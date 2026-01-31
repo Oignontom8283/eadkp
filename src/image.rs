@@ -1,10 +1,8 @@
-#[cfg(target_os = "none")]
-use alloc::boxed::Box;
-
-#[cfg(not(target_os = "none"))]
-use std::boxed::Box;
 
 use super::*;
+
+use alloc::boxed::Box;
+
 
 /// # Représente une image chargée en mémoire
 /// 
