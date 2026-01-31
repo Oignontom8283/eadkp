@@ -16,8 +16,7 @@ use eadkp::storage;
 // This macro will generate: HEAP, alloc imports, format!, String, panic handler, and EADK metadata
 eadk_setup!(name = "Eadkp example");
 
-// Additional imports after macro expansion (these are now available)
-#[cfg(target_os = "none")]
+use alloc::string::String;
 use alloc::string::ToString;
 
 #[allow(dead_code)]
