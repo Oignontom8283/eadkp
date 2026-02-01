@@ -39,6 +39,12 @@ manipulation, without which this module would probably never have come to life.
 use core::ptr;
 use heapless;
 
+
+// ============================================================================
+// STORAGE MISC UTILITIES
+// ============================================================================
+
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StorageError {
     /// Stockage invalide ou corrompu (magic number incorrect)
@@ -94,6 +100,82 @@ unsafe fn memmove(dest: *mut u8, src: *const u8, n: usize) {
 unsafe fn memset(s: *mut u8, c: u8, n: usize) {
     for i in 0..n {
         unsafe { *s.add(i) = c };
+    }
+}
+
+
+// ============================================================================
+// HARDWARE INTERFACE / STORAGE METADATA
+// ============================================================================
+
+
+/// Retourne l'adresse de base du stockage
+#[cfg(target_os = "none")]
+unsafe fn address() -> u32 {
+    unsafe { ptr::read_unaligned((userland_address() + 0xC) as *const u32) }
+}
+
+/// Retourne la taille totale du stockage
+#[cfg(target_os = "none")]
+unsafe fn size() -> u32 {
+    unsafe { ptr::read_unaligned((userland_address() + 0x10) as *const u32) }
+}
+
+/// Trouve la prochaine position libre dans le stockage
+#[cfg(target_os = "none")]
+unsafe fn next_free() -> *const u32 {
+    unsafe {
+        let storage_addr = address();
+        let mut offset = (storage_addr as *mut u8).add(4);
+        let end_addr = (storage_addr + size()) as *mut u8;
+        
+        // Vérifier validité mais ignorer l'erreur (retourne null si invalide)
+        if is_valid(storage_addr as *const u32).is_err() { return ptr::null(); }
+        
+        // Parcourir jusqu'à trouver un enregistrement vide (size=0)
+        while offset < end_addr {
+            let size = ptr::read_unaligned(offset as *const u16);
+            if size == 0 { return offset as *const u32; }
+            offset = offset.add(size as usize);
+        }
+        
+        end_addr as *const u32
+    }
+}
+
+/// Vérifie si le stockage est valide (magic number)
+#[cfg(target_os = "none")]
+unsafe fn is_valid(addr: *const u32) -> Result<()> {
+    let magic_expected = 0xBADD0BEEu32.swap_bytes();
+    let magic_found = unsafe { ptr::read_unaligned(addr) };
+    if magic_found == magic_expected {
+        Ok(())
+    } else {
+        Err(StorageError::InvalidMagicNumber { expected: magic_expected, found: magic_found })
+    }
+}
+
+/// Détecte le modèle de calculatrice et retourne l'adresse userland
+#[cfg(target_os = "none")]
+unsafe fn userland_address() -> u32 {
+    unsafe {
+        // Adresses des slots magic pour chaque modèle
+        let slots_n0110 = [0x90010000 as *const u32, 0x90410000 as *const u32];
+        let slots_n0120 = [0x90020000 as *const u32, 0x90420000 as *const u32];
+        let magic = 0xfeedc0deu32.swap_bytes();
+        
+        // Compter les slots valides pour chaque modèle
+        let count_n0110 = slots_n0110.iter().filter(|&&slot| ptr::read_unaligned(slot) == magic).count();
+        let count_n0120 = slots_n0120.iter().filter(|&&slot| ptr::read_unaligned(slot) == magic).count();
+        
+        // Choisir l'adresse de base selon le modèle détecté
+        let base_addr = if count_n0110 > count_n0120 {
+            ptr::read_unaligned(0x20000004 as *const u32).wrapping_add(0x10000) // N0110
+        } else {
+            ptr::read_unaligned(0x24000004 as *const u32).wrapping_add(0x20000) // N0120
+        };
+        
+        base_addr.wrapping_sub(0x8)
     }
 }
 
@@ -324,76 +406,3 @@ pub unsafe fn file_read_string(_filename: &str) -> Result<&'static str> {
     Ok("Dummy content")
 }
 
-// ============================================================================
-// HARDWARE INTERFACE
-// ============================================================================
-
-/// Retourne l'adresse de base du stockage
-#[cfg(target_os = "none")]
-unsafe fn address() -> u32 {
-    unsafe { ptr::read_unaligned((userland_address() + 0xC) as *const u32) }
-}
-
-/// Retourne la taille totale du stockage
-#[cfg(target_os = "none")]
-unsafe fn size() -> u32 {
-    unsafe { ptr::read_unaligned((userland_address() + 0x10) as *const u32) }
-}
-
-/// Trouve la prochaine position libre dans le stockage
-#[cfg(target_os = "none")]
-unsafe fn next_free() -> *const u32 {
-    unsafe {
-        let storage_addr = address();
-        let mut offset = (storage_addr as *mut u8).add(4);
-        let end_addr = (storage_addr + size()) as *mut u8;
-        
-        // Vérifier validité mais ignorer l'erreur (retourne null si invalide)
-        if is_valid(storage_addr as *const u32).is_err() { return ptr::null(); }
-        
-        // Parcourir jusqu'à trouver un enregistrement vide (size=0)
-        while offset < end_addr {
-            let size = ptr::read_unaligned(offset as *const u16);
-            if size == 0 { return offset as *const u32; }
-            offset = offset.add(size as usize);
-        }
-        
-        end_addr as *const u32
-    }
-}
-
-/// Vérifie si le stockage est valide (magic number)
-#[cfg(target_os = "none")]
-unsafe fn is_valid(addr: *const u32) -> Result<()> {
-    let magic_expected = 0xBADD0BEEu32.swap_bytes();
-    let magic_found = unsafe { ptr::read_unaligned(addr) };
-    if magic_found == magic_expected {
-        Ok(())
-    } else {
-        Err(StorageError::InvalidMagicNumber { expected: magic_expected, found: magic_found })
-    }
-}
-
-/// Détecte le modèle de calculatrice et retourne l'adresse userland
-#[cfg(target_os = "none")]
-unsafe fn userland_address() -> u32 {
-    unsafe {
-        // Adresses des slots magic pour chaque modèle
-        let slots_n0110 = [0x90010000 as *const u32, 0x90410000 as *const u32];
-        let slots_n0120 = [0x90020000 as *const u32, 0x90420000 as *const u32];
-        let magic = 0xfeedc0deu32.swap_bytes();
-        
-        // Compter les slots valides pour chaque modèle
-        let count_n0110 = slots_n0110.iter().filter(|&&slot| ptr::read_unaligned(slot) == magic).count();
-        let count_n0120 = slots_n0120.iter().filter(|&&slot| ptr::read_unaligned(slot) == magic).count();
-        
-        // Choisir l'adresse de base selon le modèle détecté
-        let base_addr = if count_n0110 > count_n0120 {
-            ptr::read_unaligned(0x20000004 as *const u32).wrapping_add(0x10000) // N0110
-        } else {
-            ptr::read_unaligned(0x24000004 as *const u32).wrapping_add(0x20000) // N0120
-        };
-        
-        base_addr.wrapping_sub(0x8)
-    }
-}
