@@ -59,37 +59,6 @@ pub enum StorageError {
 
 pub type Result<T> = core::result::Result<T, StorageError>;
 
-/// Convertit une string Rust en C string (avec null terminator)
-pub fn to_cstring(s: &str) -> Result<heapless::Vec<u8, 256>> {
-    let mut cstr = heapless::Vec::new();
-    cstr.extend_from_slice(s.as_bytes()).map_err(|_| StorageError::InvalidInput)?;
-    cstr.push(0).map_err(|_| StorageError::InvalidInput)?; // Ajouter \0
-    Ok(cstr)
-}
-
-/// Convertit une C string en string Rust
-fn cstring_to_str(s: *const u8) -> Result<&'static str> {
-    unsafe {
-        let len = strlen(s);
-        let slice = core::slice::from_raw_parts(s, len);
-        match core::str::from_utf8(slice) {
-            Ok(str_ref) => Ok(str_ref),
-            Err(_) => Err(StorageError::InvalidInput),
-        }
-    }
-}
-
-/// Calcule la longueur d'une C string (sans le \0)
-unsafe fn strlen(s: *const u8) -> usize {
-    let mut len = 0;
-    let mut p = s;
-    while unsafe { *p != 0 } { // Chercher le null terminator
-        len += 1;
-        p = unsafe { p.add(1) };
-    }
-    len
-}
-
 /// Compare deux C strings
 unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
     let mut p1 = s1;
@@ -103,6 +72,7 @@ unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
     unsafe { ((*p1 as i32) - (*p2 as i32)) == 0 } // Différence ASCII, si 0, ce sont les mêmes caractères, donc on est arrivé à la fin des deux chaînes en même temps
 
 }
+
 /// Copie n bytes de src vers dest (zones non chevauchantes)
 /// 
 /// **Comportement INDÉFINI en cas de CHEVAUCHEMENT des zones !** NON SÉCURISÉ .
