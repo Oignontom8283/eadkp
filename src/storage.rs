@@ -86,9 +86,9 @@ pub type Result<T> = core::result::Result<T, StorageError>;
 // HARDWARE METADATA
 // ============================================================================
 
-/// SlotInfo - 16 bytes au début de la RAM
+/// SlotInfo - 16 bytes au dèbut de la RAM
 /// 
-/// Le SlotInfo est une structure de métadonnées essentielle, située au début de la RAM (SRAM) de la calculatrice
+/// Le SlotInfo est une structure de métadonnées essentielle, située au dèbut de la RAM (SRAM) de la calculatrice
 /// (L'adresse du dèbut de la RAM varie en fonction du modèle, voir `CalculatorModel`).
 /// Il contient des pointeurs vers les headers du kernel et du userland, permettant ainsi de connaître leur emplacement en mémoire.
 /// Ces informations sont cruciales, car elles permettent d'accéder notamment au UserlandHeader, qui lui-même contient par exemple l'adresse et la taille du système de fichiers.
@@ -98,8 +98,8 @@ pub type Result<T> = core::result::Result<T, StorageError>;
 /// - userland_header_address : Pointeur static vers le UserlandHeader
 /// 
 /// Note: 
-/// - Le SlotInfo est protégé par des "magic numbers" au début et à la fin (0xEFEEDBBA) pour vérifier son intégrité et ça présence.
-/// - Les pointeurs sont de type static car ils s'agissent de données primaires de l'os en lui-même, donc impérativement présentes, sinon pas d'os, donc pas d'application non plus.
+/// - Le SlotInfo est protégé par des "magic numbers" au dèbut et à la fin (0xEFEEDBBA) pour vérifier son intégrité et ça présence.
+/// - Les pointeurs sont de type static car il s’agit de données primaires de l'os en lui-même, donc impérativement présentes, sinon pas d'os, donc pas d'application non plus.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct SlotInfo {
