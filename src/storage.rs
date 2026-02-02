@@ -72,6 +72,15 @@ pub enum StorageError {
     StorageOverflow { available: usize, needed: usize },
 }
 
+pub enum SoftWareError {
+    /// SlotInfo invalide
+    InvalidSlotInfo,
+    /// UserlandHeader invalide
+    InvalidUserlandHeader,
+    /// FileSystem invalide
+    InvalidFileSystem,
+}
+
 pub type Result<T> = core::result::Result<T, StorageError>;
 
 /// Compare deux C strings
