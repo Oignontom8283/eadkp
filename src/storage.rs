@@ -46,6 +46,7 @@ use heapless;
 
 const SLOTINFO_MAGIC: u32 = 0xEFEEDBBA;
 const USERLAND_HEADER_MAGIC: u32 = 0xDEC0EDFE;
+const KERNEL_HEADER_MAGIC: u32 = 0xDEC00DF0;
 const EXTERNAL_APPS_MAGIC: u32 = 0xDEC0EDFE;
 
 const RAM_BASE_N0110_OR_N0115: u32 = 0x20000000;
@@ -99,6 +100,8 @@ impl SlotInfo {
     }
 }
 
+
+
 /// UserlandHeader - 48 bytes au début du userland
 /// 
 /// Contient les métadonnées essentielles du userland,
@@ -117,6 +120,34 @@ pub struct UserlandHeader {
     pub device_name_flash_start: *const u8,   // +0x24: Nom device
     pub device_name_flash_end: *const u8,     // +0x28: Fin nom device
     pub footer: u32,                          // +0x2C: 0xDEC0EDFE
+}
+
+
+
+/// KernelHeader - 24 bytes au début de la zone kernel
+/// 
+/// Contient les informations de version du noyau Epsilon.
+/// 
+/// Emplacement :
+/// - Juste après la signature (8 bytes) au début du slot actif
+/// - N0110/N0115 Slot A : 0x90000008
+/// - N0110/N0115 Slot B : 0x90400008
+/// - N0120 Slot A       : 0x90000008
+/// - N0120 Slot B       : 0x90400008
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct KernelHeader {
+    pub header: u32,                      // +0x00: 0xDEC00DF0
+    pub epsilon_version: [u8; 8],         // +0x04: Version Epsilon (ex: "23.2.1")
+    pub patch_level: [u8; 8],             // +0x0C: Niveau de patch (ex: "official")
+    pub footer: u32,                      // +0x14: 0xDEC00DF0
+}
+
+impl KernelHeader {
+    /// Vérifie que le KernelHeader est valide
+    pub fn is_valid(&self) -> bool {
+        self.header == KERNEL_HEADER_MAGIC && self.footer == KERNEL_HEADER_MAGIC
+    }
 }
 
 
@@ -173,6 +204,8 @@ impl CalculatorModel {
         }
     }
 }
+
+
 
 /// Compare deux C strings
 unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
