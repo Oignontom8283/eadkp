@@ -73,7 +73,7 @@ pub enum StorageError {
     StorageOverflow { available: usize, needed: usize },
 }
 
-pub enum SoftWareError {
+pub enum SoftwareError {
     /// SlotInfo invalide
     InvalidSlotInfo,
     /// UserlandHeader invalide
@@ -83,6 +83,11 @@ pub enum SoftWareError {
 }
 
 pub type Result<T> = core::result::Result<T, StorageError>;
+
+
+// ============================================================================
+// HARDWARE METADATA
+// ============================================================================
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -99,7 +104,6 @@ impl SlotInfo {
         self.header == SLOTINFO_MAGIC && self.footer == SLOTINFO_MAGIC
     }
 }
-
 
 
 /// UserlandHeader - 48 bytes au début du userland
@@ -121,7 +125,6 @@ pub struct UserlandHeader {
     pub device_name_flash_end: *const u8,     // +0x28: Fin nom device
     pub footer: u32,                          // +0x2C: 0xDEC0EDFE
 }
-
 
 
 /// KernelHeader - 24 bytes au début de la zone kernel
@@ -167,16 +170,16 @@ impl CalculatorModel {
             Self::N0120 => RAM_BASE_N0120 as *const u8,
         }
     }
-
+    
     /// Retourne un pointeur vers le SlotInfo de la calculatrice valide
     pub fn slotinfo_adress(&self) -> Result<*const SlotInfo> {
 
         // Obtenir l'adresse de base de la RAM selon le modèle
         let ram = self.ram_base() as *const u32;
-
+        
         // Lire le SlotInfo depuis la RAM
         let slot_info = ram as *const SlotInfo;
-
+        
         // Vérifier que le pointeur n'est pas null
         let slot_info_ref = unsafe { slot_info.as_ref().ok_or(StorageError::InvalidStorage) }?;
         
@@ -206,50 +209,9 @@ impl CalculatorModel {
 }
 
 
-
-/// Compare deux C strings
-unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
-    let mut p1 = s1;
-    let mut p2 = s2;
-
-    while unsafe { *p1 != 0 && *p1 == *p2 } { // Comparer jusqu'au null terminator ou différence
-        // Avancer les pointeurs
-        p1 = unsafe { p1.add(1) };
-        p2 = unsafe { p2.add(1) };
-    }
-    unsafe { ((*p1 as i32) - (*p2 as i32)) == 0 } // Différence ASCII, si 0, ce sont les mêmes caractères, donc on est arrivé à la fin des deux chaînes en même temps
-
-}
-
-/// Copie n bytes de src vers dest (zones non chevauchantes)
-/// 
-/// **Comportement INDÉFINI en cas de CHEVAUCHEMENT des zones !** NON SÉCURISÉ .
-#[cfg(target_os = "none")]
-unsafe fn memcpy(dest: *mut u8, src: *const u8, n: usize) {
-    unsafe { ptr::copy_nonoverlapping(src, dest, n) }
-}
-
-/// Copie `n` bytes de `src:*` vers `dest:*` (zones peuvent chevaucher)
-/// 
-/// **Comportement défini même en cas de chevauchement:** La copie se fait par une mémoire tampon.
-#[cfg(target_os = "none")]
-unsafe fn memmove(dest: *mut u8, src: *const u8, n: usize) {
-    unsafe { ptr::copy(src, dest, n) }
-}
-
-/// Remplit n bytes avec la valeur c
-#[cfg(target_os = "none")]
-unsafe fn memset(s: *mut u8, c: u8, n: usize) {
-    for i in 0..n {
-        unsafe { *s.add(i) = c };
-    }
-}
-
-
 // ============================================================================
 // HARDWARE INTERFACE / STORAGE METADATA
 // ============================================================================
-
 
 /// Retourne l'adresse de base du stockage
 #[cfg(target_os = "none")]
@@ -320,6 +282,51 @@ unsafe fn userland_address() -> u32 {
         base_addr.wrapping_sub(0x8)
     }
 }
+
+
+// ============================================================================
+// MEMORY UTILITIES
+// ============================================================================
+
+/// Compare deux C strings
+unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
+    let mut p1 = s1;
+    let mut p2 = s2;
+
+    while unsafe { *p1 != 0 && *p1 == *p2 } { // Comparer jusqu'au null terminator ou différence
+        // Avancer les pointeurs
+        p1 = unsafe { p1.add(1) };
+        p2 = unsafe { p2.add(1) };
+    }
+    unsafe { ((*p1 as i32) - (*p2 as i32)) == 0 } // Différence ASCII, si 0, ce sont les mêmes caractères, donc on est arrivé à la fin des deux chaînes en même temps
+
+}
+
+/// Copie n bytes de src vers dest (zones non chevauchantes)
+/// 
+/// **Comportement INDÉFINI en cas de CHEVAUCHEMENT des zones !** NON SÉCURISÉ .
+#[cfg(target_os = "none")]
+unsafe fn memcpy(dest: *mut u8, src: *const u8, n: usize) {
+    unsafe { ptr::copy_nonoverlapping(src, dest, n) }
+}
+
+/// Copie `n` bytes de `src:*` vers `dest:*` (zones peuvent chevaucher)
+/// 
+/// **Comportement défini même en cas de chevauchement:** La copie se fait par une mémoire tampon.
+#[cfg(target_os = "none")]
+unsafe fn memmove(dest: *mut u8, src: *const u8, n: usize) {
+    unsafe { ptr::copy(src, dest, n) }
+}
+
+/// Remplit n bytes avec la valeur c
+#[cfg(target_os = "none")]
+unsafe fn memset(s: *mut u8, c: u8, n: usize) {
+    for i in 0..n {
+        unsafe { *s.add(i) = c };
+    }
+}
+
+
 
 // ============================================================================
 // STORAGE OPERATIONS  
