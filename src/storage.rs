@@ -92,10 +92,10 @@ pub type Result<T> = core::result::Result<T, StorageError>;
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct SlotInfo {
-    pub header: u32,                          // +0x00: 0xEFEEDBBA
-    pub kernel_header_address: *const u8,     // +0x04: Pointeur vers KernelHeader
-    pub userland_header_address: *const u8,   // +0x08: Pointeur vers UserlandHeader
-    pub footer: u32,                          // +0x0C: 0xEFEEDBBA
+    pub header: u32,                                      // +0x00: 0xEFEEDBBA
+    pub kernel_header_address: &'static KernelHeader,     // +0x04: Pointeur vers KernelHeader
+    pub userland_header_address: &'static UserlandHeader, // +0x08: Pointeur vers UserlandHeader
+    pub footer: u32,                                      // +0x0C: 0xEFEEDBBA
 }
 
 impl SlotInfo {
