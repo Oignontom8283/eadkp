@@ -120,6 +120,59 @@ pub struct UserlandHeader {
 }
 
 
+/// Informations sur le modèle de calculatrice
+#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CalculatorModel {
+    N0110_N0115,
+    N0120,
+}
+
+impl CalculatorModel {
+    /// Adresse de base de la RAM selon le modèle
+    pub fn ram_base(&self) -> *const u8 {
+        match self {
+            Self::N0110_N0115 => RAM_BASE_N0110_OR_N0115 as *const u8,
+            Self::N0120 => RAM_BASE_N0120 as *const u8,
+        }
+    }
+
+    /// Retourne un pointeur vers le SlotInfo de la calculatrice valide
+    pub fn slotinfo_adress(&self) -> Result<*const SlotInfo> {
+
+        // Obtenir l'adresse de base de la RAM selon le modèle
+        let ram = self.ram_base() as *const u32;
+
+        // Lire le SlotInfo depuis la RAM
+        let slot_info = ram as *const SlotInfo;
+
+        // Vérifier que le pointeur n'est pas null
+        let slot_info_ref = unsafe { slot_info.as_ref().ok_or(StorageError::InvalidStorage) }?;
+        
+        // Vérifier la validité du SlotInfo
+        if slot_info_ref.is_valid() {
+            Ok(slot_info) // Retourner le SlotInfo valide
+        } else {
+            Err(StorageError::InvalidStorage) // Si invalide, retourner une erreur
+        }
+    }
+
+    /// Modele détecté à partir des slots magic
+    pub fn detect() -> Self {
+        unsafe {
+            // Compter les slots valides pour chaque modèle
+            let count_n0110_n0115 = SLOTS_N0110_OR_N0115.iter().filter(|&&slot| ptr::read_unaligned(slot) == EXTERNAL_APPS_MAGIC).count();
+            let count_n0120 = SLOTS_N0120.iter().filter(|&&slot| ptr::read_unaligned(slot) == EXTERNAL_APPS_MAGIC).count();
+            
+            // Déterminer le modèle avec le plus de slots valides
+            if count_n0110_n0115 > count_n0120 {
+                Self::N0110_N0115
+            } else {
+                Self::N0120
+            }
+        }
+    }
+}
 
 /// Compare deux C strings
 unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
