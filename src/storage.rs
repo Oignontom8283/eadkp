@@ -99,6 +99,27 @@ impl SlotInfo {
     }
 }
 
+/// UserlandHeader - 48 bytes au début du userland
+/// 
+/// Contient les métadonnées essentielles du userland,
+/// notamment l'emplacement du système de fichiers.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct UserlandHeader {
+    pub header: u32,                          // +0x00: 0xDEC0EDFE
+    pub expected_epsilon_version: [u8; 8],    // +0x04: Version attendue
+    pub storage_address_ram: *const u8,       // +0x0C: Adresse du FileSystem en RAM
+    pub storage_size_ram: u32,                // +0x10: Taille du storage (42 Ko)
+    pub external_apps_flash_start: *const u8, // +0x14: Début apps externes
+    pub external_apps_flash_end: *const u8,   // +0x18: Fin apps externes
+    pub external_apps_ram_start: *const u8,   // +0x1C: RAM apps externes
+    pub external_apps_ram_end: *const u8,     // +0x20: Fin RAM apps
+    pub device_name_flash_start: *const u8,   // +0x24: Nom device
+    pub device_name_flash_end: *const u8,     // +0x28: Fin nom device
+    pub footer: u32,                          // +0x2C: 0xDEC0EDFE
+}
+
+
 
 /// Compare deux C strings
 unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
