@@ -57,6 +57,12 @@ const SLOTS_N0120: [*const u32; 2] = [0x90020000 as *const u32, 0x90420000 as *c
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StorageError {
+    /// SlotInfo invalide
+    InvalidSlotInfo,
+    /// UserlandHeader invalide
+    InvalidUserlandHeader,
+    /// FileSystem invalide
+    InvalidFileSystem,
     /// Stockage invalide ou corrompu (magic number incorrect)
     InvalidStorage,
     /// Fichier non trouvé dans le stockage
@@ -71,15 +77,6 @@ pub enum StorageError {
     StorageFull,
     /// Dépassement de la taille du stockage
     StorageOverflow { available: usize, needed: usize },
-}
-
-pub enum SoftwareError {
-    /// SlotInfo invalide
-    InvalidSlotInfo,
-    /// UserlandHeader invalide
-    InvalidUserlandHeader,
-    /// FileSystem invalide
-    InvalidFileSystem,
 }
 
 pub type Result<T> = core::result::Result<T, StorageError>;
@@ -154,7 +151,12 @@ impl KernelHeader {
 }
 
 
-/// Informations sur le modèle de calculatrice
+/// Modèle de la calculatrice
+/// 
+/// Utilisé pour déterminer les adresses de dèbut de la RAM et l'emplacement du slotinfo.
+/// 
+/// - `N0110` ou `N0115` partagent la même adresse de RAM de base et les mêmes emplacements de slots.
+/// - `N0120` utilise une adresse de RAM différente et des emplacements de slots distincts.
 #[allow(non_camel_case_types)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CalculatorModel {
@@ -163,7 +165,7 @@ pub enum CalculatorModel {
 }
 
 impl CalculatorModel {
-    /// Adresse de base de la RAM selon le modèle
+    /// Adresse de début de la RAM selon le modèle
     pub fn ram_base(&self) -> *const u8 {
         match self {
             Self::N0110_N0115 => RAM_BASE_N0110_OR_N0115 as *const u8,
@@ -171,23 +173,24 @@ impl CalculatorModel {
         }
     }
     
-    /// Retourne un pointeur vers le SlotInfo de la calculatrice valide
-    pub fn slotinfo_adress(&self) -> Result<*const SlotInfo> {
+    /// Retourne un pointeur vers le SlotInfo de la calculatrice
+    pub fn slotinfo_address(&self) -> Result<&'static SlotInfo> {
 
-        // Obtenir l'adresse de base de la RAM selon le modèle
+        // Obtenir l'adresse de début de la RAM
         let ram = self.ram_base() as *const u32;
         
         // Lire le SlotInfo depuis la RAM
+        // Le SlotInfo est situé au début de la RAM, a la première adresse
         let slot_info = ram as *const SlotInfo;
         
         // Vérifier que le pointeur n'est pas null
-        let slot_info_ref = unsafe { slot_info.as_ref().ok_or(StorageError::InvalidStorage) }?;
+        let slot_info_ref = unsafe { slot_info.as_ref().ok_or(StorageError::InvalidSlotInfo) }?;
         
         // Vérifier la validité du SlotInfo
         if slot_info_ref.is_valid() {
-            Ok(slot_info) // Retourner le SlotInfo valide
+            Ok(slot_info_ref) // Retourner le SlotInfo valide
         } else {
-            Err(StorageError::InvalidStorage) // Si invalide, retourner une erreur
+            Err(StorageError::InvalidSlotInfo) // Si invalide, retourner une erreur
         }
     }
 
