@@ -83,6 +83,23 @@ pub enum SoftWareError {
 
 pub type Result<T> = core::result::Result<T, StorageError>;
 
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct SlotInfo {
+    pub header: u32,                          // +0x00: 0xEFEEDBBA
+    pub kernel_header_address: *const u8,     // +0x04: Pointeur vers KernelHeader
+    pub userland_header_address: *const u8,   // +0x08: Pointeur vers UserlandHeader
+    pub footer: u32,                          // +0x0C: 0xEFEEDBBA
+}
+
+impl SlotInfo {
+    /// Vérifie que le SlotInfo est valide
+    pub fn is_valid(&self) -> bool {
+        self.header == SLOTINFO_MAGIC && self.footer == SLOTINFO_MAGIC
+    }
+}
+
+
 /// Compare deux C strings
 unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
     let mut p1 = s1;
