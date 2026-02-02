@@ -99,7 +99,7 @@ pub type Result<T> = core::result::Result<T, StorageError>;
 /// 
 /// Note: 
 /// - Le SlotInfo est protégé par des "magic numbers" au dèbut et à la fin (0xEFEEDBBA) pour vérifier son intégrité et ça présence.
-/// - Les pointeurs sont de type static car il s’agit de données primaires de l'os en lui-même, donc impérativement présentes, sinon pas d'os, donc pas d'application non plus.
+/// - Les pointeurs sont de type static car il s’agit de données primaires de l'os lui-même, donc impérativement présentes, sinon pas d'os, donc pas d'application non plus.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct SlotInfo {
