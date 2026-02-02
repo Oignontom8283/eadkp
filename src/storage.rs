@@ -86,17 +86,31 @@ pub type Result<T> = core::result::Result<T, StorageError>;
 // HARDWARE METADATA
 // ============================================================================
 
+/// SlotInfo - 16 bytes au début de la RAM
+/// 
+/// Le SlotInfo est une structure de métadonnées essentielle, située au début de la RAM (SRAM) de la calculatrice
+/// (L'adresse du dèbut de la RAM varie en fonction du modèle, voir `CalculatorModel`).
+/// Il contient des pointeurs vers les headers du kernel et du userland, permettant ainsi de connaître leur emplacement en mémoire.
+/// Ces informations sont cruciales, car elles permettent d'accéder notamment au UserlandHeader, qui lui-même contient par exemple l'adresse et la taille du système de fichiers.
+/// 
+/// Contient les pointeurs vers les headers du kernel et du userland :
+/// - kernel_header_address : Pointeur static vers le KernelHeader.
+/// - userland_header_address : Pointeur static vers le UserlandHeader
+/// 
+/// Note: 
+/// - Le SlotInfo est protégé par des "magic numbers" au début et à la fin (0xEFEEDBBA) pour vérifier son intégrité et ça présence.
+/// - Les pointeurs sont de type static car ils s'agissent de données primaires de l'os en lui-même, donc impérativement présentes, sinon pas d'os, donc pas d'application non plus.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct SlotInfo {
-    pub header: u32,                                      // +0x00: 0xEFEEDBBA
-    pub kernel_header_address: &'static KernelHeader,     // +0x04: Pointeur vers KernelHeader
-    pub userland_header_address: &'static UserlandHeader, // +0x08: Pointeur vers UserlandHeader
-    pub footer: u32,                                      // +0x0C: 0xEFEEDBBA
-}
+    pub header: u32,                                      // +0x00: 0xEFEEDBBA en little-endian
+    pub kernel_header_address: &'static KernelHeader,     // +0x04: Pointeur static vers KernelHeader
+    pub userland_header_address: &'static UserlandHeader, // +0x08: Pointeur static vers UserlandHeader
+    pub footer: u32,                                      // +0x0C: 0xEFEEDBBA en little-endian
+}                                                         // = Total: 16 bytes
 
 impl SlotInfo {
-    /// Vérifie que le SlotInfo est valide
+    /// Vérifie que le SlotInfo est valide en vérifiant les magic numbers
     pub fn is_valid(&self) -> bool {
         self.header == SLOTINFO_MAGIC && self.footer == SLOTINFO_MAGIC
     }
