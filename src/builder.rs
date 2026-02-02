@@ -75,14 +75,13 @@ fn convert_image(file_path: &std::path::Path) {
 }
 
 pub fn setup() {
-    setup_with_options(None, None, None);
+    setup_with_options(None, None);
 }
 
 /// Configure et exécute le processus de build complet avec des options personnalisées
 pub fn setup_with_options(
     asset_dir: Option<&str>,
     c_dirs: Option<Vec<&str>>,
-    keyboard_mapping_file: Option<&str>
 ) {
 
 
@@ -93,10 +92,6 @@ pub fn setup_with_options(
         .into_iter()
         .map(|d| std::path::Path::new(&manifest_dir).join(d).to_string_lossy().to_string())
         .collect();
-    let keyboard_mapping_file = std::path::Path::new(&manifest_dir)
-        .join(keyboard_mapping_file.unwrap_or(KEYBOARD_MAPPING_FILE))
-        .to_string_lossy()
-        .to_string();
 
     // Créer le dossier assets/ s'il n'existe pas
 
@@ -297,52 +292,52 @@ pub fn setup_with_options(
     build.compile("native_libs");
     
 
-    // Remapper les touches du simulateur NumWorks en modifiant keyboard.cpp
-    if std::env::var("CARGO_CFG_TARGET_OS").unwrap() != "none" {
-        if let Some(keyboard_file) = Some(&keyboard_mapping_file) {
-        cargo_changed!(keyboard_file);
+//     // Remapper les touches du simulateur NumWorks en modifiant keyboard.cpp
+//     if std::env::var("CARGO_CFG_TARGET_OS").unwrap() != "none" {
+//         if let Some(keyboard_file) = Some(&keyboard_mapping_file) {
+//         cargo_changed!(keyboard_file);
         
-        // Nouveau mapping de touches personnalisé pour le simulateur
-        let remapped = "constexpr static KeySDLKeyPair sKeyPairs[] = {\
-  KeySDLKeyPair(Key::OK,        SDL_SCANCODE_RETURN),\
-  KeySDLKeyPair(Key::Back,      SDL_SCANCODE_BACKSPACE),\
-  KeySDLKeyPair(Key::EXE,       SDL_SCANCODE_ESCAPE),\
-\
-  KeySDLKeyPair(Key::Var,       SDL_SCANCODE_I),\
-\
-  KeySDLKeyPair(Key::Toolbox,   SDL_SCANCODE_W),\
-  KeySDLKeyPair(Key::Imaginary, SDL_SCANCODE_A),\
-  KeySDLKeyPair(Key::Power,     SDL_SCANCODE_D),\
-  KeySDLKeyPair(Key::Comma,     SDL_SCANCODE_S),\
-  KeySDLKeyPair(Key::Shift,     SDL_SCANCODE_SPACE),\
-  KeySDLKeyPair(Key::Exp,       SDL_SCANCODE_LSHIFT),\
-\
-  KeySDLKeyPair(Key::Down,      SDL_SCANCODE_DOWN),\
-  KeySDLKeyPair(Key::Up,        SDL_SCANCODE_UP),\
-  KeySDLKeyPair(Key::Left,      SDL_SCANCODE_LEFT),\
-  KeySDLKeyPair(Key::Right,     SDL_SCANCODE_RIGHT),\
-};";
+//         // Nouveau mapping de touches personnalisé pour le simulateur
+//         let remapped = "constexpr static KeySDLKeyPair sKeyPairs[] = {\
+//   KeySDLKeyPair(Key::OK,        SDL_SCANCODE_RETURN),\
+//   KeySDLKeyPair(Key::Back,      SDL_SCANCODE_BACKSPACE),\
+//   KeySDLKeyPair(Key::EXE,       SDL_SCANCODE_ESCAPE),\
+// \
+//   KeySDLKeyPair(Key::Var,       SDL_SCANCODE_I),\
+// \
+//   KeySDLKeyPair(Key::Toolbox,   SDL_SCANCODE_W),\
+//   KeySDLKeyPair(Key::Imaginary, SDL_SCANCODE_A),\
+//   KeySDLKeyPair(Key::Power,     SDL_SCANCODE_D),\
+//   KeySDLKeyPair(Key::Comma,     SDL_SCANCODE_S),\
+//   KeySDLKeyPair(Key::Shift,     SDL_SCANCODE_SPACE),\
+//   KeySDLKeyPair(Key::Exp,       SDL_SCANCODE_LSHIFT),\
+// \
+//   KeySDLKeyPair(Key::Down,      SDL_SCANCODE_DOWN),\
+//   KeySDLKeyPair(Key::Up,        SDL_SCANCODE_UP),\
+//   KeySDLKeyPair(Key::Left,      SDL_SCANCODE_LEFT),\
+//   KeySDLKeyPair(Key::Right,     SDL_SCANCODE_RIGHT),\
+// };";
 
-        // Lire le fichier de configuration dukeyboard_filer
-        let file_content = fs::read_to_string(keyboard_file)
-        .expect("Cannot open keyboard.cpp file from emulator. Please check if the simulator is clonned properly.");
+//         // Lire le fichier de configuration dukeyboard_filer
+//         let file_content = fs::read_to_string(keyboard_file)
+//         .expect("Cannot open keyboard.cpp file from emulator. Please check if the simulator is clonned properly.");
 
-        // Vérifier si le mapping n'est pas déjà appliqué pour éviter les réécritures inutiles
-        if !file_content.contains(remapped) {
-            // Utiliser une regex pour trouver et remplacer l'ancien tableau de mapping
-            // Pattern: "constexpr static KeySDLKeyPair sKeyPairs[] = { ... };"
-            let re = Regex::new(r"constexpr static KeySDLKeyPair sKeyPairs\[] ?= ?\{[\S\s]*?};")
-                .unwrap();
-            let _result = re.replace(&file_content, remapped);
+//         // Vérifier si le mapping n'est pas déjà appliqué pour éviter les réécritures inutiles
+//         if !file_content.contains(remapped) {
+//             // Utiliser une regex pour trouver et remplacer l'ancien tableau de mapping
+//             // Pattern: "constexpr static KeySDLKeyPair sKeyPairs[] = { ... };"
+//             let re = Regex::new(r"constexpr static KeySDLKeyPair sKeyPairs\[] ?= ?\{[\S\s]*?};")
+//                 .unwrap();
+//             let _result = re.replace(&file_content, remapped);
 
-            // Écrire le nouveau contenu avec le mapping personnalisé
-            // fs::write(
-            //     KEYBOARD_MAPPING_FILE,
-            //     result.as_bytes(),
-            // )
-            // .unwrap();
-            // Désactivation du mapping custom de touches.
-        }
-        }
-    }
+//             // Écrire le nouveau contenu avec le mapping personnalisé
+//             // fs::write(
+//             //     KEYBOARD_MAPPING_FILE,
+//             //     result.as_bytes(),
+//             // )
+//             // .unwrap();
+//             // Désactivation du mapping custom de touches.
+//         }
+//         }
+//     }
 }
