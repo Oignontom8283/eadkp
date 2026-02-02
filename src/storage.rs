@@ -44,6 +44,15 @@ use heapless;
 // STORAGE MISC UTILITIES
 // ============================================================================
 
+const SLOTINFO_MAGIC: u32 = 0xEFEEDBBA;
+const USERLAND_HEADER_MAGIC: u32 = 0xDEC0EDFE;
+const EXTERNAL_APPS_MAGIC: u32 = 0xDEC0EDFE;
+
+const RAM_BASE_N0110_OR_N0115: u32 = 0x20000000;
+const RAM_BASE_N0120: u32 = 0x24000000;
+
+const SLOTS_N0110_OR_N0115: [*const u32; 2] = [0x90010000 as *const u32, 0x90410000 as *const u32];
+const SLOTS_N0120: [*const u32; 2] = [0x90020000 as *const u32, 0x90420000 as *const u32];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StorageError {
