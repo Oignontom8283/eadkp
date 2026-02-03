@@ -248,7 +248,7 @@ fn address() -> *const u8 {
 /// Retourne la taille totale du stockage
 #[cfg(target_os = "none")]
 fn size() -> u32 {
-    CalculatorModel::detect().slotinfo_address().unwrap().userland_header_address.storage_size_ram
+    CalculatorModel::detect().slotinfo_address().userland_header_address.storage_size_ram
 }
 
 /// Trouve la prochaine position libre dans le stockage
