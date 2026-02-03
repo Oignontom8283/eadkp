@@ -387,6 +387,11 @@ unsafe fn memset(s: *mut u8, c: u8, n: usize) {
 
 
 /// Trouve la prochaine position libre dans le stockage
+/// 
+/// Retourne un pointeur vers le début de la fin de l'espace utilisé (le prochain enregistrement vide).
+/// Si le stockage est plein, retourne l'adresse de fin du stockage utilisable
+/// 
+/// Faire : `usable_end_addr - next_free()` pour obtenir l'espace libre restant, si 0, stockage plein.
 #[cfg(target_os = "none")]
 fn next_free() -> *const u8 {
     // unsafe {
