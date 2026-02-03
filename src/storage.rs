@@ -212,7 +212,7 @@ impl CalculatorModel {
         return slot_info_ref;
     }
 
-    /// Modele détecté à partir des slots magic
+    /// Modèle détecté à partir des slots magic
     pub fn detect() -> Self {
         unsafe {
             // Compter les slots valides pour chaque modèle
