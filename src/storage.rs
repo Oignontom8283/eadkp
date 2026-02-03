@@ -267,7 +267,10 @@ pub struct Filesystem {
     pub usable_size: u32,
     /// Adresse de début de la zone utilisable (juste après le header)
     pub usable_start_addr: *const u8,
-    /// Adresse de fin de la zone utilisable (même adresse que le footer / juste après la zone utilisable)
+    /// Adresse de fin de la zone utilisable (même adresse que le footer / juste après la zone utilisable, `range semi-ouvert [start, end)`)
+    /// 
+    /// Suit la convention des ranges Rust : [usable_start_addr, usable_end_addr)
+    /// où usable_end_addr est **exclusif** (premier byte non utilisable)
     pub usable_end_addr: *const u8,
 }
 
@@ -422,6 +425,7 @@ fn next_free() -> *const u8 {
     storage.usable_end_addr
 }
 
+// TODO: can_store() pour vérifier si un fichier peut être stocké avant d'essayer de l'écrire
 
 /// Écrit un fichier dans le stockage
 /// 
