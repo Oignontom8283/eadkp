@@ -229,8 +229,12 @@ impl CalculatorModel {
     }
 }
 
-/// Filesystem metadata and addresses
+/// Filesystem addresses and metadata
 /// 
+/// Repertorie les adresses et tailles du système de fichiers embarqué dans la RAM.
+/// Calcule les zones utilisables en fonction des headers et footers magiques.
+/// 
+/// ## Layout du Filesystem :
 /// ```
 /// Adresse de base : storage_address_ram
 /// Taille totale   : storage_size_ram (43016 bytes)
@@ -260,6 +264,7 @@ pub struct Filesystem {
 }
 
 impl Filesystem {
+    /// Initialise le Filesystem en lisant les adresses depuis le UserlandHeader et en calculant les zones utilisables.
     pub fn new() -> Self {
         let user_land = CalculatorModel::detect().slotinfo_address().userland_header_address;
 
@@ -277,6 +282,7 @@ impl Filesystem {
         }
     }
 
+    /// Vérifie que le Filesystem est valide en vérifiant les magic numbers au début et à la fin.
     pub fn is_valid(&self) -> bool {
         unsafe {
             ptr::read_unaligned(self.header_addr) == FILESYSTEM_MAGIC &&
