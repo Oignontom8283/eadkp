@@ -110,7 +110,9 @@ pub struct SlotInfo {
 }                                                         // = Total: 16 bytes
 
 impl SlotInfo {
-    /// Vérifie que le SlotInfo est valide en vérifiant les magic numbers
+    /// Vérifie que le SlotInfo est valide en vérifiant les magic numbers.
+    /// 
+    /// Peut probable de retourner false en pratique, car si le SlotInfo est corrompu ou absent, l'os ne devrait pas être encore en cours d'exécution.
     pub fn is_valid(&self) -> bool {
         self.header == SLOTINFO_MAGIC && self.footer == SLOTINFO_MAGIC
     }
