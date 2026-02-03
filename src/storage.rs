@@ -229,6 +229,34 @@ impl CalculatorModel {
 }
 
 
+pub struct Filesystem {
+    pub storage_size: u32,
+    
+    pub storage_start_addr: *const u8,
+    pub storage_end_addr: *const u8,
+    
+    pub usable_size: u32,
+    pub usable_start_addr: *const u8,
+    pub usable_end_addr: *const u8,
+}
+
+impl Filesystem {
+    pub fn new() -> Self {
+        let user_land = CalculatorModel::detect().slotinfo_address().userland_header_address;
+
+        Self {
+            storage_size: user_land.storage_size_ram,
+
+            storage_start_addr: user_land.storage_address_ram,
+            storage_end_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize - 4) },
+
+            usable_size: user_land.storage_size_ram - 8,
+            usable_start_addr: unsafe { user_land.storage_address_ram.add(4)},
+            usable_end_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize - 8)}
+        }
+    }
+}
+
 // ============================================================================
 // HARDWARE INTERFACE / STORAGE METADATA
 // ============================================================================
