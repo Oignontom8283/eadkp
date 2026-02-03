@@ -57,6 +57,8 @@ const SLOTS_N0120: [*const u32; 2] = [0x90020000 as *const u32, 0x90420000 as *c
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StorageError {
+    /// Simulateur non supporté
+    SimulatorNotSupported,
     /// SlotInfo invalide
     InvalidSlotInfo,
     /// UserlandHeader invalide
