@@ -426,6 +426,7 @@ fn next_free() -> *const u8 {
 }
 
 // TODO: can_store() pour vérifier si un fichier peut être stocké avant d'essayer de l'écrire
+// TODO: available_space() pour obtenir l'espace libre restant
 
 /// Écrit un fichier dans le stockage
 /// 
