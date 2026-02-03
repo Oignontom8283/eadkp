@@ -242,8 +242,8 @@ fn model() -> CalculatorModel {
 
 /// Retourne l'adresse de base du stockage
 #[cfg(target_os = "none")]
-unsafe fn address() -> u32 {
-    unsafe { ptr::read_unaligned((userland_address() + 0xC) as *const u32) }
+fn address() -> *const u8 {
+    CalculatorModel::detect().ram_base()
 }
 
 /// Retourne la taille totale du stockage
