@@ -248,8 +248,8 @@ fn address() -> *const u8 {
 
 /// Retourne la taille totale du stockage
 #[cfg(target_os = "none")]
-unsafe fn size() -> u32 {
-    unsafe { ptr::read_unaligned((userland_address() + 0x10) as *const u32) }
+fn size() -> u32 {
+    CalculatorModel::detect().slotinfo_address().unwrap().userland_header_address.storage_size_ram
 }
 
 /// Trouve la prochaine position libre dans le stockage
