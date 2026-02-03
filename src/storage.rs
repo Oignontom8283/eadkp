@@ -104,7 +104,7 @@ pub type Result<T> = core::result::Result<T, StorageError>;
 /// - Le SlotInfo est protégé par des "magic numbers" au dèbut et à la fin (0xEFEEDBBA) pour vérifier son intégrité et ça présence.
 /// - Les pointeurs sont de type static car il s’agit de données primaires de l'os lui-même, donc impérativement présentes, sinon pas d'os, donc pas d'application non plus.
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub struct SlotInfo {
     pub header: u32,                                      // +0x00: 0xEFEEDBBA en little-endian
     pub kernel_header_address: &'static KernelHeader,     // +0x04: Pointeur static vers KernelHeader
@@ -127,7 +127,7 @@ impl SlotInfo {
 /// Contient les métadonnées essentielles du userland,
 /// notamment l'emplacement du système de fichiers.
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub struct UserlandHeader {
     pub header: u32,                          // +0x00: 0xDEC0EDFE
     pub expected_epsilon_version: [u8; 8],    // +0x04: Version attendue
@@ -154,7 +154,7 @@ pub struct UserlandHeader {
 /// - N0120 Slot A       : 0x90000008
 /// - N0120 Slot B       : 0x90400008
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub struct KernelHeader {
     pub header: u32,                      // +0x00: 0xDEC00DF0
     pub epsilon_version: [u8; 8],         // +0x04: Version Epsilon (ex: "23.2.1")
@@ -245,7 +245,7 @@ impl CalculatorModel {
 ///  storage_start_addr  usable_start_addr                     usable_end_addr  storage_end_addr
 ///  header_addr                                               footer_addr
 /// ```
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub struct Filesystem {
     pub storage_size: u32,
     
