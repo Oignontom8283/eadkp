@@ -232,6 +232,12 @@ impl CalculatorModel {
 // HARDWARE INTERFACE / STORAGE METADATA
 // ============================================================================
 
+/// Retourne le modèle de la calculatrice
+#[cfg(target_os = "none")]
+fn model() -> CalculatorModel {
+    CalculatorModel::detect()
+}
+
 /// Retourne l'adresse de base du stockage
 #[cfg(target_os = "none")]
 unsafe fn address() -> u32 {
