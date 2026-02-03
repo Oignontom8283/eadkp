@@ -229,7 +229,23 @@ impl CalculatorModel {
     }
 }
 
-
+/// Filesystem metadata and addresses
+/// 
+/// ```
+/// Adresse de base : storage_address_ram
+/// Taille totale   : storage_size_ram (43016 bytes)
+///
+///  Offset 0            Offset 4                              Offset 43012     Offset 43016  
+///  ↓                   ↓                                     ↓                ↓         
+/// ┌───────────────────┬─────────────────────────────────────┬────────────────┐
+/// │  Magic Header     │     Buffer utilisable (42 Ko)       │  Magic Footer  │
+/// │   (4 bytes)       │           (43008 bytes)             │   (4 bytes)    │
+/// └───────────────────┴─────────────────────────────────────┴────────────────┘
+///  ↑                   ↑                                     ↑                ↑
+///  storage_start_addr  usable_start_addr                     usable_end_addr  storage_end_addr
+///  header_addr                                               footer_addr
+/// ```
+#[derive(Debug, Clone, Copy)]
 pub struct Filesystem {
     pub storage_size: u32,
     
@@ -251,13 +267,13 @@ impl Filesystem {
             storage_size: user_land.storage_size_ram,
 
             storage_start_addr: user_land.storage_address_ram,
-            storage_end_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize - 4) },
+            storage_end_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize) },
             header_addr: user_land.storage_address_ram as *const u32,
             footer_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize - 4) as *const u32 },
 
             usable_size: user_land.storage_size_ram - 8,
             usable_start_addr: unsafe { user_land.storage_address_ram.add(4)},
-            usable_end_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize - 8)}
+            usable_end_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize - 4)}
         }
     }
 
