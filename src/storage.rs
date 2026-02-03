@@ -36,7 +36,7 @@ Special thanks to Yaya Cout for his remarkable engineering work on storage
 manipulation, without which this module would probably never have come to life.
 */
 
-use core::ptr;
+use core::ptr::{self, read_unaligned};
 use heapless;
 
 
@@ -47,6 +47,7 @@ use heapless;
 const SLOTINFO_MAGIC: u32 = 0xEFEEDBBA;
 const USERLAND_HEADER_MAGIC: u32 = 0xDEC0EDFE;
 const KERNEL_HEADER_MAGIC: u32 = 0xDEC00DF0;
+const FILESYSTEM_MAGIC: u32 = 0xBADD0BEEu32.swap_bytes();
 const EXTERNAL_APPS_MAGIC: u32 = 0xDEC0EDFE;
 
 const RAM_BASE_N0110_OR_N0115: u32 = 0x20000000;
@@ -234,6 +235,8 @@ pub struct Filesystem {
     
     pub storage_start_addr: *const u8,
     pub storage_end_addr: *const u8,
+    pub header_addr: *const u32,
+    pub footer_addr: *const u32,
     
     pub usable_size: u32,
     pub usable_start_addr: *const u8,
@@ -249,10 +252,19 @@ impl Filesystem {
 
             storage_start_addr: user_land.storage_address_ram,
             storage_end_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize - 4) },
+            header_addr: user_land.storage_address_ram as *const u32,
+            footer_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize - 4) as *const u32 },
 
             usable_size: user_land.storage_size_ram - 8,
             usable_start_addr: unsafe { user_land.storage_address_ram.add(4)},
             usable_end_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize - 8)}
+        }
+    }
+
+    pub fn is_valid(&self) -> bool {
+        unsafe {
+            ptr::read_unaligned(self.header_addr) == FILESYSTEM_MAGIC &&
+            ptr::read_unaligned(self.footer_addr) == FILESYSTEM_MAGIC
         }
     }
 }
@@ -273,10 +285,19 @@ fn address() -> *const u8 {
     CalculatorModel::detect().ram_base()
 }
 
-/// Retourne la taille totale du stockage
 #[cfg(target_os = "none")]
-fn size() -> u32 {
-    CalculatorModel::detect().slotinfo_address().userland_header_address.storage_size_ram
+fn kernel_header() -> &'static KernelHeader {
+    CalculatorModel::detect().slotinfo_address().kernel_header_address
+}
+
+#[cfg(target_os = "none")]
+fn userland_header() -> &'static UserlandHeader {
+    CalculatorModel::detect().slotinfo_address().userland_header_address
+}
+
+#[cfg(target_os = "none")]
+fn filesystem() -> Filesystem {
+    Filesystem::new()
 }
 
 /// Trouve la prochaine position libre dans le stockage
