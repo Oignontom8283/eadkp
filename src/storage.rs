@@ -281,14 +281,14 @@ fn size() -> u32 {
 
 /// Trouve la prochaine position libre dans le stockage
 #[cfg(target_os = "none")]
-unsafe fn next_free() -> *const u32 {
-    unsafe {
-        let storage_addr = address();
-        let mut offset = (storage_addr as *mut u8).add(4);
-        let end_addr = (storage_addr + size()) as *mut u8;
+fn next_free() -> *const u8 {
+    // unsafe {
+    //     let storage_addr = address();
+    //     let mut offset = (storage_addr as *mut u8).add(4);
+    //     let end_addr = (storage_addr + size()) as *mut u8;
         
-        // Vérifier validité mais ignorer l'erreur (retourne null si invalide)
-        if is_valid(storage_addr as *const u32).is_err() { return ptr::null(); }
+    //     // Vérifier validité mais ignorer l'erreur (retourne null si invalide)
+    //     if is_valid(storage_addr as *const u32).is_err() { return ptr::null(); }
         
     //     // Parcourir jusqu'à trouver un enregistrement vide (size=0)
     //     while offset < end_addr {
@@ -297,8 +297,25 @@ unsafe fn next_free() -> *const u32 {
     //         offset = offset.add(size as usize);
     //     }
         
-        end_addr as *const u32
+    //     end_addr as *const u32
+    // }
+
+    let storage = filesystem();
+    let mut offset = storage.usable_start_addr;
+
+    if !storage.is_valid() {
+        panic!("Invalid filesystem detected at address {:p}", storage.storage_start_addr);
     }
+
+    while offset < storage.usable_end_addr {
+        let size = unsafe { ptr::read_unaligned(offset as *const u16) };
+        if size == 0 {
+            return offset;
+        }
+        offset = unsafe { offset.add(size as usize) };
+    }
+
+    storage.usable_end_addr
 }
 
 /// Vérifie si le stockage est valide (magic number)
