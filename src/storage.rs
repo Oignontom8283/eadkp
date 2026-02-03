@@ -192,7 +192,7 @@ impl CalculatorModel {
     }
     
     /// Retourne un pointeur vers le SlotInfo de la calculatrice
-    pub fn slotinfo_address(&self) -> Result<&'static SlotInfo> {
+    pub fn slotinfo_address(&self) -> &'static SlotInfo {
 
         // Obtenir l'adresse de début de la RAM
         let ram = self.ram_base() as *const u32;
@@ -202,14 +202,13 @@ impl CalculatorModel {
         let slot_info = ram as *const SlotInfo;
         
         // Vérifier que le pointeur n'est pas null
-        let slot_info_ref = unsafe { slot_info.as_ref().ok_or(StorageError::InvalidSlotInfo) }?;
-        
-        // Vérifier la validité du SlotInfo
-        if slot_info_ref.is_valid() {
-            Ok(slot_info_ref) // Retourner le SlotInfo valide
-        } else {
-            Err(StorageError::InvalidSlotInfo) // Si invalide, retourner une erreur
+        let slot_info_ref = unsafe { slot_info.as_ref().expect("SlotInfo pointer is null") };
+
+        if !slot_info_ref.is_valid() {
+            panic!("Invalid SlotInfo detected at address {:p}", slot_info);
         }
+        
+        return slot_info_ref;
     }
 
     /// Modele détecté à partir des slots magic
