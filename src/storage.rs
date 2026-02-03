@@ -290,12 +290,12 @@ unsafe fn next_free() -> *const u32 {
         // Vérifier validité mais ignorer l'erreur (retourne null si invalide)
         if is_valid(storage_addr as *const u32).is_err() { return ptr::null(); }
         
-        // Parcourir jusqu'à trouver un enregistrement vide (size=0)
-        while offset < end_addr {
-            let size = ptr::read_unaligned(offset as *const u16);
-            if size == 0 { return offset as *const u32; }
-            offset = offset.add(size as usize);
-        }
+    //     // Parcourir jusqu'à trouver un enregistrement vide (size=0)
+    //     while offset < end_addr {
+    //         let size = ptr::read_unaligned(offset as *const u16);
+    //         if size == 0 { return offset as *const u32; }
+    //         offset = offset.add(size as usize);
+    //     }
         
         end_addr as *const u32
     }
