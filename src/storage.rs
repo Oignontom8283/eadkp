@@ -295,22 +295,25 @@ fn model() -> CalculatorModel {
     CalculatorModel::detect()
 }
 
-/// Retourne l'adresse de base du stockage
+/// Retourne l'adresse de début de la RAM
 #[cfg(target_os = "none")]
 fn address() -> *const u8 {
     CalculatorModel::detect().ram_base()
 }
 
+/// Retourne l'adresse du Kernel Header
 #[cfg(target_os = "none")]
 fn kernel_header() -> &'static KernelHeader {
     CalculatorModel::detect().slotinfo_address().kernel_header_address
 }
 
+/// Retourne l'adresse du Userland Header
 #[cfg(target_os = "none")]
 fn userland_header() -> &'static UserlandHeader {
     CalculatorModel::detect().slotinfo_address().userland_header_address
 }
 
+/// Retourne l'utilitaire d'adresse du filesystem
 #[cfg(target_os = "none")]
 fn filesystem() -> Filesystem {
     Filesystem::new()
