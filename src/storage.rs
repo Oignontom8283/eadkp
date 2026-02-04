@@ -36,7 +36,7 @@ Special thanks to Yaya Cout for his remarkable engineering work on storage
 manipulation, without which this module would probably never have come to life.
 */
 
-use core::ptr::{self, read_unaligned};
+use core::ptr;
 use heapless;
 
 
@@ -357,9 +357,22 @@ unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
 
 /// Copie n bytes de src vers dest (zones non chevauchantes)
 /// 
-/// **Comportement INDÉFINI en cas de CHEVAUCHEMENT des zones !** NON SÉCURISÉ .
+/// **Panic en cas de chevauchement des zones mémoire** pour éviter les comportements indéfinis/corrompuptions.
 #[cfg(target_os = "none")]
 unsafe fn memcpy(dest: *mut u8, src: *const u8, n: usize) {
+
+    let src_start = src as usize;
+    let src_end = src_start + n;
+    let dest_start = dest as usize;
+    let dest_end = dest_start + n;
+
+    // Vérifier que les zones ne chevauchent pas
+    if dest_start < src_end && src_start < dest_end {
+        // Zones chevauchantes détectées
+        panic!("memcpy called with overlapping regions: src {:p} - {:p}, dest {:p} - {:p}", src, src.add(n), dest, dest.add(n));
+    }
+    
+    // Effectuer la copie
     unsafe { ptr::copy_nonoverlapping(src, dest, n) }
 }
 
