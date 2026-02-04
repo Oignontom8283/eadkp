@@ -373,7 +373,7 @@ unsafe fn memcpy(dest: *mut u8, src: *const u8, n: usize) {
     }
     
     // Effectuer la copie
-    unsafe { ptr::copy_nonoverlapping(src, dest, n) }
+    ptr::copy_nonoverlapping(src, dest, n);
 }
 
 /// Copie `n` bytes de `src:*` vers `dest:*` (zones peuvent chevaucher)
