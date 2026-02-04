@@ -362,9 +362,9 @@ unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
 unsafe fn memcpy(dest: *mut u8, src: *const u8, n: usize) {
 
     let src_start = src as usize;
-    let src_end = src_start + n;
+    let src_end = src_start.checked_add(n).expect("memcpy src pointer overflow");
     let dest_start = dest as usize;
-    let dest_end = dest_start + n;
+    let dest_end = dest_start.checked_add(n).expect("memcpy dest pointer overflow");
 
     // Vérifier que les zones ne chevauchent pas
     if dest_start < src_end && src_start < dest_end {
