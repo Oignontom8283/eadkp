@@ -366,6 +366,10 @@ unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
 #[cfg(target_os = "none")]
 unsafe fn memcpy(dest: *mut u8, src: *const u8, n: usize) -> Result<()> {
 
+    if n == 0 {
+        return Ok(()); // Rien à copier, pas de risque de chevauchement
+    }
+
     let src_start = src as usize;
     let src_end = src_start.checked_add(n).ok_or(StorageError::PointerOverflow)?;
     let dest_start = dest as usize;
@@ -374,7 +378,12 @@ unsafe fn memcpy(dest: *mut u8, src: *const u8, n: usize) -> Result<()> {
     // Vérifier que les zones ne chevauchent pas
     if dest_start < src_end && src_start < dest_end {
         // Zones chevauchantes détectées
-        return Err(StorageError::OverlappingRegions { src_start: src, src_end: src.add(n), dest_start: dest, dest_end: dest.add(n) });
+        return Err(StorageError::OverlappingRegions {
+            src_start: src,
+            src_end: src.add(n),
+            dest_start: dest,
+            dest_end: dest.add(n)
+        });
     }
     
     // Effectuer la copie
