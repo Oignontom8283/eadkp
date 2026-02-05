@@ -473,10 +473,15 @@ pub fn available_space() -> usize {
     usable_end - free_addr
 }
 
-/// Vérifie si un fichier de la taille donnée peut être stocké dans l'espace libre actuel
+/// Vérifie que :
+/// - Qu'il y a assez d'espace disponible pour stocker le fichier
+/// - Que la taille du nom du fichier ne dépasse pas 255 bytes (limitation imposée par Epsilon)
+/// - Que la taille totale du fichier (header + nom + contenu) ne dépasse pas la taille maximum de `2^16 - 1` (=65535 bytes)
 /// 
-/// Calcule la taille totale nécessaire pour stocker le fichier (header + nom + contenu) et compare avec l'espace disponible.
-/// Retourne true si le fichier peut être stocké, false sinon
+/// Retourne `true` si le fichier peut être stocké, `false` sinon.
+/// 
+/// La taille maximum du fichier est limité par la taille du header qui est sur 2 octects (u16),
+/// et le nom du fichier est limité à 255 bytes pour des raisons de compatibilité avec Epsilon.
 #[cfg(target_os = "none")]
 pub fn can_store(content_size: usize, filename_size: usize) -> bool {
     // Calculer la taille totale nécessaire pour stocker le fichier (header + nom + contenu)
