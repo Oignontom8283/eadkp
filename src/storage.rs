@@ -472,6 +472,19 @@ pub fn available_space() -> usize {
     usable_end - free_addr
 }
 
+/// Vérifie si un fichier de la taille donnée peut être stocké dans l'espace libre actuel
+/// 
+/// Calcule la taille totale nécessaire pour stocker le fichier (header + nom + contenu) et compare avec l'espace disponible.
+/// Retourne true si le fichier peut être stocké, false sinon
+#[cfg(target_os = "none")]
+pub fn can_store(content_size: usize, filename_size: usize) -> bool {
+    // Calculer la taille totale nécessaire pour stocker le fichier (header + nom + contenu)
+    let total_size = 2 + filename_size + content_size; // 2 bytes pour la taille du header
+
+    // Vérifier si l'espace disponible est suffisant
+    available_space() >= total_size
+}
+
 // TODO: can_store() pour vérifier si un fichier peut être stocké avant d'essayer de l'écrire
 // TODO: available_space() pour obtenir l'espace libre restant
 
