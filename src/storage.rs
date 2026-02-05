@@ -458,6 +458,20 @@ fn next_free() -> *const u8 {
     storage.usable_end_addr
 }
 
+/// Calcule l'espace libre restant dans le stockage
+/// 
+/// Retourne la différence entre l'adresse de fin du stockage utilisable et l'adresse de la position libre actuelle.
+/// Si 0, le stockage est plein.
+#[cfg(target_os = "none")]
+pub fn available_space() -> usize {
+
+    let free_addr = next_free() as usize; // Adresse de la prochaine position libre
+    let usable_end = filesystem().usable_end_addr as usize; // Adresse de fin du stockage utilisable (adresse du footer)
+
+    // Retourner l'espace libre restant, en soustrayant l'adresse de la prochaine position libre de l'adresse de fin du stockage utilisable
+    usable_end - free_addr
+}
+
 // TODO: can_store() pour vérifier si un fichier peut être stocké avant d'essayer de l'écrire
 // TODO: available_space() pour obtenir l'espace libre restant
 
