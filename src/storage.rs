@@ -75,7 +75,7 @@ pub enum StorageError {
     /// Pas assez d'espace disponible pour l'écriture
     InsufficientSpace,
     /// Nom de fichier invalide ou trop long (max 256 bytes)
-    InvalidInput,
+    StorageInvalidName,
     /// Magic number invalide à l'adresse de stockage
     InvalidMagicNumber { expected: u32, found: u32 },
     /// Stockage plein, position libre null
@@ -512,7 +512,8 @@ pub fn can_store(content_size: usize, filename_size: usize) -> bool {
 pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<()> {
 
     // Convertir le nom du fichier en C string (UTF-8 avec null terminator)
-    let filename_cstring = CString::new(filename).unwrap();
+    let filename_cstring = CString::new(filename)
+        .map_err(|_| StorageError::StorageInvalidName)?; // Erreur si le nom contient un null byte ou est trop long
     
     let content_ptr = content.as_ptr(); // Pointeur vers le contenu à écrire
     let content_len = content.len();
@@ -520,7 +521,7 @@ pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<()> {
     let free_pos = next_free(); // Trouver la position libre dans le stockage
     let free_space = available_space();
 
-    // Vérifier que le stockage est valide et qu'on a assez d'espace pour stocker le fichier, avec info détaillée sur l'espace disponible et nécessaire
+    // Vérifier que le fichier peut être stocker (taille max du nom, taille max, espace disponible)
     if !can_store(content_len, filename_cstring.as_bytes_with_nul().len()) {
         return Err(StorageError::StorageOverflow { 
             available: free_space,
@@ -744,7 +745,7 @@ pub unsafe fn file_read_string(filename: &str) -> Result<&'static str> {
 
     // Vérifier la présence du null terminator à la fin et que ce ne soit pas vide.
     if content_slice.is_empty() || content_slice.last() != Some(&0) {
-        return Err(StorageError::InvalidInput);
+        return Err(StorageError::StorageInvalidName);
     }
 
     // Convertir la slice en C string
