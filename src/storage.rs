@@ -482,6 +482,17 @@ pub fn can_store(content_size: usize, filename_size: usize) -> bool {
     // Calculer la taille totale nécessaire pour stocker le fichier (header + nom + contenu)
     let total_size = 2 + filename_size + content_size; // 2 bytes pour la taille du header
 
+    // Vérifier que la taille du nom du fichier ne dépasse pas 255, limitation imposée par Epsilon.
+    // Par soucis de compatibilité avec Epsilon, on limite a 255 bytes pour le nom du fichier.
+    if filename_size > u8::MAX as usize {
+        return false;
+    }
+
+    // Vérifier que la taille totale ne dépasse pas la capacité maximale du header (2 bytes, soit 65535)
+    if total_size > u16::MAX as usize {
+        return false; // La taille totale dépasse la capacité maximale du header (2 bytes), donc impossible à stocker;
+    }
+
     // Vérifier si l'espace disponible est suffisant
     available_space() >= total_size
 }
