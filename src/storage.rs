@@ -374,7 +374,6 @@ unsafe fn memcpy(dest: *mut u8, src: *const u8, n: usize) -> Result<()> {
     // Vérifier que les zones ne chevauchent pas
     if dest_start < src_end && src_start < dest_end {
         // Zones chevauchantes détectées
-
         return Err(StorageError::OverlappingRegions { src_start: src, src_end: src.add(n), dest_start: dest, dest_end: dest.add(n) });
     }
     
