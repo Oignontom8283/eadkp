@@ -38,6 +38,7 @@ manipulation, without which this module would probably never have come to life.
 
 use core::ptr;
 use heapless;
+use ::alloc::*;
 
 
 // ============================================================================
@@ -80,6 +81,10 @@ pub enum StorageError {
     StorageFull,
     /// Dépassement de la taille du stockage
     StorageOverflow { available: usize, needed: usize },
+    /// Zones de mémoire ce chevauchantes
+    OverlappingRegions { src_start: *const u8, src_end: *const u8, dest_start: *const u8, dest_end: *const u8 },
+    /// Overflow lors du calcul de pointeur
+    PointerOverflow,
 }
 
 pub type Result<T> = core::result::Result<T, StorageError>;
@@ -357,23 +362,25 @@ unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
 
 /// Copie n bytes de src vers dest (zones non chevauchantes)
 /// 
-/// **Panic en cas de chevauchement des zones mémoire** pour éviter les comportements indéfinis/corrompuptions.
+/// **Erreur en cas de chevauchement des zones mémoire** pour éviter les comportements indéfinis/corrompuptions.
 #[cfg(target_os = "none")]
-unsafe fn memcpy(dest: *mut u8, src: *const u8, n: usize) {
+unsafe fn memcpy(dest: *mut u8, src: *const u8, n: usize) -> Result<()> {
 
     let src_start = src as usize;
-    let src_end = src_start.checked_add(n).expect("memcpy src pointer overflow");
+    let src_end = src_start.checked_add(n).ok_or(StorageError::PointerOverflow)?;
     let dest_start = dest as usize;
-    let dest_end = dest_start.checked_add(n).expect("memcpy dest pointer overflow");
+    let dest_end = dest_start.checked_add(n).ok_or(StorageError::PointerOverflow)?;
 
     // Vérifier que les zones ne chevauchent pas
     if dest_start < src_end && src_start < dest_end {
         // Zones chevauchantes détectées
-        panic!("memcpy called with overlapping regions: src {:p} - {:p}, dest {:p} - {:p}", src, src.add(n), dest, dest.add(n));
+
+        return Err(StorageError::OverlappingRegions { src_start: src, src_end: src.add(n), dest_start: dest, dest_end: dest.add(n) });
     }
     
     // Effectuer la copie
     ptr::copy_nonoverlapping(src, dest, n);
+    Ok(())
 }
 
 /// Copie `n` bytes de `src:*` vers `dest:*` (zones peuvent chevaucher)
