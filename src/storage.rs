@@ -35,7 +35,8 @@ Rust port, adaptations, and modifications by: **[Oignontom8283](https://github.c
 Special thanks to Yaya Cout for his remarkable engineering work on storage
 manipulation, without which this module would probably never have come to life.
 */
-
+dddddd
+use core::ffi::{CStr, c_char};
 use core::ptr;
 use heapless;
 use ::alloc::*;
@@ -307,6 +308,29 @@ impl Filesystem {
         }
     }
 }
+
+/// Représente un fichier dans le stockage, avec des pointeurs vers sa taille, son nom et son contenu.
+/// 
+/// Le FileObject est une abstraction qui facilite la manipulation des fichiers dans le stockage,
+/// en regrouppant les informations essentielles et en calculant le mapping du fichier.
+pub struct FileObject {
+    /// Adresse de base du fichier, la ou il commence.
+    pub addr: *const u8,
+    
+    /// Pointeur vers la taille du fichier (2 bytes du header et nom inclus dans la taille totale)
+    pub size_addr: *const u16,
+    /// Pointeur vers le nom du fichier (adresse de début + 2 bytes du header)
+    pub name_addr: *const c_char,
+    /// Pointeur vers le début du contenu du fichier (adresse de début + 2 bytes du header + taille du nom)
+    pub content_start_addr: *const u8,
+    /// Pointeur vers la fin du contenu du fichier (adresse de début + size totale)
+    pub content_end_addr: *const u8,
+
+    /// Taille totale du fichier, `header + nom + contenu`. Admet un maxium de u16::MAX a cause du header sur 2 bytes.
+    size: usize,
+}
+
+
 
 // ============================================================================
 // HARDWARE INTERFACE / TOOLS
