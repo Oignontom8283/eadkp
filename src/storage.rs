@@ -35,7 +35,7 @@ Rust port, adaptations, and modifications by: **[Oignontom8283](https://github.c
 Special thanks to Yaya Cout for his remarkable engineering work on storage
 manipulation, without which this module would probably never have come to life.
 */
-dddddd
+
 use core::ffi::{CStr, c_char};
 use core::ptr;
 use heapless;
