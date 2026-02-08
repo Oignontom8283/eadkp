@@ -330,6 +330,35 @@ pub struct FileObject {
     size: usize,
 }
 
+impl FileObject {
+    /// Initialise un FileObject à partir de l'adresse d'un enregistrement dans le stockage.
+    pub fn from_addr(addr:*const u8) -> Self {
+        
+        let size_addr = addr as *const u16; // Adresse du header de taille (2 bytes)
+        let size = unsafe { ptr::read_unaligned(size_addr) } as usize; // Taille totale du fichier (header + nom + contenu)
+
+        let name_addr = unsafe { addr.add(2) as *const c_char }; // Adresse du nom du fichier (juste après la taille)
+        let name_cstr = unsafe { CStr::from_ptr(name_addr) }; // Convertir le nom en Cstr pour calculer sa longueur
+        let name_len = name_cstr.to_bytes_with_nul().len();
+
+        let content_start_addr = unsafe { addr.add(2 + name_len) as *const u8 }; // Adresse du contenu (juste après le nom, qui suit la taille)
+        let content_end_addr = unsafe { addr.add(size) }; // Adresse de fin du contenu = adresse de début + taille totale (header + nom + contenu)
+
+        Self {
+            addr,
+            size_addr,
+            name_addr,
+            content_start_addr,
+            content_end_addr,
+            size,
+        }
+    }
+
+    /// Retourne le nom du fichier en tant que CStr
+    pub fn c_name(&self) -> &CStr {
+        unsafe { CStr::from_ptr(self.name_addr) }
+    }
+}
 
 
 // ============================================================================
