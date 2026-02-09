@@ -24,6 +24,8 @@ pub mod random;
 pub mod battery;
 pub mod input;
 pub mod storage;
+pub mod epsilon;
+pub mod errors;
 
 // Module builder uniquement disponible pour les build scripts (OS hôte, pas embarqué)
 #[cfg(all(not(target_os = "none"), feature = "build-tools"))]
@@ -33,7 +35,7 @@ pub mod builder;
 pub use utils::*;
 pub use color::*;
 pub use image::*;
-
+pub use errors::*;
 // Note: Le panic handler et l'allocateur global sont définis par la macro eadkp_setup!
 // L'application n'a pas besoin de les définir manuellement
 
