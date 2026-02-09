@@ -233,54 +233,6 @@ impl Filesystem {
     }
 }
 
-/// Représente un fichier dans le stockage, avec des pointeurs vers sa taille, son nom et son contenu.
-/// 
-/// Le FileObject est une abstraction qui facilite la manipulation des fichiers dans le stockage,
-/// en regrouppant les informations essentielles et en calculant le mapping du fichier.
-pub struct FileObject {
-    /// Adresse de base du fichier, la ou il commence.
-    pub addr: *const u8,
-    
-    /// Pointeur vers la taille du fichier (2 bytes du header et nom inclus dans la taille totale)
-    pub size_addr: *const u16,
-    /// Pointeur vers le nom du fichier (adresse de début + 2 bytes du header)
-    pub name_addr: *const c_char,
-    /// Pointeur vers le début du contenu du fichier (adresse de début + 2 bytes du header + taille du nom)
-    pub content_start_addr: *const u8,
-    /// Pointeur vers la fin du contenu du fichier (adresse de début + size totale)
-    pub content_end_addr: *const u8,
-
-    /// Taille totale du fichier, `header + nom + contenu`. Admet un maxium de u16::MAX a cause du header sur 2 bytes.
-    size: usize,
-}
-
-impl FileObject {
-    /// Initialise un FileObject à partir de l'adresse d'un enregistrement dans le stockage.
-    pub fn from_addr(addr:*const u8) -> Self {
-        
-        let size_addr = addr as *const u16; // Adresse du header de taille (2 bytes)
-        let size = unsafe { ptr::read_unaligned(size_addr) } as usize; // Taille totale du fichier (header + nom + contenu)
-
-        let name_addr = unsafe { addr.add(2) as *const c_char }; // Adresse du nom du fichier (juste après la taille)
-        let name_cstr = unsafe { CStr::from_ptr(name_addr) }; // Convertir le nom en Cstr pour calculer sa longueur
-        let name_len = name_cstr.to_bytes_with_nul().len();
-
-        let content_start_addr = unsafe { addr.add(2 + name_len) as *const u8 }; // Adresse du contenu (juste après le nom, qui suit la taille)
-        let content_end_addr = unsafe { addr.add(size) }; // Adresse de fin du contenu = adresse de début + taille totale (header + nom + contenu)
-
-        Self {
-            addr,
-            size_addr,
-            name_addr,
-            content_start_addr,
-            content_end_addr,
-            size,
-        }
-    }
-
-    
-}
-
 
 // ============================================================================
 // HARDWARE INTERFACE / TOOLS
