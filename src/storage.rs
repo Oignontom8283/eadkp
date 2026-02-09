@@ -176,10 +176,10 @@ pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<()> {
         // Écrire le header (taille totale sur 2 bytes)
         ptr::write_unaligned(size_addr, total_size as u16);
         // Écrire le nom du fichier (avec null terminator)
-        memcpy(name_addr, filename_cstring.as_ptr(), filename_cstring.as_bytes_with_nul().len())
+        memory::memcpy(name_addr, filename_cstring.as_ptr(), filename_cstring.as_bytes_with_nul().len())
             .map_err(|_| StorageError::StorageOverflow { available: 0, needed: 0 })?;
         // Écrire le contenu
-        memcpy(content_addr, content_ptr, content_len)
+        memory::memcpy(content_addr, content_ptr, content_len)
             .map_err(|_| StorageError::StorageOverflow { available: 0, needed: 0 })?;
     }
 
