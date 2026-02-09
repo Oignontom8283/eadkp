@@ -3,17 +3,17 @@ use core::ptr;
 use core::ffi::{CStr, c_char};
 
 
-const SLOTINFO_MAGIC: u32 = 0xEFEEDBBA;
-const USERLAND_HEADER_MAGIC: u32 = 0xDEC0EDFE;
-const KERNEL_HEADER_MAGIC: u32 = 0xDEC00DF0;
-const FILESYSTEM_MAGIC: u32 = 0xBADD0BEEu32.swap_bytes();
-const EXTERNAL_APPS_MAGIC: u32 = 0xDEC0EDFE;
+pub const SLOTINFO_MAGIC: u32 = 0xEFEEDBBA;
+pub const USERLAND_HEADER_MAGIC: u32 = 0xDEC0EDFE;
+pub const KERNEL_HEADER_MAGIC: u32 = 0xDEC00DF0;
+pub const FILESYSTEM_MAGIC: u32 = 0xBADD0BEEu32.swap_bytes();
+pub const EXTERNAL_APPS_MAGIC: u32 = 0xDEC0EDFE;
 
-const RAM_BASE_N0110_OR_N0115: u32 = 0x20000000;
-const RAM_BASE_N0120: u32 = 0x24000000;
+pub const RAM_BASE_N0110_OR_N0115: u32 = 0x20000000;
+pub const RAM_BASE_N0120: u32 = 0x24000000;
 
-const SLOTS_N0110_OR_N0115: [*const u32; 2] = [0x90010000 as *const u32, 0x90410000 as *const u32];
-const SLOTS_N0120: [*const u32; 2] = [0x90020000 as *const u32, 0x90420000 as *const u32];
+pub const SLOTS_N0110_OR_N0115: [*const u32; 2] = [0x90010000 as *const u32, 0x90410000 as *const u32];
+pub const SLOTS_N0120: [*const u32; 2] = [0x90020000 as *const u32, 0x90420000 as *const u32];
 
 
 /// SlotInfo - 16 bytes au dèbut de la RAM
@@ -287,30 +287,30 @@ impl FileObject {
 
 /// Retourne le modèle de la calculatrice
 #[cfg(target_os = "none")]
-fn model() -> CalculatorModel {
+pub fn model() -> CalculatorModel {
     CalculatorModel::detect()
 }
 
 /// Retourne l'adresse de début de la RAM
 #[cfg(target_os = "none")]
-fn address() -> *const u8 {
+pub fn address() -> *const u8 {
     CalculatorModel::detect().ram_base()
 }
 
 /// Retourne l'adresse du Kernel Header
 #[cfg(target_os = "none")]
-fn kernel_header() -> &'static KernelHeader {
+pub fn kernel_header() -> &'static KernelHeader {
     CalculatorModel::detect().slotinfo_address().kernel_header_address
 }
 
 /// Retourne l'adresse du Userland Header
 #[cfg(target_os = "none")]
-fn userland_header() -> &'static UserlandHeader {
+pub fn userland_header() -> &'static UserlandHeader {
     CalculatorModel::detect().slotinfo_address().userland_header_address
 }
 
 /// Retourne l'utilitaire d'adresse du filesystem
 #[cfg(target_os = "none")]
-fn filesystem() -> Filesystem {
+pub fn filesystem() -> Filesystem {
     Filesystem::new()
 }
