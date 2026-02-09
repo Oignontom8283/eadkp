@@ -43,6 +43,8 @@ use heapless;
 use ::alloc::*;
 use ::alloc::ffi::CString;
 
+// Utiiliser StorageError pour toutes les fonction de ce fichier
+pub type Result<T> = core::result::Result<T, StorageError>;
 
 // ============================================================================
 // STORAGE OPERATIONS  
@@ -101,7 +103,7 @@ fn next_free() -> *const u8 {
 pub fn available_space() -> usize {
 
     let free_addr = next_free() as usize; // Adresse de la prochaine position libre
-    let usable_end = filesystem().usable_end_addr as usize; // Adresse de fin du stockage utilisable (adresse du footer)
+    let usable_end = epsilon::filesystem().usable_end_addr as usize; // Adresse de fin du stockage utilisable (adresse du footer)
 
     // Retourner l'espace libre restant, en soustrayant l'adresse de la prochaine position libre de l'adresse de fin du stockage utilisable
     usable_end - free_addr
@@ -174,9 +176,11 @@ pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<()> {
         // Écrire le header (taille totale sur 2 bytes)
         ptr::write_unaligned(size_addr, total_size as u16);
         // Écrire le nom du fichier (avec null terminator)
-        memcpy(name_addr, filename_cstring.as_ptr(), filename_cstring.as_bytes_with_nul().len())?;
+        memcpy(name_addr, filename_cstring.as_ptr(), filename_cstring.as_bytes_with_nul().len())
+            .map_err(|_| StorageError::StorageOverflow { available: 0, needed: 0 })?;
         // Écrire le contenu
-        memcpy(content_addr, content_ptr, content_len)?;
+        memcpy(content_addr, content_ptr, content_len)
+            .map_err(|_| StorageError::StorageOverflow { available: 0, needed: 0 })?;
     }
 
     Ok(())
@@ -236,6 +240,7 @@ pub unsafe fn file_write_raw(_filename: &str, _content: &[u8]) -> Result<()> {
     Ok(())
 }
 
+// ! Tout ce qui est en dessous n'est pas encore refactoriser
 
 /// Lit un fichier et retourne un pointeur vers son contenu
 #[cfg(target_os = "none")]
