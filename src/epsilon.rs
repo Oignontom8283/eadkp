@@ -278,10 +278,7 @@ impl FileObject {
         }
     }
 
-    /// Retourne le nom du fichier en tant que CStr
-    pub fn c_name(&self) -> &CStr {
-        unsafe { CStr::from_ptr(self.name_addr) }
-    }
+    
 }
 
 
