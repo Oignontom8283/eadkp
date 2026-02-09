@@ -86,7 +86,6 @@ pub unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
 /// Copie n bytes de src vers dest (zones non chevauchantes)
 /// 
 /// **Erreur en cas de chevauchement des zones mémoire** pour éviter les comportements indéfinis/corrompuptions.
-#[cfg(target_os = "none")]
 pub unsafe fn memcpy(dest: *mut u8, src: *const u8, n: usize) -> Result<(), SoftwareError> {
     
     if n == 0 {
@@ -117,13 +116,11 @@ pub unsafe fn memcpy(dest: *mut u8, src: *const u8, n: usize) -> Result<(), Soft
 /// Copie `n` bytes de `src:*` vers `dest:*` (zones peuvent chevaucher)
 /// 
 /// **Comportement défini même en cas de chevauchement:** La copie se fait par une mémoire tampon.
-#[cfg(target_os = "none")]
 pub unsafe fn memmove(dest: *mut u8, src: *const u8, n: usize) {
     unsafe { ptr::copy(src, dest, n) }
 }
 
 /// Remplit n bytes avec la valeur c
-#[cfg(target_os = "none")]
 pub unsafe fn memset(s: *mut u8, c: u8, n: usize) {
     for i in 0..n {
         unsafe { *s.add(i) = c };
