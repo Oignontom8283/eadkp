@@ -29,3 +29,22 @@ pub enum SoftwareError {
     /// Overflow lors du calcul de pointeur
     PointerOverflow,
 }
+
+
+/// Erreur globale englobant tout les types d"erreurs
+pub enum GlobalError {
+    Storage(StorageError),
+    Software(SoftwareError),
+}
+
+impl From<StorageError> for GlobalError { // Convertire un StorageError en GlobalError automatiquement
+    fn from(err: StorageError) -> Self {
+        GlobalError::Storage(err)
+    }
+}
+
+impl From<SoftwareError> for GlobalError { // De même pour SoftwareError
+    fn from(err: SoftwareError) -> Self {
+        GlobalError::Software(err)
+    }
+}
