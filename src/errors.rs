@@ -6,6 +6,8 @@ pub enum StorageError {
     InsufficientSpace,
     /// Nom de fichier invalide ou trop long (max 256 bytes)
     StorageInvalidName,
+    /// Taille du fichier dépasse la limite donnée ou maximale (u16::MAX)
+    FileTooLarge { max_size: usize, actual_size: usize },
     /// Magic number invalide à l'adresse de stockage
     InvalidMagicNumber { expected: u32, found: u32 },
     /// Stockage plein, position libre null
