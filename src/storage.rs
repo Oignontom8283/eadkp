@@ -59,23 +59,6 @@ pub type Result<T> = core::result::Result<T, StorageError>;
 /// Faire : `usable_end_addr - next_free()` pour obtenir l'espace libre restant, si 0, stockage plein.
 #[cfg(target_os = "none")]
 fn next_free() -> *const u8 {
-    // unsafe {
-    //     let storage_addr = address();
-    //     let mut offset = (storage_addr as *mut u8).add(4);
-    //     let end_addr = (storage_addr + size()) as *mut u8;
-        
-    //     // Vérifier validité mais ignorer l'erreur (retourne null si invalide)
-    //     if is_valid(storage_addr as *const u32).is_err() { return ptr::null(); }
-        
-    //     // Parcourir jusqu'à trouver un enregistrement vide (size=0)
-    //     while offset < end_addr {
-    //         let size = ptr::read_unaligned(offset as *const u16);
-    //         if size == 0 { return offset as *const u32; }
-    //         offset = offset.add(size as usize);
-    //     }
-        
-    //     end_addr as *const u32
-    // }
 
     let storage = epsilon::filesystem();
     let mut offset = storage.usable_start_addr;
@@ -109,32 +92,28 @@ pub fn available_space() -> usize {
     usable_end - free_addr
 }
 
-/// Vérifie que :
-/// - Qu'il y a assez d'espace disponible pour stocker le fichier
-/// - Que la taille du nom du fichier ne dépasse pas 255 bytes (limitation imposée par Epsilon)
-/// - Que la taille totale du fichier (header + nom + contenu) ne dépasse pas la taille maximum de `2^16 - 1` (=65535 bytes)
-/// 
-/// Retourne `true` si le fichier peut être stocké, `false` sinon.
-/// 
-/// La taille maximum du fichier est limité par la taille du header qui est sur 2 octects (u16),
-/// et le nom du fichier est limité à 255 bytes pour des raisons de compatibilité avec Epsilon.
+/// Vérifie si un fichier peut être stocké en respectant les contraintes suivantes :
+/// - Espace disponible suffisant
+/// - Nom du fichier ≤ 255 bytes (limite Epsilon)
+/// - Taille totale (header + nom + contenu) ≤ 65535 bytes (u16 max)
+/// Retourne `true` si possible, sinon `false`.
 #[cfg(target_os = "none")]
-pub fn can_store(content_size: usize, filename_size: usize) -> bool {
-    // Calculer la taille totale nécessaire pour stocker le fichier (header + nom + contenu)
+pub fn can_store(content: &[u8], filename: &str) -> bool {
+
+    let filename_size = filename.len() + 1; // +1 pour le null terminator
+    let content_size = content.len();
     let total_size = 2 + filename_size + content_size; // 2 bytes pour la taille du header
 
-    // Vérifier que la taille du nom du fichier ne dépasse pas 255, limitation imposée par Epsilon.
-    // Par soucis de compatibilité avec Epsilon, on limite a 255 bytes pour le nom du fichier.
+    // Check nom < 255 bytes (limitation Epsilon)
     if filename_size > u8::MAX as usize {
         return false;
     }
 
-    // Vérifier que la taille totale ne dépasse pas la capacité maximale du header (2 bytes, soit 65535)
+    // Check total_size < 65535 bytes (limitation du header sur 2 bytes)
     if total_size > u16::MAX as usize {
-        return false; // La taille totale dépasse la capacité maximale du header (2 bytes), donc impossible à stocker;
+        return false; // Impossible a stocker
     }
 
-    // Vérifier si l'espace disponible est suffisant
     available_space() >= total_size
 }
 
