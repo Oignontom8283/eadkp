@@ -86,7 +86,7 @@ fn next_free() -> *const u8 {
 pub fn available_space() -> usize {
 
     let free_addr = next_free() as usize; // Adresse de la prochaine position libre
-    let usable_end = epsilon::filesystem().usable_end_addr as usize; // Adresse de fin du stockage utilisable (adresse du footer)
+    let usable_end = epsilon::filesystem().usable_end_addr as usize; // Adresse fin stockage utilisable (adresse du footer)
 
     // Retourner l'espace libre restant, en soustrayant l'adresse de la prochaine position libre de l'adresse de fin du stockage utilisable
     usable_end - free_addr
