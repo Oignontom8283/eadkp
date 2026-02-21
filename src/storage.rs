@@ -134,36 +134,31 @@ pub fn can_store(content: &[u8], filename: &str) -> Result<()> {
 /// Format: \[2 bytes taille\] \[nom\0\] \[contenu\]
 #[cfg(target_os = "none")]
 pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<()> {
-
+    
+    // Vérifier que le fichier peut être stocké avec info détaillée
+    can_store(content, filename)?; 
+    
     let content_ptr = content.as_ptr(); // Pointeur vers le contenu à écrire
     let content_len = content.len();
 
-    can_store(content, filename)?; // Vérifier que le fichier peut être stocké avec info détaillée
+    let filename_cstring = CString::new(filename).unwrap(); // can_store garentie que nom est c string valide
+    let filename_len = filename.len() + 1; // Taille du nom avec null terminator
 
-    let free_pos = next_free(); // Trouver la position libre dans le stockage
-    let free_space = available_space();
-
-    // Vérifier que le fichier peut être stocker (taille max du nom, taille max, espace disponible)
-    if !can_store(content_len, filename_cstring.as_bytes_with_nul().len()) {
-        return Err(StorageError::StorageOverflow { 
-            available: free_space,
-            needed: 2 + filename_cstring.as_bytes_with_nul().len() + content_len,
-        });
-    }
-
-    let write_pos = free_pos as *mut u8; // Adresse où écrire le nouvel enregistrement
-    let total_size = 2 + filename_cstring.as_bytes_with_nul().len() + content_len; // Taille totale de l'enregistrement (header + nom + contenu)
+    let write_pos = next_free() as *mut u8; // Adresse où écrire le nouvel enregistrement
+    let total_size = 2 + filename_len + content_len; // Taille totale de l'enregistrement (header + nom + contenu)
     
     let size_addr = write_pos as *mut u16; // Adresse où écrire la taille du header (2 bytes)
     let name_addr = unsafe { write_pos.add(2) }; // Adresse où écrire le nom du fichier (juste après la taille)
-    let content_addr = unsafe { name_addr.add(filename_cstring.as_bytes_with_nul().len()) }; // Adresse où écrire le contenu (juste après le nom)
+    let content_addr = unsafe { name_addr.add(filename_len) }; // Adresse où écrire le contenu (juste après le nom)
 
     unsafe {
         // Écrire le header (taille totale sur 2 bytes)
         ptr::write_unaligned(size_addr, total_size as u16);
+
         // Écrire le nom du fichier (avec null terminator)
-        memory::memcpy(name_addr, filename_cstring.as_ptr(), filename_cstring.as_bytes_with_nul().len())
+        memory::memcpy(name_addr, filename_cstring.as_ptr(), filename_len)
             .map_err(|_| StorageError::StorageOverflow { available: 0, needed: 0 })?;
+        
         // Écrire le contenu
         memory::memcpy(content_addr, content_ptr, content_len)
             .map_err(|_| StorageError::StorageOverflow { available: 0, needed: 0 })?;
