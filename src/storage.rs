@@ -44,9 +44,6 @@ use ::alloc::*;
 use ::alloc::string::*;
 use ::alloc::ffi::CString;
 
-// Utiiliser StorageError pour toutes les fonction de ce fichier
-pub type Result<T> = core::result::Result<T, StorageError>;
-
 // ============================================================================
 // STORAGE OPERATIONS  
 // ============================================================================
@@ -99,7 +96,7 @@ pub fn available_space() -> usize {
 /// - Taille totale (header + nom + contenu) ≤ 65535 bytes (u16 max)
 /// Retourne `true` si possible, sinon `false`.
 #[cfg(target_os = "none")]
-pub fn can_store(content: &[u8], filename: &str) -> Result<()> {
+pub fn can_store(content: &[u8], filename: &str) -> Result<(), StorageError> {
 
     let filename_size = filename.len() + 1; // +1 pour le null terminator
     let content_size = content.len();
@@ -133,7 +130,7 @@ pub fn can_store(content: &[u8], filename: &str) -> Result<()> {
 /// 
 /// Format: \[2 bytes taille\] \[nom\0\] \[contenu\]
 #[cfg(target_os = "none")]
-pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<()> {
+pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<(), GlobalError> {
     
     // Vérifier que le fichier peut être stocké avec info détaillée
     can_store(content, filename)?; 
@@ -156,12 +153,10 @@ pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<()> {
         ptr::write_unaligned(size_addr, total_size as u16);
 
         // Écrire le nom du fichier (avec null terminator)
-        memory::memcpy(name_addr, filename_cstring.as_ptr(), filename_len)
-            .map_err(|_| StorageError::StorageOverflow { available: 0, needed: 0 })?;
+        memory::memcpy(name_addr, filename_cstring.as_ptr(), filename_len)?;
 
         // Écrire le contenu
-        memory::memcpy(content_addr, content_ptr, content_len)
-            .map_err(|_| StorageError::StorageOverflow { available: 0, needed: 0 })?;
+        memory::memcpy(content_addr, content_ptr, content_len)?;
     }
 
     Ok(())
@@ -169,7 +164,7 @@ pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<()> {
 
 /// Dummy version
 #[cfg(not(target_os = "none"))]
-pub unsafe fn file_write_raw(_filename: &str, _content: &[u8]) -> Result<()> {
+pub unsafe fn file_write_raw(_filename: &str, _content: &[u8]) -> Result<(), GlobalError> {
     Ok(())
 }
 
