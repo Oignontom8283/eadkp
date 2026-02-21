@@ -41,6 +41,7 @@ use core::ffi::{CStr, c_char};
 use core::ptr;
 use heapless;
 use ::alloc::*;
+use ::alloc::string::*;
 use ::alloc::ffi::CString;
 
 // Utiiliser StorageError pour toutes les fonction de ce fichier
@@ -104,6 +105,10 @@ pub fn can_store(content: &[u8], filename: &str) -> Result<()> {
     let content_size = content.len();
     let total_size = 2 + filename_size + content_size; // 2 bytes pour la taille du header
 
+    // Check que le nom est un c string valide
+    CString::new(filename)
+        .map_err(|_| StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() })?;
+
     // Check nom < 255 bytes (limitation Epsilon)
     if filename_size > u8::MAX as usize {
         return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() });
@@ -130,10 +135,6 @@ pub fn can_store(content: &[u8], filename: &str) -> Result<()> {
 #[cfg(target_os = "none")]
 pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<()> {
 
-    // Convertir le nom du fichier en C string (UTF-8 avec null terminator)
-    let filename_cstring = CString::new(filename)
-        .map_err(|_| StorageError::StorageInvalidName)?; // Erreur si le nom contient un null byte ou est trop long
-    
     let content_ptr = content.as_ptr(); // Pointeur vers le contenu à écrire
     let content_len = content.len();
 
