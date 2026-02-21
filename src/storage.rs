@@ -158,61 +158,13 @@ pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<()> {
         // Écrire le nom du fichier (avec null terminator)
         memory::memcpy(name_addr, filename_cstring.as_ptr(), filename_len)
             .map_err(|_| StorageError::StorageOverflow { available: 0, needed: 0 })?;
-        
+
         // Écrire le contenu
         memory::memcpy(content_addr, content_ptr, content_len)
             .map_err(|_| StorageError::StorageOverflow { available: 0, needed: 0 })?;
     }
 
     Ok(())
-
-    // let filename_cstr = to_cstring(filename)?;
-    // let filename_ptr = filename_cstr.as_ptr();
-    // let filename_len = filename_cstr.len(); // Avec le null terminator !
-
-    // let content_ptr = content.as_ptr();
-    // let content_len = content.len();
-
-    // unsafe {
-    //     // Trouver la position libre dans le stockage
-    //     let free_pos = next_free();
-    //     if free_pos.is_null() { 
-    //         return Err(StorageError::StorageFull); 
-    //     }
-        
-    //     // Calculer la taille totale nécessaire
-    //     let total_size = 2 + filename_len + content_len; // taille_header + nom (avec null terminator) + contenu
-    //     let storage_end = (address() + size()) as usize;
-    //     let free_pos_usize = free_pos as usize;
-    //     let needed_end = free_pos_usize + total_size;
-        
-    //     // Vérifier qu'on a assez d'espace avec info détaillée
-    //     if needed_end > storage_end { 
-    //         return Err(StorageError::StorageOverflow { 
-    //             available: storage_end.saturating_sub(free_pos_usize),
-    //             needed: total_size,
-    //         }); 
-    //     }
-        
-    //     // Écrire le header (taille totale sur 2 bytes)
-    //     let write_pos = free_pos as *mut u8;
-    //     ptr::write_unaligned(write_pos as *mut u16, total_size as u16);
-        
-    //     // Écrire le nom du fichier (avec null terminator)
-    //     let name_pos = write_pos.add(2);
-    //     memcpy(name_pos, filename_ptr, filename_len);
-        
-    //     // Écrire le contenu
-    //     let content_pos = name_pos.add(filename_len);
-    //     memcpy(content_pos, content_ptr, content_len);
-        
-    //     // Nettoyer le reste (marquer la fin des enregistrements)
-    //     let cleanup_pos = content_pos.add(content_len);
-    //     let cleanup_size = ((address() + size()) as *mut u8).offset_from(cleanup_pos) as usize;
-    //     memset(cleanup_pos, 0, cleanup_size);
-        
-    //     Ok(())
-    // }
 }
 
 /// Dummy version
