@@ -13,8 +13,8 @@ pub unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
         p1 = unsafe { p1.add(1) };
         p2 = unsafe { p2.add(1) };
     }
+    
     unsafe { ((*p1 as i32) - (*p2 as i32)) == 0 } // Différence ASCII, si 0, ce sont les mêmes caractères, donc on est arrivé à la fin des deux chaînes en même temps
-
 }
 
 /// Copie n bytes de src vers dest (zones non chevauchantes)
