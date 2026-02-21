@@ -123,6 +123,11 @@ pub fn can_store(content: &[u8], filename: &str) -> Result<(), StorageError> {
     }
 }
 
+#[cfg(not(target_os = "none"))]
+pub fn can_store(_content: &[u8], _filename: &str) -> Result<(), GlobalError> {
+    Err(SoftwareError::SimulatorNotSupported)
+}
+
 /// Écrit un nouveau fichier dans le stockage
 /// 
 /// ## Warning
