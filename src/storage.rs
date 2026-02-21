@@ -98,7 +98,7 @@ pub fn available_space() -> usize {
 /// - Taille totale (header + nom + contenu) ≤ 65535 bytes (u16 max)
 /// Retourne `true` si possible, sinon `false`.
 #[cfg(target_os = "none")]
-pub fn can_store(content: &[u8], filename: &str) -> bool {
+pub fn can_store(content: &[u8], filename: &str) -> Result<()> {
 
     let filename_size = filename.len() + 1; // +1 pour le null terminator
     let content_size = content.len();
@@ -106,15 +106,19 @@ pub fn can_store(content: &[u8], filename: &str) -> bool {
 
     // Check nom < 255 bytes (limitation Epsilon)
     if filename_size > u8::MAX as usize {
-        return false;
+        return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() });
     }
 
     // Check total_size < 65535 bytes (limitation du header sur 2 bytes)
     if total_size > u16::MAX as usize {
-        return false; // Impossible a stocker
+        return Err(StorageError::FileTooLarge { max_size: u16::MAX as usize, actual_size: total_size });
     }
 
-    available_space() >= total_size
+    if available_space() >= total_size {
+        Ok(())
+    } else {
+        Err(StorageError::StorageOverflow { available: available_space(), needed: total_size })
+    }
 }
 
 /// Écrit un nouveau fichier dans le stockage
@@ -132,6 +136,8 @@ pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<()> {
     
     let content_ptr = content.as_ptr(); // Pointeur vers le contenu à écrire
     let content_len = content.len();
+
+    can_store(content, filename)?; // Vérifier que le fichier peut être stocké avec info détaillée
 
     let free_pos = next_free(); // Trouver la position libre dans le stockage
     let free_space = available_space();
