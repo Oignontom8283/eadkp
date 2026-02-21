@@ -1,11 +1,13 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+use alloc::string::String;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StorageError {
     /// Fichier non trouvé dans le stockage
     FileNotFound,
     /// Pas assez d'espace disponible pour l'écriture
     InsufficientSpace,
     /// Nom de fichier invalide ou trop long (max 256 bytes)
-    StorageInvalidName,
+    StorageInvalidName {length: usize, string: String},
     /// Taille du fichier dépasse la limite donnée ou maximale (u16::MAX)
     FileTooLarge { max_size: usize, actual_size: usize },
     /// Magic number invalide à l'adresse de stockage
