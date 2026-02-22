@@ -50,7 +50,7 @@ impl SlotInfo {
     /// 
     /// Peut probable de retourner false en pratique, car si le SlotInfo est corrompu ou absent, l'os ne devrait pas être encore en cours d'exécution.
     pub fn is_valid(&self) -> Result<(), SoftwareError> {
-        
+
         if self.header != SLOTINFO_MAGIC {
             return Err(SoftwareError::InvalidMagicNumber { expected: SLOTINFO_MAGIC, found: self.header });
         }
@@ -80,6 +80,20 @@ pub struct UserlandHeader {
     pub device_name_flash_start: *const u8,   // +0x24: Nom device
     pub device_name_flash_end: *const u8,     // +0x28: Fin nom device
     pub footer: u32,                          // +0x2C: 0xDEC0EDFE
+}
+
+impl UserlandHeader {
+    /// Vérifie que le UserlandHeader est valide en vérifiant les magic numbers.
+    pub fn is_valid(&self) -> Result<(), SoftwareError> {
+
+        if self.header != USERLAND_HEADER_MAGIC {
+            return Err(SoftwareError::InvalidMagicNumber { expected: USERLAND_HEADER_MAGIC, found: self.header });
+        }
+        if self.footer != USERLAND_HEADER_MAGIC {
+            return Err(SoftwareError::InvalidMagicNumber { expected: USERLAND_HEADER_MAGIC, found: self.footer });
+        }
+        Ok(())
+    }
 }
 
 
