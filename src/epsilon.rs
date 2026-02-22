@@ -49,8 +49,15 @@ impl SlotInfo {
     /// Vérifie que le SlotInfo est valide en vérifiant les magic numbers.
     /// 
     /// Peut probable de retourner false en pratique, car si le SlotInfo est corrompu ou absent, l'os ne devrait pas être encore en cours d'exécution.
-    pub fn is_valid(&self) -> bool {
-        self.header == SLOTINFO_MAGIC && self.footer == SLOTINFO_MAGIC
+    pub fn is_valid(&self) -> Result<(), SoftwareError> {
+        
+        if self.header != SLOTINFO_MAGIC {
+            return Err(SoftwareError::InvalidMagicNumber { expected: SLOTINFO_MAGIC, found: self.header });
+        }
+        if self.footer != SLOTINFO_MAGIC {
+            return Err(SoftwareError::InvalidMagicNumber { expected: SLOTINFO_MAGIC, found: self.footer });
+        }
+        Ok(())
     }
 }
 
