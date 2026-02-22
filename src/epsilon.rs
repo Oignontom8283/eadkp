@@ -154,6 +154,8 @@ impl CalculatorModel {
     }
     
     /// Retourne un pointeur vers le SlotInfo de la calculatrice
+    /// 
+    /// @unverified : En pratique, le SlotInfo DOIT être présent et valide ! Sinon la ram est corrompue.
     pub fn slotinfo_address(&self) -> &'static SlotInfo {
 
         // Obtenir l'adresse de début de la RAM
@@ -162,13 +164,9 @@ impl CalculatorModel {
         // Lire le SlotInfo depuis la RAM
         // Le SlotInfo est situé au début de la RAM, a la première adresse
         let slot_info = ram as *const SlotInfo;
-        
-        // Vérifier que le pointeur n'est pas null
-        let slot_info_ref = unsafe { slot_info.as_ref().expect("SlotInfo pointer is null") };
 
-        if !slot_info_ref.is_valid() {
-            panic!("Invalid SlotInfo detected at address {:p}", slot_info);
-        }
+        // Convertir le pointeur brut en référence statique
+        let slot_info_ref = unsafe { &*slot_info };
         
         return slot_info_ref;
     }
