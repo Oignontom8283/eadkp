@@ -98,16 +98,12 @@ pub struct KernelHeader {
 impl KernelHeader {
     /// Vérifie que le KernelHeader est valide
     pub fn is_valid(&self) -> Result<(), SoftwareError> {
-        unsafe  {
-            let header = ptr::read_unaligned(&self.header);
-            let footer = ptr::read_unaligned(&self.footer);
 
-            if header != KERNEL_HEADER_MAGIC {
-                return Err(SoftwareError::InvalidMagicNumber { expected: KERNEL_HEADER_MAGIC, found: header });
-            }
-            if footer != KERNEL_HEADER_MAGIC {
-                return Err(SoftwareError::InvalidMagicNumber { expected: KERNEL_HEADER_MAGIC, found: footer });
-            }
+        if self.header != KERNEL_HEADER_MAGIC {
+            return Err(SoftwareError::InvalidMagicNumber { expected: KERNEL_HEADER_MAGIC, found: self.header });
+        }
+        if self.footer != KERNEL_HEADER_MAGIC {
+            return Err(SoftwareError::InvalidMagicNumber { expected: KERNEL_HEADER_MAGIC, found: self.footer });
         }
         Ok(())
     }
