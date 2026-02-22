@@ -6,6 +6,8 @@ avec les composants essentiels d'Epsilon en mêmoire.
 use core::ptr;
 use core::ffi::{CStr, c_char};
 
+use crate::SoftwareError;
+
 
 pub const SLOTINFO_MAGIC: u32 = 0xEFEEDBBA;
 pub const USERLAND_HEADER_MAGIC: u32 = 0xDEC0EDFE;
@@ -95,8 +97,19 @@ pub struct KernelHeader {
 
 impl KernelHeader {
     /// Vérifie que le KernelHeader est valide
-    pub fn is_valid(&self) -> bool {
-        self.header == KERNEL_HEADER_MAGIC && self.footer == KERNEL_HEADER_MAGIC
+    pub fn is_valid(&self) -> Result<(), SoftwareError> {
+        unsafe  {
+            let header = ptr::read_unaligned(&self.header);
+            let footer = ptr::read_unaligned(&self.footer);
+
+            if header != KERNEL_HEADER_MAGIC {
+                return Err(SoftwareError::InvalidMagicNumber { expected: KERNEL_HEADER_MAGIC, found: header });
+            }
+            if footer != KERNEL_HEADER_MAGIC {
+                return Err(SoftwareError::InvalidMagicNumber { expected: KERNEL_HEADER_MAGIC, found: footer });
+            }
+        }
+        Ok(())
     }
 }
 
@@ -225,11 +238,19 @@ impl Filesystem {
     }
 
     /// Vérifie que le Filesystem est valide en vérifiant les magic numbers au début et à la fin.
-    pub fn is_valid(&self) -> bool {
+    pub fn is_valid(&self) -> Result<(), SoftwareError> {
         unsafe {
-            ptr::read_unaligned(self.header_addr) == FILESYSTEM_MAGIC &&
-            ptr::read_unaligned(self.footer_addr) == FILESYSTEM_MAGIC
+            let header = ptr::read_unaligned(self.header_addr);
+            let footer = ptr::read_unaligned(self.footer_addr);
+
+            if header != FILESYSTEM_MAGIC {
+                return Err(SoftwareError::InvalidMagicNumber { expected: FILESYSTEM_MAGIC, found: header });
+            }
+            if footer != FILESYSTEM_MAGIC {
+                return Err(SoftwareError::InvalidMagicNumber { expected: FILESYSTEM_MAGIC, found: footer });
+            }
         }
+        Ok(())
     }
 }
 
