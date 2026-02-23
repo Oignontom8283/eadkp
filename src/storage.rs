@@ -48,24 +48,26 @@ use ::alloc::ffi::CString;
 // STORAGE OPERATIONS  
 // ============================================================================
 
+#[cfg(target_os = "none")]
+fn is_valid_storage() -> bool {
+    let storage = epsilon::filesystem();
+    storage.is_valid().is_ok()
+}
 
 /// Trouve la prochaine position libre dans le stockage
 /// 
 /// Retourne un pointeur vers le début de la fin de l'espace utilisé (le prochain enregistrement vide).
 /// Si le stockage est plein, retourne l'adresse de fin du stockage utilisable
 /// 
-/// Faire : `usable_end_addr - next_free()` pour obtenir l'espace libre restant, si 0, stockage plein.
+/// @unchecked
 #[cfg(target_os = "none")]
 fn next_free() -> *const u8 {
 
     let storage = epsilon::filesystem();
+    let usable_end_addr = storage.usable_end_addr;
     let mut offset = storage.usable_start_addr;
 
-    if !storage.is_valid() {
-        panic!("Invalid filesystem detected at address {:p}", storage.storage_start_addr);
-    }
-
-    while offset < storage.usable_end_addr {
+    while offset < usable_end_addr {
         let size = unsafe { ptr::read_unaligned(offset as *const u16) };
         if size == 0 {
             return offset;
@@ -73,7 +75,7 @@ fn next_free() -> *const u8 {
         offset = unsafe { offset.add(size as usize) };
     }
 
-    storage.usable_end_addr
+    usable_end_addr
 }
 
 /// Calcule l'espace libre restant dans le stockage
