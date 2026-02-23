@@ -156,6 +156,7 @@ impl CalculatorModel {
     /// Retourne un pointeur vers le SlotInfo de la calculatrice
     /// 
     /// @unverified : En pratique, le SlotInfo DOIT être présent et valide ! Sinon la ram est corrompue.
+    /// Utiliser `SlotInfo::is_valid()` pour vérifier son intégrité si nécessaire.
     pub fn slotinfo_address(&self) -> &'static SlotInfo {
 
         // Obtenir l'adresse de début de la RAM
