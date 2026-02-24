@@ -210,7 +210,7 @@ pub unsafe fn file_read_raw(filename: &str) -> Result<(*const u8, usize), Global
     unsafe {
         while offset < storage_end {
             
-            let size = ptr::read_unaligned(offset as *const u16);
+            let size = ptr::read_unaligned(offset as *const u16) as usize;
             if size == 0 { break; } // Fin des enregistrements
 
             let name_ptr = offset.add(2);
@@ -219,11 +219,11 @@ pub unsafe fn file_read_raw(filename: &str) -> Result<(*const u8, usize), Global
 
             if name_candidate == filename_slice && name_null_terminator == 0 { // Fichier trouvé !
                 let content_ptr = name_ptr.add(filename_len);
-                let content_size = size as usize - 2 - (filename_len + 1); // Taille totale - header - nom  
+                let content_size = size - 2 - (filename_len + 1); // Taille totale - header - nom  
                 return Ok((content_ptr, content_size));
             }
 
-            offset = offset.add(size as usize); // Passer à l'enregistrement suivant
+            offset = offset.add(size); // Passer à l'enregistrement suivant
         }
     }
 
