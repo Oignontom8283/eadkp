@@ -85,6 +85,8 @@ fn next_free() -> *const u8 {
 /// 
 /// Retourne la différence entre l'adresse de fin du stockage utilisable et l'adresse de la position libre actuelle.
 /// Si 0, le stockage est plein.
+/// 
+/// @unchecked
 #[cfg(target_os = "none")]
 pub fn available_space() -> usize {
 
@@ -100,6 +102,8 @@ pub fn available_space() -> usize {
 /// - Nom du fichier ≤ 255 bytes (limite Epsilon)
 /// - Taille totale (header + nom + contenu) ≤ 65535 bytes (u16 max)
 /// Retourne `true` si possible, sinon `false`.
+/// 
+/// @unchecked
 #[cfg(target_os = "none")]
 pub fn can_store(content: &[u8], filename: &str) -> Result<(), StorageError> {
 
