@@ -190,7 +190,6 @@ pub unsafe fn file_write_raw(_filename: &str, _content: &[u8]) -> Result<(), Glo
     Ok(())
 }
 
-// ! Tout ce qui est en dessous n'est pas encore refactoriser
 
 /// Lit un fichier et retourne un pointeur vers son contenu
 #[cfg(target_os = "none")]
@@ -220,7 +219,7 @@ pub unsafe fn file_read_raw(filename: &str) -> Result<&[u8], GlobalError> {
             if name_candidate == filename_slice && name_null_terminator == 0 { // Fichier trouvé !
                 let content_ptr = name_ptr.add(filename_len + 1); // +1 pour sauter le null terminator
                 let content_size = size - 2 - (filename_len + 1); // Taille totale - header - nom  
-                
+
                 return Ok(slice::from_raw_parts(content_ptr, content_size)); // Retourner une slice vers le contenu du fichier
             }
 
@@ -269,10 +268,11 @@ pub unsafe fn file_read_raw(filename: &str) -> Result<&[u8], GlobalError> {
 
 /// Dummy version
 #[cfg(not(target_os = "none"))]
-pub unsafe fn file_read_raw(_filename: &str) -> Result<(*const u8, usize)> {
-    Err(StorageError::InvalidStorage)
+pub unsafe fn file_read_raw(_filename: &str) -> Result<&[u8], GlobalError> {
+    Err(SoftwareError::SimulatorNotSupported.into())
 }
 
+// ! Tout ce qui est en dessous n'est pas encore refactoriser
 
 /// Vérifie si un fichier existe dans le stockage
 #[cfg(target_os = "none")]
