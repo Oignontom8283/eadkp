@@ -48,6 +48,7 @@ use ::alloc::ffi::CString;
 // STORAGE OPERATIONS  
 // ============================================================================
 
+/// Vérifie que le stockage semble valide. **Ne vérifie pas l'integrité des fichiers !**
 #[cfg(target_os = "none")]
 fn is_valid_storage() -> bool {
     let storage = epsilon::filesystem();
