@@ -194,43 +194,76 @@ pub unsafe fn file_write_raw(_filename: &str, _content: &[u8]) -> Result<(), Glo
 
 /// Lit un fichier et retourne un pointeur vers son contenu
 #[cfg(target_os = "none")]
-pub unsafe fn file_read_raw(filename: &str) -> Result<(*const u8, usize)> {
+pub unsafe fn file_read_raw(filename: &str) -> Result<(*const u8, usize), GlobalError> {
+
+    is_valid_storage()?;
 
     let filename_cstr = to_cstring(filename)?;
-    let filename_ptr = filename_cstr.as_ptr();
+    let filename_slice = filename_cstr.as_bytes_with_nul();
+    let filename_len = filename_slice.len();
+
+    let storage = epsilon::filesystem();
+    let storage_start = storage.usable_start_addr;
+    let storage_end = storage.usable_end_addr;
+
+    let mut offset = storage_start;
 
     unsafe {
-        let storage_addr = address();
-        let mut offset = (storage_addr as *mut u8).add(4); // Skip magic number
-        let end_addr = (storage_addr + size()) as *mut u8;
-        
-        // Vérifier que le stockage est valide avec info sur le magic number
-        let magic_expected = 0xBADD0BEEu32.swap_bytes();
-        let magic_found = ptr::read_unaligned(storage_addr as *const u32);
-        if magic_found != magic_expected {
-            return Err(StorageError::InvalidMagicNumber { 
-                expected: magic_expected, 
-                found: magic_found 
-            });
-        }
-        
-        // Parcourir tous les enregistrements
-        while offset < end_addr {
+        while offset < storage_end {
+            
             let size = ptr::read_unaligned(offset as *const u16);
             if size == 0 { break; } // Fin des enregistrements
-            
-            let name = offset.add(2);
-            if strcmp(name, filename_ptr) { // Fichier trouvé
-                let name_size = strlen(name) + 1;
-                let content_size = size as usize - 2 - name_size;
-                return Ok((offset.add(2 + name_size), content_size));
+
+            let name_ptr = offset.add(2);
+            let name_candidate = slice::from_raw_parts(name_ptr, filename_len);
+
+            if name_candidate == filename_slice { // Fichier trouvé !
+                let content_ptr = name_ptr.add(filename_len);
+                let content_size = size as usize - 2 - filename_len; // Taille totale - header - nom
+                return Ok((content_ptr, content_size));
             }
-            
-            offset = offset.add(size as usize);
+
+            offset = offset.add(size as usize); // Passer à l'enregistrement suivant
         }
-        
-        Err(StorageError::FileNotFound)
     }
+
+    Err(StorageError::FileNotFound.into())
+
+    // let filename_cstr = to_cstring(filename)?;
+    // let filename_ptr = filename_cstr.as_ptr();
+
+    // unsafe {
+    //     let storage_addr = address();
+    //     let mut offset = (storage_addr as *mut u8).add(4); // Skip magic number
+    //     let end_addr = (storage_addr + size()) as *mut u8;
+        
+    //     // Vérifier que le stockage est valide avec info sur le magic number
+    //     let magic_expected = 0xBADD0BEEu32.swap_bytes();
+    //     let magic_found = ptr::read_unaligned(storage_addr as *const u32);
+    //     if magic_found != magic_expected {
+    //         return Err(StorageError::InvalidMagicNumber { 
+    //             expected: magic_expected, 
+    //             found: magic_found 
+    //         });
+    //     }
+        
+    //     // Parcourir tous les enregistrements
+    //     while offset < end_addr {
+    //         let size = ptr::read_unaligned(offset as *const u16);
+    //         if size == 0 { break; } // Fin des enregistrements
+            
+    //         let name = offset.add(2);
+    //         if strcmp(name, filename_ptr) { // Fichier trouvé
+    //             let name_size = strlen(name) + 1;
+    //             let content_size = size as usize - 2 - name_size;
+    //             return Ok((offset.add(2 + name_size), content_size));
+    //         }
+            
+    //         offset = offset.add(size as usize);
+    //     }
+        
+    //     Err(StorageError::FileNotFound)
+    // }
 }
 
 /// Dummy version
