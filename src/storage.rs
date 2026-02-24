@@ -49,6 +49,11 @@ use ::alloc::ffi::CString;
 // ============================================================================
 
 
+fn to_cstring(s: &str) -> Result<CString, StorageError> {
+    CString::new(s).map_err(|_| StorageError::StorageInvalidName { length: s.len() + 1, string: s.to_string() })
+}
+
+
 /// Vérifie que le stockage semble valide. **Ne vérifie pas l'integrité des fichiers !**
 #[cfg(target_os = "none")]
 pub fn is_valid_storage() -> Result<(), GlobalError> {
@@ -137,6 +142,7 @@ pub fn can_store(_content: &[u8], _filename: &str) -> Result<(), GlobalError> {
     Err(SoftwareError::SimulatorNotSupported)
 }
 
+
 /// Écrit un nouveau fichier dans le stockage
 /// 
 /// ## Warning
@@ -146,6 +152,8 @@ pub fn can_store(_content: &[u8], _filename: &str) -> Result<(), GlobalError> {
 #[cfg(target_os = "none")]
 pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<(), GlobalError> {
     
+    is_valid_storage()?;
+
     // Vérifier que le fichier peut être stocké avec info détaillée
     can_store(content, filename)?; 
     
