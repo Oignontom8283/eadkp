@@ -51,9 +51,9 @@ use ::alloc::ffi::CString;
 
 /// Vérifie que le stockage semble valide. **Ne vérifie pas l'integrité des fichiers !**
 #[cfg(target_os = "none")]
-pub fn is_valid_storage() -> bool {
+pub fn is_valid_storage() -> Result<(), GlobalError> {
     let storage = epsilon::filesystem();
-    storage.is_valid().is_ok()
+    storage.is_valid().map_err(|_| SoftwareError::InvalidStorage.into())
 }
 
 
