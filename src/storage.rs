@@ -198,8 +198,7 @@ pub unsafe fn file_read_raw(filename: &str) -> Result<(*const u8, usize), Global
 
     is_valid_storage()?;
 
-    let filename_cstr = to_cstring(filename)?;
-    let filename_slice = filename_cstr.as_bytes_with_nul();
+    let filename_slice = filename.as_bytes(); // Obtenir les octets du nom du fichier (sans null terminator)
     let filename_len = filename_slice.len();
 
     let storage = epsilon::filesystem();
@@ -216,10 +215,11 @@ pub unsafe fn file_read_raw(filename: &str) -> Result<(*const u8, usize), Global
 
             let name_ptr = offset.add(2);
             let name_candidate = slice::from_raw_parts(name_ptr, filename_len);
+            let name_null_terminator = *name_ptr.add(filename_len); // Octet juste après le nom candidate, doit être le null terminator
 
-            if name_candidate == filename_slice { // Fichier trouvé !
+            if name_candidate == filename_slice && name_null_terminator == 0 { // Fichier trouvé !
                 let content_ptr = name_ptr.add(filename_len);
-                let content_size = size as usize - 2 - filename_len; // Taille totale - header - nom
+                let content_size = size as usize - 2 - (filename_len + 1); // Taille totale - header - nom  
                 return Ok((content_ptr, content_size));
             }
 
