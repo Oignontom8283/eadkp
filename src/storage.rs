@@ -218,7 +218,7 @@ pub unsafe fn file_read_raw(filename: &str) -> Result<(*const u8, usize), Global
             let name_null_terminator = *name_ptr.add(filename_len); // Octet juste après le nom candidate, doit être le null terminator
 
             if name_candidate == filename_slice && name_null_terminator == 0 { // Fichier trouvé !
-                let content_ptr = name_ptr.add(filename_len);
+                let content_ptr = name_ptr.add(filename_len + 1); // +1 pour sauter le null terminator
                 let content_size = size - 2 - (filename_len + 1); // Taille totale - header - nom  
                 return Ok((content_ptr, content_size));
             }
