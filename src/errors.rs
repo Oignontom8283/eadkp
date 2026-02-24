@@ -10,8 +10,6 @@ pub enum StorageError {
     StorageInvalidName {length: usize, string: String},
     /// Taille du fichier dépasse la limite donnée ou maximale (u16::MAX)
     FileTooLarge { max_size: usize, actual_size: usize },
-    /// Magic number invalide à l'adresse de stockage
-    InvalidMagicNumber { expected: u32, found: u32 },
     /// Stockage plein, position libre null
     StorageFull,
     /// Dépassement de la taille du stockage
@@ -28,6 +26,8 @@ pub enum SoftwareError {
     InvalidUserlandHeader,
     /// Stockage invalide ou corrompu (magic number incorrect)
     InvalidStorage,
+    /// Magic number incorrect dans une structure (ex: UserlandHeader, SlotInfo)
+    InvalidMagicNumber { expected: u32, found: u32 },
     /// Zones de mémoire ce chevauchantes
     OverlappingRegions { src_start: *const u8, src_end: *const u8, dest_start: *const u8, dest_end: *const u8 },
     /// Overflow lors du calcul de pointeur
