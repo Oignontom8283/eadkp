@@ -150,35 +150,33 @@ pub fn can_store(_content: &[u8], _filename: &str) -> Result<(), GlobalError> {
 /// 
 /// Format: \[2 bytes taille\] \[nom\0\] \[contenu\]
 #[cfg(target_os = "none")]
-pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<(), GlobalError> {
+pub fn file_write_raw(filename: &str, content: &[u8]) -> Result<(), GlobalError> {
     
     is_valid_storage()?;
-
-    // Vérifier que le fichier peut être stocké avec info détaillée
-    can_store(content, filename)?; 
+    can_store(content, filename)?;
     
-    let content_ptr = content.as_ptr(); // Pointeur vers le contenu à écrire
-    let content_len = content.len();
+    let write_pos = next_free() as *mut u8; // adr du nouveau fichier (début)
 
-    let filename_cstring = CString::new(filename).unwrap(); // can_store garentie que nom est c string valide
-    let filename_len = filename.len() + 1; // Taille du nom avec null terminator
-
-    let write_pos = next_free() as *mut u8; // Adresse où écrire le nouvel enregistrement
-    let total_size = 2 + filename_len + content_len; // Taille totale de l'enregistrement (header + nom + contenu)
-    
-    let size_addr = write_pos as *mut u16; // Adresse où écrire la taille du header (2 bytes)
-    let name_addr = unsafe { write_pos.add(2) }; // Adresse où écrire le nom du fichier (juste après la taille)
-    let content_addr = unsafe { name_addr.add(filename_len) }; // Adresse où écrire le contenu (juste après le nom)
+    let size = (2 + filename.len() + 1 + content.len()) as u16; // Total size (header + nom + term + contenu)
 
     unsafe {
-        // Écrire le header (taille totale sur 2 bytes)
-        ptr::write_unaligned(size_addr, total_size as u16);
+        let dest_header_ptr = write_pos as *mut u16;
+        let dest_name_slice = slice::from_raw_parts_mut((dest_header_ptr as *mut u8).add(2), filename.len());
+        let dist_term_ptr = dest_name_slice.as_mut_ptr().add(filename.len());
+        let dest_content_slice = slice::from_raw_parts_mut(dist_term_ptr.add(1), content.len());
 
-        // Écrire le nom du fichier (avec null terminator)
-        memory::memcpy(name_addr, filename_cstring.as_ptr(), filename_len)?;
 
-        // Écrire le contenu
-        memory::memcpy(content_addr, content_ptr, content_len)?;
+        // Écrire le header
+        ptr::write_unaligned(dest_header_ptr, size);
+
+        // écrire le nom du fichier (sans null terminator)
+        dest_name_slice.copy_from_slice(filename.as_bytes());
+
+        // Écrire le null terminator
+        *dist_term_ptr = 0;
+        
+        // Écrire le contenu du fichier
+        dest_content_slice.copy_from_slice(content);
     }
 
     Ok(())
