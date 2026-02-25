@@ -117,8 +117,9 @@ pub fn can_store(content: &[u8], filename: &str) -> Result<(), StorageError> {
     let total_size = 2 + filename_size + content_size; // 2 bytes pour la taille du header
 
     // Check que le nom est un c string valide
-    CString::new(filename)
-        .map_err(|_| StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() })?;
+    if filename.as_bytes().contains(&0) {
+        return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() });
+    }
 
     // Check nom < 255 bytes (limitation Epsilon)
     if filename_size > u8::MAX as usize {
