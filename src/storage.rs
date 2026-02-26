@@ -271,7 +271,6 @@ pub unsafe fn file_read_raw(_filename: &str) -> Result<&[u8], GlobalError> {
     Err(SoftwareError::SimulatorNotSupported.into())
 }
 
-// ! Tout ce qui est en dessous n'est pas encore refactoriser
 
 /// Vérifie si un fichier existe dans le stockage
 #[cfg(target_os = "none")]
@@ -288,6 +287,9 @@ pub fn file_exists(filename: &str) -> Result<bool, GlobalError> {
 pub fn file_exists(_filename: &str) -> Result<bool, GlobalError> {
     Ok(false)
 }
+
+
+// ! Tout ce qui est en dessous n'est pas encore refactoriser
 
 
 /// Supprime un fichier du stockage
