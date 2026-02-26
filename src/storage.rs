@@ -275,18 +275,18 @@ pub unsafe fn file_read_raw(_filename: &str) -> Result<&[u8], GlobalError> {
 
 /// Vérifie si un fichier existe dans le stockage
 #[cfg(target_os = "none")]
-pub fn file_exists(filename: &str) -> bool {
+pub fn file_exists(filename: &str) -> Result<bool, GlobalError> {
     match unsafe { file_read_raw(filename) } {
-        Ok(_) => true,
-        Err(StorageError::FileNotFound) => false,
-        Err(_) => false,
+        Ok(_) => Ok(true),
+        Err(GlobalError::Storage(StorageError::FileNotFound)) => Ok(false),
+        Err(e) => Err(e),
     }
 }
 
 /// Dummy version
 #[cfg(not(target_os = "none"))]
-pub unsafe fn file_exists(_filename: &str) -> bool {
-    false
+pub fn file_exists(_filename: &str) -> Result<bool, GlobalError> {
+    Ok(false)
 }
 
 
