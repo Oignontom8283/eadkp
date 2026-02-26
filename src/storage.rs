@@ -49,11 +49,6 @@ use ::alloc::ffi::CString;
 // ============================================================================
 
 
-fn to_cstring(s: &str) -> Result<CString, StorageError> {
-    CString::new(s).map_err(|_| StorageError::StorageInvalidName { length: s.len() + 1, string: s.to_string() })
-}
-
-
 /// Vérifie que le stockage semble valide. **Ne vérifie pas l'integrité des fichiers !**
 #[cfg(target_os = "none")]
 pub fn is_valid_storage() -> Result<(), GlobalError> {
