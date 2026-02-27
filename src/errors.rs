@@ -14,6 +14,8 @@ pub enum StorageError {
     StorageFull,
     /// Dépassement de la taille du stockage
     StorageOverflow { available: usize, needed: usize },
+    /// Format de fichier invalide ou corrompu
+    InvalidFileFormat { ptr: *const u8, details: String },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

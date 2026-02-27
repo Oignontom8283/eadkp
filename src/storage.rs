@@ -81,6 +81,41 @@ fn next_free() -> *const u8 {
     usable_end_addr
 }
 
+
+
+
+
+fn find_one_file(filename: &str) -> Option<(*const u8, usize)> {
+    let filename_slice = filename.as_bytes();
+    let filename_len = filename_slice.len();
+
+    let storage = epsilon::filesystem();
+    let storage_start = storage.usable_start_addr;
+    let storage_end = storage.usable_end_addr;
+
+    let mut offset = storage_start;
+
+    unsafe {
+        while offset < storage_end {
+            let size = ptr::read_unaligned(offset as *const u16) as usize;
+            if size == 0 { break; }
+
+            let name_ptr = offset.add(2);
+            let name_candidate = slice::from_raw_parts(name_ptr, filename_len);
+            let name_null_terminator = *name_ptr.add(filename_len);
+
+            if name_candidate == filename_slice && name_null_terminator == 0 {
+                return Some((offset, size));
+            }
+
+            offset = offset.add(size);
+        }
+    }
+
+    None
+}
+
+
 /// Calcule l'espace libre restant dans le stockage
 /// 
 /// Retourne la différence entre l'adresse de fin du stockage utilisable et l'adresse de la position libre actuelle.
