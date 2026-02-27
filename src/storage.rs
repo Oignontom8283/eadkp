@@ -66,6 +66,12 @@ pub fn is_valid_storage() -> Result<(), GlobalError> {
 }
 
 
+/// Vérifie que le nom d'un fichier est un C string valide (pas de null byte à l'intérieur)
+fn is_valid_cstring(s: &str) -> bool {
+    !s.as_bytes().contains(&0)
+}
+
+
 /// Trouve la prochaine position libre dans le stockage
 /// 
 /// Retourne un pointeur vers le début de la fin de l'espace utilisé (le prochain enregistrement vide).
