@@ -36,8 +36,6 @@ Special thanks to Yaya Cout for his remarkable engineering work on storage
 manipulation, without which this module would probably never have come to life.
 */
 
-use crate::epsilon::FileView;
-
 use super::*;
 
 // Core
@@ -92,8 +90,9 @@ fn next_free() -> *const u8 {
     usable_end_addr
 }
 
+
 /// Trouve un fichier par son nom et retourne une vue sur ce fichier
-fn _find_one_file(filename: &str) -> Result<Option<epsilon::FileView>, GlobalError> {
+fn get_one_file(filename: &str) -> Result<Option<epsilon::FileView>, GlobalError> {
     let filename_slice = filename.as_bytes();
     let filename_len = filename_slice.len();
 
