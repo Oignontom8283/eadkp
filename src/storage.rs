@@ -36,6 +36,8 @@ Special thanks to Yaya Cout for his remarkable engineering work on storage
 manipulation, without which this module would probably never have come to life.
 */
 
+use crate::epsilon::FileView;
+
 use super::*;
 use core::ffi::{CStr, c_char};
 use core::ptr;
@@ -81,11 +83,9 @@ fn next_free() -> *const u8 {
     usable_end_addr
 }
 
-
-
-
-
-fn find_one_file(filename: &str) -> Option<(*const u8, usize)> {
+/// Trouve un fichier par son nom et retourne une vue sur ce fichier
+/// - Optimisé pour la recherche d'UN SEUL fichier.
+fn find_one_file(filename: &str) -> Result<Option<FileView>, GlobalError> {
     let filename_slice = filename.as_bytes();
     let filename_len = filename_slice.len();
 
@@ -105,14 +105,14 @@ fn find_one_file(filename: &str) -> Option<(*const u8, usize)> {
             let name_null_terminator = *name_ptr.add(filename_len);
 
             if name_candidate == filename_slice && name_null_terminator == 0 {
-                return Some((offset, size));
+                return Ok(Some(FileView::from_ptr(offset)?));
             }
 
             offset = offset.add(size);
         }
     }
 
-    None
+    Ok(None)
 }
 
 
