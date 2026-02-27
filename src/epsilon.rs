@@ -5,8 +5,10 @@ avec les composants essentiels d'Epsilon en mêmoire.
 
 use core::ptr;
 use core::ffi::{CStr, c_char};
+use ::alloc::string::ToString;
+use ::alloc::*;
 
-use crate::SoftwareError;
+use crate::{SoftwareError, StorageError};
 
 
 pub const SLOTINFO_MAGIC: u32 = 0xEFEEDBBA;
@@ -267,6 +269,81 @@ impl Filesystem {
             }
         }
         Ok(())
+    }
+}
+
+
+pub struct FileView {
+    ptr: *const u8,      // size and ptr_start
+    name: *const c_char, // n_char + 1 (nt) bytes
+//  data: *const [u8]       size - (2 + n_char + 1) bytes
+}
+
+impl FileView {
+
+    pub fn from_ptr(ptr: *const u8) -> Result<Self, StorageError> {
+        unsafe {
+            let size = ptr::read_unaligned(ptr as *const u16);
+            let name_start = ptr.add(2);
+            
+            // Chercher le \0 avec une limite de sécurité
+            let mut name_len = None;
+            for i in 0..255 {
+                if *name_start.add(i) == 0 {
+                    name_len = Some(i as u8);
+                    break;
+                }
+            }
+
+            let n_len = name_len.ok_or(StorageError::InvalidFileFormat { ptr: ptr, details: "Name not null-terminated or too long".to_string() })?;
+
+            // Check que la taille totale est cohérente
+            // Header(2) + Nom + \0(1)
+            if size < (2 + n_len as u16 + 1) {
+                return Err(StorageError::InvalidFileFormat { ptr: ptr, details: "File size is smaller than the header + name + null terminator".to_string() });
+            }
+
+            Ok(Self {
+                ptr,
+                name: ptr.add(2) as *const c_char,
+            })
+        }
+        
+    }
+
+    pub fn size(&self) -> u16 {
+        unsafe { ptr::read_unaligned(self.ptr as *const u16) }
+    }
+
+    fn name_len(&self) -> usize {
+        let start = self.name as *const u8;
+        let mut ptr = start;
+
+        // Parcours la chaine pour compter les caractères jusqu'au null terminator
+        unsafe {
+            while *ptr != 0 {
+                ptr = ptr.add(1);
+            }
+
+            let name_len = ptr.offset_from(start) as usize;
+
+            name_len
+        }
+    }
+
+    pub fn name(&self) -> &str {
+        let name_len = self.name_len();
+
+        unsafe {
+            let name_slice = slice::from_raw_parts(self.name, name_len);
+            core::str::from_utf8_unchecked(name_slice) // Epsilon utilise l'utf-8 donc on est safe
+        }
+    }
+
+    pub fn data(&self) -> &[u8] {
+        let size = self.size() as usize;
+        let before_data = 2 + (self.name_len() + 1);
+        unsafe { slice::from_raw_parts(self.ptr.add(before_data), size - before_data) }
     }
 }
 
