@@ -18,7 +18,7 @@ pub enum StorageError {
     InvalidFileFormat { ptr: *const u8, details: String },
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SoftwareError {
     /// Simulateur non supporté
     SimulatorNotSupported,
@@ -34,6 +34,8 @@ pub enum SoftwareError {
     OverlappingRegions { src_start: *const u8, src_end: *const u8, dest_start: *const u8, dest_end: *const u8 },
     /// Overflow lors du calcul de pointeur
     PointerOverflow,
+    /// Paramètre invalide fourni à une fonction
+    InvalidParameter { param_name: String, details: String },
 }
 
 
