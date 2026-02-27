@@ -129,6 +129,59 @@ fn get_one_file(filename: &str) -> Result<Option<epsilon::FileView>, GlobalError
 }
 
 
+pub fn find_files_with_suffix(suffix: &str) -> Result<Vec<&str>, GlobalError> {
+
+    // Vérifier que le suffix est un c string valide (pas de null byte à l'intérieur) et pas vide (un suffix vide correspondrait à tous les fichiers)
+    if suffix.is_empty() || !is_valid_cstring(suffix) {
+        return Err(SoftwareError::InvalidParameter { param_name: "suffix".to_string(), details: "suffix is empty or contains null bytes".to_string() }.into());
+    }
+
+    let suffix_slice = suffix.as_bytes();
+    let suffix_len = suffix_slice.len();
+
+    let storage = epsilon::filesystem();
+    let storage_start = storage.usable_start_addr;
+    let storage_end = storage.usable_end_addr;
+
+    let mut offset = storage_start;
+    let mut matching_files = Vec::new();
+
+    unsafe {
+        while offset < storage_end {
+            let size = ptr::read_unaligned(offset as *const u16) as usize;
+            if size == 0 { break; }
+
+            let name_ptr = offset.add(2);
+            
+            let mut nt_ptr = name_ptr; // Trouver l'adr du nt
+            while *nt_ptr != 0 {
+                nt_ptr = nt_ptr.add(1);
+            }
+
+            let name_len = nt_ptr.offset_from(name_ptr) as usize;
+            
+            // Vérifier que le nom est assez long pour contenir le suffix
+            if name_len >= suffix_len {
+                let suffix_candidate_ptr = nt_ptr.sub(suffix_len);
+                let suffix_candidate = slice::from_raw_parts(suffix_candidate_ptr, suffix_len);
+                
+                if suffix_candidate == suffix_slice {
+                    // Si trouvé une correspondance, extraire le nom complet du fichier pour le push
+                    let name_slice = slice::from_raw_parts(name_ptr, name_len);
+                    let name_str = str::from_utf8_unchecked(name_slice);  
+                    
+                    matching_files.push(name_str);
+                }
+            }
+
+            offset = offset.add(size);
+        }
+    }
+
+    Ok(matching_files)
+}
+
+
 /// Calcule l'espace libre restant dans le stockage
 /// 
 /// Retourne la différence entre l'adresse de fin du stockage utilisable et l'adresse de la position libre actuelle.
