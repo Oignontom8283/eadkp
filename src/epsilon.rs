@@ -273,6 +273,14 @@ impl Filesystem {
 }
 
 
+/// FileView - Vue d'un fichier dans le système de fichiers
+/// 
+/// Abstraction pour parser et accéder a un fichier.
+/// - Vérifie la validité minimale du fichier (taille cohérente, nom null-terminated, etc.)
+/// - Parse automatiquement les données du fichier pour une sécurité maxiale !
+/// - Accés facile aux métadonnées et contenue du fichier. (taille, nom, données) En évitant les SegFaults et erreurs de parsing.
+/// 
+/// Utiliser `FileView::from_ptr()` pour créer une instance à partir d'un pointeur vers un fichier dans le système de fichiers.
 pub struct FileView {
     ptr: *const u8,      // size and ptr_start
     name: *const c_char, // n_char + 1 (nt) bytes
@@ -281,6 +289,7 @@ pub struct FileView {
 
 impl FileView {
 
+    /// Crée une instance de FileView à partir d'un pointeur vers un fichier dans le système de fichiers.
     pub fn from_ptr(ptr: *const u8) -> Result<Self, StorageError> {
         unsafe {
             let size = ptr::read_unaligned(ptr as *const u16);
@@ -311,10 +320,14 @@ impl FileView {
         
     }
 
+    /// Retourne la taille totale du fichier, y compris le header et le nom.
+    /// 
+    /// `[header(2)] + [name(n_char + 1)] + [data(size - (2 + n_char + 1))]`
     pub fn size(&self) -> u16 {
         unsafe { ptr::read_unaligned(self.ptr as *const u16) }
     }
 
+    /// Calcule la longueur du nom du fichier en parcourant la chaîne jusqu'au null terminator.
     fn name_len(&self) -> usize {
         let start = self.name as *const u8;
         let mut ptr = start;
@@ -331,6 +344,7 @@ impl FileView {
         }
     }
 
+    /// Retourne le nom du fichier en tant que &str.
     pub fn name(&self) -> &str {
         let name_len = self.name_len();
 
@@ -340,6 +354,7 @@ impl FileView {
         }
     }
 
+    /// Retourne les données du fichier en tant que slice de bytes.
     pub fn data(&self) -> &[u8] {
         let size = self.size() as usize;
         let before_data = 2 + (self.name_len() + 1);
