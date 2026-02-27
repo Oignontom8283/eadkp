@@ -39,12 +39,21 @@ manipulation, without which this module would probably never have come to life.
 use crate::epsilon::FileView;
 
 use super::*;
-use core::ffi::{CStr, c_char};
+
+// Core
+#[allow(unused_imports)]
+use core::ffi::{c_char};
 use core::ptr;
-use heapless;
-use ::alloc::*;
-use ::alloc::string::*;
-use ::alloc::ffi::CString;
+use core::slice;
+use core::str;
+
+// Alloc
+extern crate alloc; 
+use alloc::vec::Vec;
+#[allow(unused_imports)]
+use alloc::string::{String, ToString};
+#[allow(unused_imports)]
+use alloc::ffi::CString;
 
 // ============================================================================
 // STORAGE OPERATIONS  
@@ -84,8 +93,7 @@ fn next_free() -> *const u8 {
 }
 
 /// Trouve un fichier par son nom et retourne une vue sur ce fichier
-/// - Optimisé pour la recherche d'UN SEUL fichier.
-fn find_one_file(filename: &str) -> Result<Option<FileView>, GlobalError> {
+fn _find_one_file(filename: &str) -> Result<Option<epsilon::FileView>, GlobalError> {
     let filename_slice = filename.as_bytes();
     let filename_len = filename_slice.len();
 
@@ -105,7 +113,7 @@ fn find_one_file(filename: &str) -> Result<Option<FileView>, GlobalError> {
             let name_null_terminator = *name_ptr.add(filename_len);
 
             if name_candidate == filename_slice && name_null_terminator == 0 {
-                return Ok(Some(FileView::from_ptr(offset)?));
+                return Ok(Some(epsilon::FileView::from_ptr(offset)?));
             }
 
             offset = offset.add(size);
