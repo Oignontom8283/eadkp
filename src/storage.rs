@@ -128,7 +128,17 @@ fn get_one_file(filename: &str) -> Result<Option<epsilon::FileView>, GlobalError
     Ok(None)
 }
 
-
+/// Trouve tous les fichiers dont le nom se termine par un suffix donné et retourne une liste de leurs noms
+/// 
+/// ## Exemple
+/// ```
+/// fn display(file: &str) { ... } // Fonction d'affichage fictive
+/// 
+/// let txt_files = find_files_with_suffix(".txt")?;
+/// for file in txt_files {
+///     display(file); // Affiche tous les fichiers se terminant par .txt
+/// }
+/// ```
 pub fn find_files_with_suffix(suffix: &str) -> Result<Vec<&str>, GlobalError> {
 
     // Vérifier que le suffix est un c string valide (pas de null byte à l'intérieur) et pas vide (un suffix vide correspondrait à tous les fichiers)
