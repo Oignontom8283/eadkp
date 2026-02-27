@@ -10,6 +10,8 @@ pub enum StorageError {
     StorageInvalidName {length: usize, string: String},
     /// Taille du fichier dépasse la limite donnée ou maximale (u16::MAX)
     FileTooLarge { max_size: usize, actual_size: usize },
+    /// Fichier vide, pas de données à stocker
+    FileContentEmpty { name: String },
     /// Stockage plein, position libre null
     StorageFull,
     /// Dépassement de la taille du stockage
