@@ -251,7 +251,7 @@ pub fn can_store(content: &[u8], filename: &str) -> Result<(), GlobalError> {
 
     // Check que le content n'est pas vide
     if content.is_empty() {
-        return Err(StorageError::FileContentEmpty { name: filename.to_string() }.into());
+        return Err(StorageError::FileContentEmpty.into());
     }
 
     // Check total_size < 65535 bytes (limitation du header sur 2 bytes)
