@@ -323,6 +323,7 @@ pub unsafe fn file_write_raw(_filename: &str, _content: &[u8]) -> Result<(), Glo
 pub unsafe fn file_read_raw(filename: &str) -> Result<&[u8], GlobalError> {
 
     is_valid_storage()?;
+    //TODO: Pas de can_store ici, donc faut vérifier les arg a la main
 
     let filename_slice = filename.as_bytes(); // Obtenir les octets du nom du fichier (sans null terminator)
     let filename_len = filename_slice.len();
