@@ -211,36 +211,58 @@ pub fn available_space() -> usize {
 /// Vérifie si un fichier peut être stocké en respectant les contraintes suivantes :
 /// - Espace disponible suffisant
 /// - Nom du fichier ≤ 255 bytes (limite Epsilon)
+/// - Nom du fichier valide (pas de null byte à l'intérieur)
 /// - Taille totale (header + nom + contenu) ≤ 65535 bytes (u16 max)
 /// Retourne `true` si possible, sinon `false`.
 /// 
+/// ## Exemple
+/// ```
+/// let content = b"Hello, world!";
+/// let filename1 = "greeting.txt";
+/// assert!(can_store(content1, filename1).is_ok()); // Vérifie que le fichier peut être stocké
+/// 
+/// let filename2 = "invalid\0name.txt";
+/// let content2 = b"Some content";
+/// assert!(can_store(content2, filename2).is_err()); // Vérifie que le nom de fichier invalide est rejeté
+/// ```
+/// 
 /// @unchecked
 #[cfg(target_os = "none")]
-pub fn can_store(content: &[u8], filename: &str) -> Result<(), StorageError> {
+pub fn can_store(content: &[u8], filename: &str) -> Result<(), GlobalError> {
 
     let filename_size = filename.len() + 1; // +1 pour le null terminator
     let content_size = content.len();
     let total_size = 2 + filename_size + content_size; // 2 bytes pour la taille du header
 
+    // Check que le nom n'est pas vide
+    if filename.is_empty() {
+        return Err(StorageError::StorageInvalidName { length: 0, string: filename.to_string() }.into());
+    }
+
     // Check que le nom est un c string valide
     if filename.as_bytes().contains(&0) {
-        return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() });
+        return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() }.into());
     }
 
     // Check nom < 255 bytes (limitation Epsilon)
     if filename_size > u8::MAX as usize {
-        return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() });
+        return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() }.into());
+    }
+
+    // Check que le content n'est pas vide
+    if content.is_empty() {
+        return Err(StorageError::FileContentEmpty { name: filename.to_string() }.into());
     }
 
     // Check total_size < 65535 bytes (limitation du header sur 2 bytes)
     if total_size > u16::MAX as usize {
-        return Err(StorageError::FileTooLarge { max_size: u16::MAX as usize, actual_size: total_size });
+        return Err(StorageError::FileTooLarge { max_size: u16::MAX as usize, actual_size: total_size }.into());
     }
 
     if available_space() >= total_size {
         Ok(())
     } else {
-        Err(StorageError::StorageOverflow { available: available_space(), needed: total_size })
+        Err(StorageError::StorageOverflow { available: available_space(), needed: total_size }.into())
     }
 }
 
