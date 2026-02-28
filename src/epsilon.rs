@@ -201,15 +201,15 @@ impl CalculatorModel {
 /// Adresse de base : storage_address_ram
 /// Taille totale   : storage_size_ram (43016 bytes)
 ///
-///  Offset 0            Offset 4                              Offset 43012     Offset 43016  
-///  ↓                   ↓                                     ↓                ↓         
-/// ┌───────────────────┬─────────────────────────────────────┬────────────────┐
-/// │  Magic Header     │     Buffer utilisable (42 Ko)       │  Magic Footer  │
-/// │   (4 bytes)       │           (43008 bytes)             │   (4 bytes)    │
-/// └───────────────────┴─────────────────────────────────────┴────────────────┘
-///  ↑                   ↑                                     ↑                ↑
-///  storage_start_addr  usable_start_addr                     usable_end_addr  storage_end_addr
-///  header_addr                                               footer_addr
+///  Offset 0            Offset 4                           Offset 43010     Offset 43012     Offset 43016  
+///  ↓                   ↓                                  ↓                ↓                ↓         
+/// ┌───────────────────┬───────────────────────────────────┬────────────────┬────────────────┐
+/// │  Magic Header     │     Buffer utilisable (42 Ko)     │    Marge       │  Magic Footer  │
+/// │   (4 bytes)       │           (43008 bytes)           │  (2 bytes)     │   (4 bytes)    │
+/// └───────────────────┴───────────────────────────────────┴────────────────┴────────────────┘
+///  ↑                   ↑                                  ↑                ↑
+///  storage_start_addr  usable_start_addr                  usable_end_addr  storage_end_addr
+///  header_addr                                            footer_addr
 /// ```
 #[derive(Debug)]
 pub struct Filesystem {
@@ -251,7 +251,7 @@ impl Filesystem {
 
             usable_size: user_land.storage_size_ram - 8, // Taille utilisable (total - header/footer)
             usable_start_addr: unsafe { user_land.storage_address_ram.add(4)}, // Adresse juste après le header
-            usable_end_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize - 4)} // adresse du footer = fin de la zone utilisable
+            usable_end_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize - 4 - 2)} // adresse du footer = fin de la zone utilisable, 2 bytes de marge de sécurité pour éviter de lire le booter
         }
     }
 
