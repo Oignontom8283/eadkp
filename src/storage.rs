@@ -65,10 +65,9 @@ pub fn is_valid_storage() -> Result<(), GlobalError> {
     storage.is_valid().map_err(|_| SoftwareError::InvalidStorage.into())
 }
 
-
-/// Vérifie que le nom d'un fichier est un C string valide (pas de null byte à l'intérieur)
+/// Vérifie que la string est un c string valide (pas de null byte à l'intérieur) et pas vide (un nom de fichier vide n'est pas autorisé)
 fn is_valid_cstring(s: &str) -> bool {
-    !s.as_bytes().contains(&0)
+    !s.as_bytes().contains(&0) && !s.is_empty()
 }
 
 
@@ -142,7 +141,7 @@ fn get_one_file(filename: &str) -> Result<Option<epsilon::FileView>, GlobalError
 pub fn find_files_with_suffix(suffix: &str) -> Result<Vec<&str>, GlobalError> {
 
     // Vérifier que le suffix est un c string valide (pas de null byte à l'intérieur) et pas vide (un suffix vide correspondrait à tous les fichiers)
-    if suffix.is_empty() || !is_valid_cstring(suffix) {
+    if !is_valid_cstring(suffix) {
         return Err(SoftwareError::InvalidParameter { param_name: "suffix".to_string(), details: "suffix is empty or contains null bytes".to_string() }.into());
     }
 
@@ -234,13 +233,8 @@ pub fn can_store(content: &[u8], filename: &str) -> Result<(), GlobalError> {
     let content_size = content.len();
     let total_size = 2 + filename_size + content_size; // 2 bytes pour la taille du header
 
-    // Check que le nom n'est pas vide
-    if filename.is_empty() {
-        return Err(StorageError::StorageInvalidName { length: 0, string: filename.to_string() }.into());
-    }
-
-    // Check que le nom est un c string valide
-    if filename.as_bytes().contains(&0) {
+    // Check que le nom peut être une c string valide
+    if is_valid_cstring(filename) {
         return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() }.into());
     }
 
@@ -283,6 +277,11 @@ pub fn file_write_raw(filename: &str, content: &[u8]) -> Result<(), GlobalError>
     
     is_valid_storage()?;
     can_store(content, filename)?;
+
+    // Vérifier que le nom du fichier est valide
+    if !is_valid_cstring(filename) {
+        return Err(StorageError::StorageInvalidName { length: filename.len(), string: filename.to_string() }.into());
+    }
     
     let write_pos = next_free() as *mut u8; // adr du nouveau fichier (début)
 
