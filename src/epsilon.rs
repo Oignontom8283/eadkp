@@ -23,6 +23,8 @@ pub const RAM_BASE_N0120: u32 = 0x24000000;
 pub const SLOTS_N0110_OR_N0115: [*const u32; 2] = [0x90010000 as *const u32, 0x90410000 as *const u32];
 pub const SLOTS_N0120: [*const u32; 2] = [0x90020000 as *const u32, 0x90420000 as *const u32];
 
+pub const STORAGE_FILE_MAX_NAME_LEN: usize = u16::MAX as usize;
+
 
 /// SlotInfo - 16 bytes au dèbut de la RAM
 /// 

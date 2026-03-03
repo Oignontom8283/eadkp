@@ -70,6 +70,19 @@ fn is_valid_cstring(s: &str) -> bool {
     !s.as_bytes().contains(&0) && !s.is_empty()
 }
 
+fn find_null_terminator(start:*const u8) -> Result<*const u8, StorageError> {
+    let mut len = 0;
+    unsafe {
+        while *start.add(len) != 0 {
+            len += 1;
+            
+            if len > epsilon::STORAGE_FILE_MAX_NAME_LEN { // Limite de longueur pour éviter de parcourir indéfiniment en cas de corruption
+                return Err(StorageError::NullTerminatorNotFound { start: start});
+            }
+        }
+        Ok(start.add(len))
+    }
+}
 
 /// Trouve la prochaine position libre dans le stockage
 /// 

@@ -18,6 +18,8 @@ pub enum StorageError {
     StorageOverflow { available: usize, needed: usize },
     /// Format de fichier invalide ou corrompu
     InvalidFileFormat { ptr: *const u8, details: String },
+    /// Le null terminator n'a pas été trouvé
+    NullTerminatorNotFound { start: *const u8 },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
