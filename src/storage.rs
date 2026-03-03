@@ -96,37 +96,6 @@ fn next_free() -> *const u8 {
 }
 
 
-/// Trouve un fichier par son nom et retourne une vue sur ce fichier
-fn get_one_file(filename: &str) -> Result<Option<epsilon::FileView>, GlobalError> {
-    let filename_slice = filename.as_bytes();
-    let filename_len = filename_slice.len();
-
-    let storage = epsilon::filesystem();
-    let storage_start = storage.usable_start_addr;
-    let storage_end = storage.usable_end_addr;
-
-    let mut offset = storage_start;
-
-    unsafe {
-        while offset < storage_end {
-            let size = ptr::read_unaligned(offset as *const u16) as usize;
-            if size == 0 { break; }
-
-            let name_ptr = offset.add(2);
-            let name_candidate = slice::from_raw_parts(name_ptr, filename_len);
-            let name_null_terminator = *name_ptr.add(filename_len);
-
-            if name_candidate == filename_slice && name_null_terminator == 0 {
-                return Ok(Some(epsilon::FileView::from_ptr(offset)?));
-            }
-
-            offset = offset.add(size);
-        }
-    }
-
-    Ok(None)
-}
-
 /// Trouve tous les fichiers dont le nom se termine par un suffix donné et retourne une liste de leurs noms
 /// 
 /// ## Exemple
