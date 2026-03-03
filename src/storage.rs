@@ -70,17 +70,19 @@ fn is_valid_cstring(s: &str) -> bool {
     !s.as_bytes().contains(&0) && !s.is_empty()
 }
 
-fn find_null_terminator(start:*const u8) -> Result<*const u8, StorageError> {
-    let mut len = 0;
-    unsafe {
-        while *start.add(len) != 0 {
-            len += 1;
-            
-            if len > epsilon::STORAGE_FILE_MAX_NAME_LEN { // Limite de longueur pour éviter de parcourir indéfiniment en cas de corruption
-                return Err(StorageError::NullTerminatorNotFound { start: start});
+/// Trouve l'adresse du null terminator d'une string dans le stockage, à partir d'une adresse de départ et d'une adresse maximale
+fn find_null_terminator(start:*const u8, max:*const u8) -> Result<*const u8, StorageError> {
+    unsafe  {
+
+        // limite d'Epsilon et l'imite donnée
+        let len = (max.offset_from(start) as usize).min(epsilon::STORAGE_FILE_MAX_NAME_LEN);
+        
+        for offset in 0..=len {
+            if *start.add(offset) == 0 {
+                return Ok(start.add(offset));
             }
         }
-        Ok(start.add(len))
+        Err(StorageError::NullTerminatorNotFound { start })
     }
 }
 
