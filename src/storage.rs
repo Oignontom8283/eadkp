@@ -111,6 +111,49 @@ fn next_free() -> *const u8 {
 }
 
 
+/// Structure pour représenter un fichier.
+struct FileEntry {
+    size: usize,
+    ptr: *const u8,
+    name: *const u8,
+    content: *const u8,
+    content_size: usize,
+}
+
+/// Trouve un fichier par son nom et retourne une structure contenant des pointeurs vers son header, son nom et son contenu, ainsi que sa taille.
+fn _find_file(filename: &str) -> Result<FileEntry, StorageError> {
+    let filename_slice = filename.as_bytes();
+    let filename_len = filename_slice.len();
+
+    let storage = epsilon::filesystem();
+    let storage_start = storage.usable_start_addr;
+    let storage_end = storage.usable_end_addr;
+
+    let mut offset = storage_start;
+
+    unsafe {
+        while offset < storage_end {
+            let size = ptr::read_unaligned(offset as *const u16) as usize;
+            if size == 0 { break; }
+
+            let name_ptr = offset.add(2);
+            let name_candidate = slice::from_raw_parts(name_ptr, filename_len);
+            let name_null_terminator = *name_ptr.add(filename_len);
+
+            if name_candidate == filename_slice && name_null_terminator == 0 {
+                let content_ptr = name_ptr.add(filename_len + 1);
+                let content_size = size - 2 - (filename_len + 1);
+                return Ok(FileEntry { size: size, ptr: offset, name: name_ptr, content: content_ptr, content_size });
+            }
+
+            offset = offset.add(size);
+        }
+    }
+
+    Err(StorageError::FileNotFound)
+}
+
+
 /// Trouve tous les fichiers dont le nom se termine par un suffix donné et retourne une liste de leurs noms
 /// 
 /// ## Exemple
@@ -306,77 +349,14 @@ pub unsafe fn file_write_raw(_filename: &str, _content: &[u8]) -> Result<(), Glo
 #[cfg(target_os = "none")]
 pub unsafe fn file_read_raw(filename: &str) -> Result<&[u8], GlobalError> {
 
+    // Vérifier que le storage est valide
     is_valid_storage()?;
     
-    // Pas besouin de check le nom, car au pire, on ne trouve pas le fichier, grace a la comparaison de bytes
+    // Localiser le fichier via une recherche directe
+    let file_view = _find_file(filename)?;
 
-    let filename_slice = filename.as_bytes(); // Obtenir les octets du nom du fichier (sans null terminator)
-    let filename_len = filename_slice.len();
-
-    let storage = epsilon::filesystem();
-    let storage_start = storage.usable_start_addr;
-    let storage_end = storage.usable_end_addr;
-
-    let mut offset = storage_start;
-
-    unsafe {
-        while offset < storage_end {
-            
-            let size = ptr::read_unaligned(offset as *const u16) as usize;
-            if size == 0 { break; } // Fin des enregistrements
-
-            let name_ptr = offset.add(2);
-            let name_candidate = slice::from_raw_parts(name_ptr, filename_len);
-            let name_null_terminator = *name_ptr.add(filename_len); // Octet juste après le nom candidate, doit être le null terminator
-
-            if name_candidate == filename_slice && name_null_terminator == 0 { // Fichier trouvé !
-                let content_ptr = name_ptr.add(filename_len + 1); // +1 pour sauter le null terminator
-                let content_size = size - 2 - (filename_len + 1); // Taille totale - header - nom  
-
-                return Ok(slice::from_raw_parts(content_ptr, content_size)); // Retourner une slice vers le contenu du fichier
-            }
-
-            offset = offset.add(size); // Passer à l'enregistrement suivant
-        }
-    }
-
-    Err(StorageError::FileNotFound.into())
-
-    // let filename_cstr = to_cstring(filename)?;
-    // let filename_ptr = filename_cstr.as_ptr();
-
-    // unsafe {
-    //     let storage_addr = address();
-    //     let mut offset = (storage_addr as *mut u8).add(4); // Skip magic number
-    //     let end_addr = (storage_addr + size()) as *mut u8;
-        
-    //     // Vérifier que le stockage est valide avec info sur le magic number
-    //     let magic_expected = 0xBADD0BEEu32.swap_bytes();
-    //     let magic_found = ptr::read_unaligned(storage_addr as *const u32);
-    //     if magic_found != magic_expected {
-    //         return Err(StorageError::InvalidMagicNumber { 
-    //             expected: magic_expected, 
-    //             found: magic_found 
-    //         });
-    //     }
-        
-    //     // Parcourir tous les enregistrements
-    //     while offset < end_addr {
-    //         let size = ptr::read_unaligned(offset as *const u16);
-    //         if size == 0 { break; } // Fin des enregistrements
-            
-    //         let name = offset.add(2);
-    //         if strcmp(name, filename_ptr) { // Fichier trouvé
-    //             let name_size = strlen(name) + 1;
-    //             let content_size = size as usize - 2 - name_size;
-    //             return Ok((offset.add(2 + name_size), content_size));
-    //         }
-            
-    //         offset = offset.add(size as usize);
-    //     }
-        
-    //     Err(StorageError::FileNotFound)
-    // }
+    // Retourner une slice pointant vers le contenu du fichier
+    return Ok(slice::from_raw_parts(file_view.content, file_view.content_size));
 }
 
 /// Dummy version
