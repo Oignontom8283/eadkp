@@ -386,50 +386,33 @@ pub fn file_exists(_filename: &str) -> Result<bool, GlobalError> {
 // ! Tout ce qui est en dessous n'est pas encore refactoriser
 
 
-/// Supprime un fichier du stockage
+/// Efface un fichier du stockage (**Irréversible!**)
 #[cfg(target_os = "none")]
-pub unsafe fn file_erase(filename: &str) -> Result<()> {
+pub unsafe fn file_erase(filename: &str) -> Result<(), GlobalError> {
 
-    let filename_cstr = to_cstring(filename)?;
-    let filename_ptr = filename_cstr.as_ptr();
+    is_valid_storage()?;
 
-    unsafe {
-        let storage_addr = address();
-        let mut offset = (storage_addr as *mut u8).add(4);
-        let end_addr = (storage_addr + size()) as *mut u8;
-        
-        // Vérifier que le stockage est valide
-        let magic_expected = 0xBADD0BEEu32.swap_bytes();
-        let magic_found = ptr::read_unaligned(storage_addr as *const u32);
-        if magic_found != magic_expected {
-            return Err(StorageError::InvalidMagicNumber { 
-                expected: magic_expected, 
-                found: magic_found 
-            });
-        }
-        
-        // Chercher le fichier
-        while offset < end_addr {
-            let size = ptr::read_unaligned(offset as *const u16);
-            if size == 0 { break; }
-            
-            let name = offset.add(2);
-            if strcmp(name, filename_ptr) { // Fichier trouvé
-                // Déplacer tous les enregistrements suivants pour combler le trou
-                let next_free_pos = next_free() as *mut u8;
-                let move_size = next_free_pos.offset_from(offset) as usize;
-                memmove(offset, offset.add(size as usize), move_size);
-                
-                // Nettoyer l'espace libéré
-                memset(next_free_pos.sub(size as usize), 0, size as usize);
-                return Ok(());
-            }
-            
-            offset = offset.add(size as usize);
-        }
-        
-        Err(StorageError::FileNotFound)
-    }
+    let file_to_erase = _find_file(filename)?;
+
+    let free_space_before_deletion = next_free();
+    let next_file_pos = file_to_erase.ptr.add(file_to_erase.size);
+
+    // Déplacer tout depuis la fin du fichier supprimé jusqu'à la fin de l'espace utilisé vers le début du fichier supprimé pour combler le trou
+    // Normalement ptr::copy devrait automatiquement détecter le chvauchement et faire la copie de manière sûre.
+    ptr::copy(
+        next_file_pos,
+        file_to_erase.ptr as *mut u8,
+        free_space_before_deletion.offset_from(next_file_pos) as usize
+    );
+
+    // Nettoyer l'espace libéré à la fin du stockage (obligatoire)
+    ptr::write_bytes(
+        free_space_before_deletion.sub(file_to_erase.size) as *mut u8,
+        0,
+        file_to_erase.size
+    );
+
+    Ok(())
 }
 
 /// Dummy version
