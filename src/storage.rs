@@ -70,10 +70,10 @@ fn is_valid_cstring(s: &str) -> bool {
     !s.as_bytes().contains(&0) && !s.is_empty()
 }
 
-/// Trouve l'adresse du null terminator d'une string dans le stockage, à partir d'une adresse de départ et d'une adresse maximale
-fn find_null_terminator(start:*const u8, max:*const u8) -> Result<*const u8, StorageError> {
+/// Trouve le pointeur vers le null terminator d'une string commençant à `start`,
+/// sans dépasser `max` dans un maxium de `epsilon::STORAGE_FILE_MAX_NAME_LEN`.
+fn strnend(start:*const u8, max:*const u8) -> Result<*const u8, StorageError> {
     unsafe  {
-
         // limite d'Epsilon et l'imite donnée
         let len = (max.offset_from(start) as usize).min(epsilon::STORAGE_FILE_MAX_NAME_LEN);
         
@@ -146,10 +146,11 @@ pub fn find_files_with_suffix(suffix: &str) -> Result<Vec<&str>, GlobalError> {
 
             let name_ptr = offset.add(2);
             
-            let mut nt_ptr = name_ptr; // Trouver l'adr du nt
-            while *nt_ptr != 0 {
-                nt_ptr = nt_ptr.add(1);
-            }
+            // let mut nt_ptr = name_ptr; // Trouver l'adr du nt
+            // while *nt_ptr != 0 {
+            //     nt_ptr = nt_ptr.add(1);
+            // }
+            let nt_ptr = strnend(name_ptr, offset.add(size))?;
 
             let name_len = nt_ptr.offset_from(name_ptr) as usize;
             
