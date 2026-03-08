@@ -235,6 +235,46 @@ pub fn available_space() -> usize {
     usable_end - free_addr
 }
 
+
+/// Sous-fonction de `can_store()`. Utilise directement la longueur du contenu sans pointeur. Se réfère à `can_store()` pour la documentation complète.
+#[cfg(target_os = "none")]
+pub fn can_store_len(content_len: usize, filename: &str) -> Result<(), GlobalError> {
+    let filename_size = filename.len() + 1; // +1 pour le null terminator
+    let total_size = 2 + filename_size + content_len; // 2 bytes pour la taille du header
+
+    // Check que le nom peut être une c string valide
+    if is_valid_cstring(filename) {
+        return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() }.into());
+    }
+
+    // Check nom < 255 bytes (limitation Epsilon)
+    if filename_size > u8::MAX as usize {
+        return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() }.into());
+    }
+
+    // Check que le content n'est pas vide
+    if content_len == 0 {
+        return Err(StorageError::FileContentEmpty.into());
+    }
+
+    // Check total_size < 65535 bytes (limitation du header sur 2 bytes)
+    if total_size > u16::MAX as usize {
+        return Err(StorageError::FileTooLarge { max_size: u16::MAX as usize, actual_size: total_size }.into());
+    }
+
+    if available_space() >= total_size {
+        Ok(())
+    } else {
+        Err(StorageError::StorageOverflow { available: available_space(), needed: total_size }.into())
+    }
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn can_store_len(_content_len: usize, _filename: &str) -> Result<(), GlobalError> {
+    Ok(())
+}
+
+
 /// Vérifie si un fichier peut être stocké en respectant les contraintes suivantes :
 /// - Espace disponible suffisant
 /// - Nom du fichier ≤ 255 bytes (limite Epsilon)
@@ -256,41 +296,7 @@ pub fn available_space() -> usize {
 /// @unchecked
 #[cfg(target_os = "none")]
 pub fn can_store(content: &[u8], filename: &str) -> Result<(), GlobalError> {
-
-    let filename_size = filename.len() + 1; // +1 pour le null terminator
-    let content_size = content.len();
-    let total_size = 2 + filename_size + content_size; // 2 bytes pour la taille du header
-
-    // Check que le nom peut être une c string valide
-    if is_valid_cstring(filename) {
-        return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() }.into());
-    }
-
-    // Check nom < 255 bytes (limitation Epsilon)
-    if filename_size > u8::MAX as usize {
-        return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() }.into());
-    }
-
-    // Check que le content n'est pas vide
-    if content.is_empty() {
-        return Err(StorageError::FileContentEmpty.into());
-    }
-
-    // Check total_size < 65535 bytes (limitation du header sur 2 bytes)
-    if total_size > u16::MAX as usize {
-        return Err(StorageError::FileTooLarge { max_size: u16::MAX as usize, actual_size: total_size }.into());
-    }
-
-    if available_space() >= total_size {
-        Ok(())
-    } else {
-        Err(StorageError::StorageOverflow { available: available_space(), needed: total_size }.into())
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-pub fn can_store(_content: &[u8], _filename: &str) -> Result<(), GlobalError> {
-    Err(SoftwareError::SimulatorNotSupported)
+    can_store_len(content.len(), filename)
 }
 
 
