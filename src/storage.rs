@@ -300,31 +300,44 @@ pub fn can_store(content: &[u8], filename: &str) -> Result<(), GlobalError> {
 }
 
 
-/// Écrit un nouveau fichier dans le stockage
+/// Écrit un fichier dans le stockage en utilisant un ou plusieur(s) segments de contenu (Pas de copie, directement écrit a l'emplacement)
 /// 
-/// ## Warning
-/// Le contenu écrit doit être en bytes bruts. Pour écrire du texte, utilisez `write_file_string` qui gère l'encodage UTF-8 et le null terminator. 
+/// ## Specifications
+/// - Les données sont écrites dans l'ordre de la liste fournie.
+/// - Aucune copie intermédiaire n'est effectuée
 /// 
-/// Format: \[2 bytes taille\] \[nom\0\] \[contenu\]
+/// ## Exemple avec le format de fichier python d'Epsilon:
+/// ```
+/// let filename = "greeting.py";
+/// 
+/// let segment1 = [0x1];                     // Metadata         Écrit en premier
+/// let segment2 = "Hello world!".as_bytes(); // contenu          Écrit en second
+/// let segment3 = [0x0];                     // Null terminator  Écrit en dernier
+/// 
+/// let segments = [&segment1, &segment2, &segment3]; // Assemblage en liste
+/// file_write_segments(filename, &segments)?; // Écrit le fichier
+/// ``` 
 #[cfg(target_os = "none")]
-pub fn file_write_raw(filename: &str, content: &[u8]) -> Result<(), GlobalError> {
-    
-    is_valid_storage()?;
-    can_store(content, filename)?;
+pub fn file_write_segments(filename: &str, segments: &[&[u8]]) -> Result<(), GlobalError> {
+    let total_content_size: usize = segments.iter().map(|s| s.len()).sum();
 
-    // can_store vérifie déja que le nom sois valide
-    
+    is_valid_storage()?;
+    can_store_len(total_content_size, filename)?;
+
+    // can_store_lken vérifie déja que le nom sois valide
+
     let write_pos = next_free() as *mut u8; // adr du nouveau fichier (début)
 
-    let size = (2 + filename.len() + 1 + content.len()) as u16; // Total size (header + nom + term + contenu)
+    let size = (2 + filename.len() + 1 + total_content_size) as u16; // Total size (header + nom + term + contenu)
 
     unsafe {
+        // = Écrire le header et le nom du fichier (avec null terminator) =
+        let filename_len = filename.len();
+        
         let dest_header_ptr = write_pos as *mut u16;
-        let dest_name_slice = slice::from_raw_parts_mut((dest_header_ptr as *mut u8).add(2), filename.len());
-        let dist_term_ptr = dest_name_slice.as_mut_ptr().add(filename.len());
-        let dest_content_slice = slice::from_raw_parts_mut(dist_term_ptr.add(1), content.len());
-
-
+        let dest_name_slice = slice::from_raw_parts_mut((dest_header_ptr as *mut u8).add(2), filename_len);
+        let dist_nt_ptr = dest_name_slice.as_mut_ptr().add(filename_len);
+        
         // Écrire le header
         ptr::write_unaligned(dest_header_ptr, size);
 
@@ -332,18 +345,47 @@ pub fn file_write_raw(filename: &str, content: &[u8]) -> Result<(), GlobalError>
         dest_name_slice.copy_from_slice(filename.as_bytes());
 
         // Écrire le null terminator
-        *dist_term_ptr = 0;
-        
-        // Écrire le contenu du fichier
-        dest_content_slice.copy_from_slice(content);
+        *dist_nt_ptr = 0;
+
+        // = Écrire les segments de contenu =
+        let mut content_write_ptr = dist_nt_ptr.add(1); // ptr du contenue (juste après le null terminator)
+
+        for segment in segments {
+            let segment_len = segment.len();
+            let dest_content_slice = slice::from_raw_parts_mut(content_write_ptr, segment_len);
+
+            // Écrire le segment de contenu
+            dest_content_slice.copy_from_slice(segment);
+
+            // Avancer le pointeur d'écriture du contenu
+            content_write_ptr = content_write_ptr.add(segment_len); 
+        }
+
+        // = Écrire 2 bytes vide a la fin du fichier par sécurité =
+
+        // Même si le fichie va jusqu'a la tout fin du stockage, la limite de zone définie ici laisse la marche de 2 bytes avent le magic footer
+        ptr::write_unaligned(content_write_ptr as *mut u16, 0);
     }
 
     Ok(())
 }
 
-/// Dummy version
 #[cfg(not(target_os = "none"))]
-pub unsafe fn file_write_raw(_filename: &str, _content: &[u8]) -> Result<(), GlobalError> {
+pub fn file_write_segments(_filename: &str, _segments: &[&[u8]]) -> Result<(), GlobalError> {
+    Ok(())
+}
+
+
+/// Écrit un nouveau fichier dans le stockage
+/// 
+/// ## Warning
+/// Cette fonction wrtie des bytes bruts, si vous voulais stocker du texte utilisez plutôt `file_write_string()`
+/// qui gère le format de fichier texte de Epsilon (notament utiliser pour les fichier python)
+/// 
+/// Format: \[2 bytes taille\] \[nom\0\] \[contenu\]
+#[cfg(target_os = "none")]
+pub fn file_write_raw(filename: &str, content: &[u8]) -> Result<(), GlobalError> {
+    file_write_segments(filename, &[content])?;
     Ok(())
 }
 
