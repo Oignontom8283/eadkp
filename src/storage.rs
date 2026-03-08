@@ -52,6 +52,8 @@ use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 #[allow(unused_imports)]
 use alloc::ffi::CString;
+#[allow(unused_imports)]
+use alloc::format;
 
 // ============================================================================
 // STORAGE OPERATIONS  
@@ -115,6 +117,7 @@ fn next_free() -> *const u8 {
 struct FileEntry {
     size: usize,
     ptr: *const u8,
+    #[allow(unused)]
     name: *const u8,
     content: *const u8,
     content_size: usize,
@@ -426,9 +429,6 @@ pub fn file_exists(filename: &str) -> Result<bool, GlobalError> {
 pub fn file_exists(_filename: &str) -> Result<bool, GlobalError> {
     Ok(false)
 }
-
-
-// ! Tout ce qui est en dessous n'est pas encore refactoriser
 
 
 /// Efface un fichier du stockage (**Irréversible!**)
