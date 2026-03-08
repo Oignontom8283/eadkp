@@ -312,10 +312,7 @@ pub fn file_write_raw(filename: &str, content: &[u8]) -> Result<(), GlobalError>
     is_valid_storage()?;
     can_store(content, filename)?;
 
-    // Vérifier que le nom du fichier est valide
-    if !is_valid_cstring(filename) {
-        return Err(StorageError::StorageInvalidName { length: filename.len(), string: filename.to_string() }.into());
-    }
+    // can_store vérifie déja que le nom sois valide
     
     let write_pos = next_free() as *mut u8; // adr du nouveau fichier (début)
 
