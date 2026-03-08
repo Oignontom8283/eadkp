@@ -466,18 +466,29 @@ pub unsafe fn file_erase(_filename: &str) -> Result<()> {
     Ok(())
 }
 
-/// Écrit une string dans le stockage (avec encodage UTF-8 et null terminator)
-#[cfg(target_os = "none")]
-pub unsafe fn file_write_string(filename: &str, content: &str) -> Result<()> {
-    let content_cstr = to_cstring(content)?;
-    let content_bytes = content_cstr.as_slice(); // Obtenir les octets, y compris le null terminator
 
-    unsafe { file_write_raw(filename, content_bytes) }
+/// Écrit un fichier texte dans le stockage en utilisant le format de fichier texte d'Epsilon
+/// 
+/// Ce format est notament utilisé pour les fichiers python d'Epsilon. **A utiliser pour type de fichier texte pour une universification !**
+#[cfg(target_os = "none")]
+pub fn file_write_string(filename: &str, content: &str) -> Result<(), GlobalError> {
+    
+    let header_slice = [0u8];
+    let content_slice = content.as_bytes();
+    let footer_slice = [0u8];
+
+    // 1 bytes de metadata + contenu en utf-8 + 1 bytes de null terminator car c'est comme ça
+    let segments: [&[u8]; 3] = [&header_slice, content_slice, &footer_slice];
+
+    // Écrire le fichier par segmentation, aucune copie intermédiaire
+    file_write_segments(filename, &segments)?;
+
+    Ok(())
 }
 
 /// Dummy version
 #[cfg(not(target_os = "none"))]
-pub unsafe fn file_write_string(_filename: &str, _content: &str) -> Result<()> {
+pub fn file_write_string(_filename: &str, _content: &str) -> Result<(), GlobalError> {
     Ok(())
 }
 
