@@ -492,29 +492,38 @@ pub fn file_write_string(_filename: &str, _content: &str) -> Result<(), GlobalEr
     Ok(())
 }
 
-#[cfg(target_os = "none")]
-pub unsafe fn file_read_string(filename: &str) -> Result<&'static str> {
-    // Obtenir les bytes bruts du fichier
-    let (content_ptr, content_len) = unsafe { file_read_raw(filename)? };
 
-    // Convertir les bytes en slice
-    let content_slice = unsafe { core::slice::from_raw_parts(content_ptr, content_len) };
+/// Lit un fichier texte en utilisant le format de fichier texte d'Epsilon et retourne une string slice pointant vers son contenu
+/// 
+/// ## Warning
+/// Rust considère que la `&str` renvoyée par la fonction a une durée de vie rattachée à celle du `filename` fournie
+/// Or c'est FAUX ! Sa durée de vie est indépendante (celle du fichier dans le storage) et je ne veux pas utiliser un `'static` non plus. 
+/// Donc assurez-vous que le nom du fichier soit toujours en vie tant que vous voulez utiliser le contenu du fichier. Je conseille d'en faire une constante si possible.
+/// Sinon convertissez-le en bytes puis à nouveau en `&str` pour qu'il vous laisse tranquille.
+/// (Le compilateur devrait simplement ignorer la conversion, donc pas de perte de perf.)
+#[cfg(target_os = "none")] 
+pub fn file_read_string(filename: &str) -> Result<&str, GlobalError> {
+    unsafe {
+        // Obtenir le contenu brut du fichier
+        let raw_content = file_read_raw(filename)?;
 
-    // Vérifier la présence du null terminator à la fin et que ce ne soit pas vide.
-    if content_slice.is_empty() || content_slice.last() != Some(&0) {
-        return Err(StorageError::StorageInvalidName);
+        if raw_content.len() < 2 { // Il faut au moins 2 bytes (metadata et nt)
+            return Err(StorageError::FileContentTooShort { expected: 2, actual: raw_content.len() }.into());
+        }
+
+        // Ignorer le premier bytes de metadata et le dernier byte de nt pour uniquement le texte
+        let trimmed_content = &raw_content[1..raw_content.len() - 1];
+    
+        // Convertir les bytes en str (pas de vérification car Epsilon enregistre déja tout en utf-8 et pire il y eura des caractère êtrange)
+        let content_str = str::from_utf8_unchecked(trimmed_content);
+
+        Ok(content_str) 
     }
-
-    // Convertir la slice en C string
-    let cstr_ptr = content_slice.as_ptr();
-
-    // Convertir la C string en string Rust
-    return cstring_to_str(cstr_ptr)
 }
 
 /// Dummy version
 #[cfg(not(target_os = "none"))]
-pub unsafe fn file_read_string(_filename: &str) -> Result<&'static str> {
+pub fn file_read_string(_filename: &str) -> Result<&'static str, GlobalError> {
     Ok("Dummy content")
 }
 
