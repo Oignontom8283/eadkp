@@ -243,7 +243,7 @@ pub fn can_store_len(content_len: usize, filename: &str) -> Result<(), GlobalErr
     let total_size = 2 + filename_size + content_len; // 2 bytes pour la taille du header
 
     // Check que le nom peut être une c string valide
-    if is_valid_cstring(filename) {
+    if !is_valid_cstring(filename) {
         return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() }.into());
     }
 
