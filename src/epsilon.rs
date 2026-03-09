@@ -199,15 +199,15 @@ impl CalculatorModel {
 /// Adresse de base : storage_address_ram
 /// Taille totale   : storage_size_ram (43016 bytes)
 ///
-///  Offset 0            Offset 4                           Offset 43010     Offset 43012     Offset 43016  
-///  ↓                   ↓                                  ↓                ↓                ↓         
+///  Offset 0            Offset 4                            Offset 43010     Offset 43012    Offset 43016  
+///  ↓                   ↓                                   ↓                ↓               ↓         
 /// ┌───────────────────┬───────────────────────────────────┬────────────────┬────────────────┐
 /// │  Magic Header     │     Buffer utilisable (42 Ko)     │    Marge       │  Magic Footer  │
 /// │   (4 bytes)       │           (43008 bytes)           │  (2 bytes)     │   (4 bytes)    │
 /// └───────────────────┴───────────────────────────────────┴────────────────┴────────────────┘
-///  ↑                   ↑                                  ↑                ↑
-///  storage_start_addr  usable_start_addr                  usable_end_addr  storage_end_addr
-///  header_addr                                            footer_addr
+///  ↑                   ↑                                   ↑                ↑
+///  storage_start_addr  usable_start_addr                   usable_end_addr  storage_end_addr
+///  header_addr                                             footer_addr
 /// ```
 #[derive(Debug)]
 pub struct Filesystem {
