@@ -123,9 +123,9 @@ fn _find_file(filename: &str) -> Result<FileEntry, StorageError> {
 
             let name_ptr = offset.add(2);
             let name_candidate = slice::from_raw_parts(name_ptr, filename_len);
-            let name_null_terminator = *name_ptr.add(filename_len);
+            let name_null_terminator = name_ptr.add(filename_len);
 
-            if name_candidate == filename_slice && name_null_terminator == 0 {
+            if name_candidate == filename_slice && *name_null_terminator == 0 {
                 let content_ptr = name_ptr.add(filename_len + 1);
                 let content_size = size - 2 - (filename_len + 1);
                 return Ok(FileEntry { size: size, ptr: offset, name: name_ptr, content: content_ptr, content_size });
