@@ -3,12 +3,8 @@ Ce module fournit des structures de données et fonctions utilitaires pour inter
 avec les composants essentiels d'Epsilon en mêmoire.
 */
 
-use core::ptr;
-use core::ffi::{CStr, c_char};
-use ::alloc::string::ToString;
-use ::alloc::*;
-
-use crate::{SoftwareError, StorageError};
+use core::{ptr};
+use crate::{SoftwareError};
 
 
 pub const SLOTINFO_MAGIC: u32 = 0xEFEEDBBA;
