@@ -505,7 +505,7 @@ pub fn file_read_string(filename: &str) -> Result<&str, GlobalError> {
 
 /// Dummy version
 #[cfg(not(target_os = "none"))]
-pub fn file_read_string(_filename: &str) -> Result<&'static str, GlobalError> {
+pub fn file_read_string(_filename: &str) -> Result<&str, GlobalError> {
     Ok("Dummy content")
 }
 
