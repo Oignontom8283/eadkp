@@ -395,6 +395,6 @@ pub fn userland_header() -> &'static UserlandHeader {
 
 /// Retourne l'utilitaire d'adresse du filesystem
 #[cfg(target_os = "none")]
-pub fn filesystem() -> Filesystem {
+pub fn storage() -> Filesystem {
     Filesystem::new()
 }
