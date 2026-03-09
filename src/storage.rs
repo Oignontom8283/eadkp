@@ -1,39 +1,21 @@
 
 /*!
-# Storage Management Module for Epsilon Applications on Numworks Calculators.
+# Module de Gestion du Stockage pour les Applications Externes Epsilon sur Calculatrices NumWorks.
 
-Provides functions to read, write, and manage files in the embedded storage.
+Fournit des fonctions pour lire, écrire et gérer les fichiers dans le système de fichiers.
 
-This module is originally a Rust port of `storage.c` (MIT License) from the
-**NumWorks Extapp Storage** project. However, several modifications and
-feature additions have been made during development. As a result, the current
-implementation may differ from the original source code, both structurally and
-behaviorally.
+Ce module est à l'origine un portage en Rust de `storage.c` (Licence MIT) provenant du 
+projet **NumWorks Extapp Storage**. Cependant, de lourdes modifications on été apportées.
+La forme et la logique actuelle diffèrent donc significativement de l'origial.
 
-## Important Notes
+## Crédits
 
-- This module is designed to work in a `no_std` environment on NumWorks
-    calculators.
+Auteur original : **[Yaya Cout](https://framagit.org/Yaya.Cout)**
 
-- Supported calculator models:
-    - **N0115** (tested and functional)
-    - **N0120** (untested, but theoretically supported)
-    - **N0110** (untested, but theoretically supported)
+Fichier source original : [numworks-extapp-storage/src/storage.c](https://framagit.org/Yaya.Cout/numworks-extapp-storage/-/blob/master/src/storage.c)
 
-## Credits
-
-Original author: **[Yaya Cout](https://framagit.org/Yaya.Cout)**
-
-Original source file: [numworks-extapp-storage/src/storage.c](https://framagit.org/Yaya.Cout/numworks-extapp-storage/-/blob/master/src/storage.c)
-
----
-
-Rust port, adaptations, and modifications by: **[Oignontom8283](https://github.com/Oignontom8283)**
-
-## Acknowledgments
-
-Special thanks to Yaya Cout for his remarkable engineering work on storage
-manipulation, without which this module would probably never have come to life.
+Un merci tout particulier à Yaya Cout pour son travail d'ingénierie remarquable sur la 
+manipulation du stockage, sans lequel ce module n'aurait probablement jamais vu le jour.
 */
 
 use super::*;
