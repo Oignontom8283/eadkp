@@ -61,7 +61,7 @@ fn strnend(start:*const u8, max:*const u8) -> Result<*const u8, StorageError> {
         // limite d'Epsilon et l'imite donnée
         let len = (max.offset_from(start) as usize).min(epsilon::STORAGE_FILE_MAX_NAME_LEN);
         
-        for offset in 0..=len {
+        for offset in 0..len {
             if *start.add(offset) == 0 {
                 return Ok(start.add(offset));
             }
