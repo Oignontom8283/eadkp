@@ -263,8 +263,12 @@ fn main() -> isize {
 
             // Si le fichier existe déja, le supprimer
             unsafe {
-                if storage::file_exists(filename) {
-                    let _ = storage::file_erase(filename);
+                match storage::file_exists(filename) {
+                    Ok(true) => {
+                        let _ = storage::file_erase(filename);
+                    }
+                    Ok(false) => {}
+                    Err(_) => return false,
                 }
 
                 // Écrire dans le fichier de sauvegarde                            Le premier caractère sera effacé pour une raison inconnue, il faut donc ajouter un caractère inutile au début, comme un espace.
@@ -287,16 +291,20 @@ fn main() -> isize {
         let filename = "bounce_data.py";
 
         // Si le fichier n'existe pas, retourner des données par défaut
-        if storage::file_exists(filename) == false {
-            return Some(GameData {
-                bounces: 15,
-                total_time: 15,
-                max_time: 15
-            });
+        match storage::file_exists(filename) {
+            Ok(false) => {
+                return Some(GameData {
+                    bounces: 15,
+                    total_time: 15,
+                    max_time: 15,
+                });
+            }
+            Ok(true) => {}
+            Err(_) => return None,
         }
 
         // Charger les données depuis le fichier
-        let file_content = unsafe { storage::file_read_string(filename).ok()};
+        let file_content = unsafe { storage::file_read_string(filename).ok() };
         
         // Convertir le pointer en String
         let clean_data = file_content.unwrap_or("").to_string();
