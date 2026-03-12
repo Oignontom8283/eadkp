@@ -476,16 +476,15 @@ pub fn file_write_string(_filename: &str, _content: &str) -> Result<(), GlobalEr
 }
 
 
-/// Lit un fichier texte en utilisant le format de fichier texte d'Epsilon et retourne une string slice pointant vers son contenu
+/// Lit un fichier texte en utilisant le format de fichier texte d'Epsilon et retourne une slice de string pointant vers son contenu.
 /// 
 /// ## Warning
-/// Rust considère que la `&str` renvoyée par la fonction a une durée de vie rattachée à celle du `filename` fournie
-/// Or c'est FAUX ! Sa durée de vie est indépendante (celle du fichier dans le storage) et je ne veux pas utiliser un `'static` non plus. 
-/// Donc assurez-vous que le nom du fichier soit toujours en vie tant que vous voulez utiliser le contenu du fichier. Je conseille d'en faire une constante si possible.
-/// Sinon convertissez-le en bytes puis à nouveau en `&str` pour qu'il vous laisse tranquille.
-/// (Le compilateur devrait simplement ignorer la conversion, donc pas de perte de perf.)
+/// **Retourne une string statique pointant directement vers le contenu du fichier dans le stockage !**
+/// 
+/// Si vous supprimez le fichier ou le modifiez/déplacez, assurez-vous de ne plus utiliser la string obtenue via cette fonction,
+/// car elle ne pointera plus vers le bon contenu. **Réutilisez la fonction pour obtenir une nouvelle string après toute modification du fichier.**
 #[cfg(target_os = "none")] 
-pub fn file_read_string(filename: &str) -> Result<&str, GlobalError> {
+pub fn file_read_string(filename: &str) -> Result<&'static str, GlobalError> {
     unsafe {
         // Obtenir le contenu brut du fichier
         let raw_content = file_read_raw(filename)?;
@@ -496,17 +495,18 @@ pub fn file_read_string(filename: &str) -> Result<&str, GlobalError> {
 
         // Ignorer le premier bytes de metadata et le dernier byte de nt pour uniquement le texte
         let trimmed_content = &raw_content[1..raw_content.len() - 1];
-    
-        // Convertir les bytes en str (pas de vérification car Epsilon enregistre déja tout en utf-8 et pire il y eura des caractère êtrange)
-        let content_str = str::from_utf8_unchecked(trimmed_content);
+        
+        // Manipulation pour convertire en static str. 
+        let static_slice = slice::from_raw_parts(trimmed_content.as_ptr(), trimmed_content.len());
+        let static_str = str::from_utf8_unchecked(static_slice);
 
-        Ok(content_str) 
+        Ok(static_str) // Cast en 'static car le contenu du fichier est supposé rester valide tant que le fichier existe (et on ne gère pas la suppression dans cette fonction)
     }
 }
 
 /// Dummy version
 #[cfg(not(target_os = "none"))]
-pub fn file_read_string(_filename: &str) -> Result<&str, GlobalError> {
+pub fn file_read_string(_filename: &str) -> Result<&'static str, GlobalError> {
     Ok("Dummy content")
 }
 
