@@ -26,7 +26,6 @@ pub mod input;
 pub mod storage;
 pub mod epsilon;
 mod errors;
-pub mod memory;
 
 // Module builder uniquement disponible pour les build scripts (OS hôte, pas embarqué)
 #[cfg(all(not(target_os = "none"), feature = "build-tools"))]
