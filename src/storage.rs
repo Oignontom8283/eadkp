@@ -50,13 +50,13 @@ pub fn is_valid_storage() -> Result<(), GlobalError> {
 }
 
 /// Vérifie que la string est un c string valide (pas de null byte à l'intérieur) et pas vide (un nom de fichier vide n'est pas autorisé)
-fn is_valid_cstring(s: &str) -> bool {
+pub(crate) fn is_valid_cstring(s: &str) -> bool {
     !s.as_bytes().contains(&0) && !s.is_empty()
 }
 
 /// Trouve le pointeur vers le null terminator d'une string commençant à `start`,
 /// sans dépasser `max` dans un maxium de `epsilon::STORAGE_FILE_MAX_NAME_LEN`.
-fn strnend(start:*const u8, max:*const u8) -> Result<*const u8, StorageError> {
+pub(crate) fn strnend(start:*const u8, max:*const u8) -> Result<*const u8, StorageError> {
     //TODO: Separer la fonction en deux, une général pour trouver le nt et celle ici avec limite STORAGE_FILE_MAX_NAME_LEN
     unsafe  {
         // limite d'Epsilon et l'imite donnée
@@ -78,7 +78,8 @@ fn strnend(start:*const u8, max:*const u8) -> Result<*const u8, StorageError> {
 /// 
 /// @unchecked
 #[cfg(target_os = "none")]
-fn next_free() -> *const u8 {
+#[doc(hidden)]
+pub fn next_free() -> *const u8 {
 
     let storage = epsilon::storage();
     let usable_end_addr = storage.usable_end_addr;
@@ -97,7 +98,8 @@ fn next_free() -> *const u8 {
 
 
 /// Structure pour représenter un fichier.
-struct FileEntry {
+#[doc(hidden)]
+pub struct FileEntry {
     size: usize,
     ptr: *const u8,
     #[allow(unused)]
@@ -107,7 +109,8 @@ struct FileEntry {
 }
 
 /// Trouve un fichier par son nom et retourne une structure contenant des pointeurs vers son header, son nom et son contenu, ainsi que sa taille.
-fn _find_file(filename: &str) -> Result<FileEntry, StorageError> {
+#[doc(hidden)]
+pub fn _find_file(filename: &str) -> Result<FileEntry, StorageError> {
     let filename_slice = filename.as_bytes();
     let filename_len = filename_slice.len();
 
