@@ -5,22 +5,34 @@
     <sub>Alpha 1</sub>
     <br/>
     <p align="center">
-        <a href="https://github.com/Oignontom8283/eadkp/stargazers">
-            <img src="https://img.shields.io/badge/Stars-$(stars)-brightgreen?style=flat-square" alt="GitHub stars"/>
-        </a>
-        <a href="https://github.com/Oignontom8283/eadkp/fork">
-            <img src="https://img.shields.io/badge/Forks-$(forks)-blue?style=flat-square" alt="GitHub forks"/>
-        </a>
-        <a href="https://github.com/Oignontom8283/eadkp/issues">
-            <img src="https://img.shields.io/badge/Issues-$(issues)-orange?style=flat-square" alt="GitHub issues"/>
-        </a>
-        <a href="https://github.com/Oignontom8283/eadkp/pulls">
-            <img src="https://img.shields.io/badge/PRs-$(prs)-purple?style=flat-square" alt="GitHub pull requests"/>
-        </a>
-        <a href="./LICENSE">
-            <img src="https://img.shields.io/badge/License-GPL--3.0-lightgrey?style=flat-square" alt="License"/>
-        </a>
-    </p>
+        <p align="center">
+            <a href="https://github.com/Oignontom8283/eadkp/actions">
+                <img src="https://img.shields.io/github/actions/workflow/status/Oignontom8283/eadkp/rust.yml?style=flat&logo=github" alt="Build Status"/>
+            </a>
+            <img src="https://img.shields.io/badge/Target-NumWorks_Epsilon-ffb734?style=flat" alt="Target Hardware"/>
+            <a href="https://github.com/Oignontom8283/eadkp/blob/main/LICENSE">
+                <img src="https://img.shields.io/github/license/Oignontom8283/eadkp?style=flat&color=ff6912" alt="License"/>
+            </a>
+            <br>
+            <a href="https://github.com/Oignontom8283/eadkp/graphs/commit-activity">
+                <img src="https://img.shields.io/github/last-commit/Oignontom8283/eadkp?style=flat" alt="Last Commit"/>
+            </a>
+            <img src="https://img.shields.io/github/repo-size/Oignontom8283/eadkp?style=flat" alt="Repo Size"/>
+            <img src="https://img.shields.io/github/languages/top/Oignontom8283/eadkp?style=flat&logo=rust&color=red" alt="Top Language"/>
+            <br>
+            <a href="https://github.com/Oignontom8283/eadkp/stargazers">
+                <img src="https://img.shields.io/github/stars/Oignontom8283/eadkp?style=flat&logo=github&color=gold" alt="GitHub stars"/>
+            </a>
+            <a href="https://github.com/Oignontom8283/eadkp/network/members">
+                <img src="https://img.shields.io/github/forks/Oignontom8283/eadkp?style=flat&logo=github&color=pink" alt="GitHub forks"/>
+            </a>
+            <a href="https://github.com/Oignontom8283/eadkp/issues">
+                <img src="https://img.shields.io/github/issues/Oignontom8283/eadkp?style=flat&logo=github" alt="GitHub issues"/>
+            </a>
+            <a href="https://github.com/Oignontom8283/eadkp/pulls">
+                <img src="https://img.shields.io/github/issues-pr/Oignontom8283/eadkp?style=flat&logo=github" alt="GitHub pull requests"/>
+            </a>
+        </p>
     </p>
 </h1>
 
