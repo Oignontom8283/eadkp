@@ -2,9 +2,7 @@ name: Rust CI
 
 on:
   push:
-    branches: [ "dev", "master", "main" ]
   pull_request:
-    branches: [ "dev", "master", "main" ]
 
 jobs:
   build:
@@ -41,12 +39,20 @@ jobs:
 
       - name: Build library (host)
         run: cargo +nightly build --lib --release
+        env:
+          EADKP_PRIMARY_BUILD: 1
 
       - name: Build library (thumbv7em-none-eabihf)
         run: cargo +nightly build --lib --release --target thumbv7em-none-eabihf
+        env:
+          EADKP_PRIMARY_BUILD: 1
 
       - name: Build NWA example (host)
         run: cargo +nightly build --release --example simulator
+        env:
+          EADKP_PRIMARY_BUILD: 1
 
       - name: Build NWA example (thumbv7em-none-eabihf)
         run: cargo +nightly build --release --example device --target thumbv7em-none-eabihf
+        env:
+          EADKP_PRIMARY_BUILD: 1
