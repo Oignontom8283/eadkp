@@ -1,429 +1,522 @@
 
 /*!
-# Storage Management Module for Epsilon Applications on Numworks Calculators.
+# Module de Gestion du Stockage pour les Applications Externes Epsilon sur Calculatrices NumWorks.
 
-Provides functions to read, write, and manage files in the embedded storage.
+Fournit des fonctions pour lire, écrire et gérer les fichiers dans le système de fichiers.
 
-This module is originally a Rust port of `storage.c` (MIT License) from the
-**NumWorks Extapp Storage** project. However, several modifications and
-feature additions have been made during development. As a result, the current
-implementation may differ from the original source code, both structurally and
-behaviorally.
+Ce module est à l'origine un portage en Rust de `storage.c` (Licence MIT) provenant du 
+projet **NumWorks Extapp Storage**. Cependant, de lourdes modifications on été apportées.
+La forme et la logique actuelle diffèrent donc significativement de l'origial.
 
-## Important Notes
+## Crédits
 
-- This module is designed to work in a `no_std` environment on NumWorks
-    calculators.
+Auteur original : **[Yaya Cout](https://framagit.org/Yaya.Cout)**
 
-- Supported calculator models:
-    - **N0115** (tested and functional)
-    - **N0120** (untested, but theoretically supported)
-    - **N0110** (untested, but theoretically supported)
+Fichier source original : [numworks-extapp-storage/src/storage.c](https://framagit.org/Yaya.Cout/numworks-extapp-storage/-/blob/master/src/storage.c)
 
-## Credits
-
-Original author: **[Yaya Cout](https://framagit.org/Yaya.Cout)**
-
-Original source file: [numworks-extapp-storage/src/storage.c](https://framagit.org/Yaya.Cout/numworks-extapp-storage/-/blob/master/src/storage.c)
-
----
-
-Rust port, adaptations, and modifications by: **[Oignontom8283](https://github.com/Oignontom8283)**
-
-## Acknowledgments
-
-Special thanks to Yaya Cout for his remarkable engineering work on storage
-manipulation, without which this module would probably never have come to life.
+Un merci tout particulier à Yaya Cout pour son travail d'ingénierie remarquable sur la 
+manipulation du stockage, sans lequel ce module n'aurait probablement jamais vu le jour.
 */
 
+use super::*;
+
+// Core
+#[allow(unused_imports)]
+use core::ffi::{c_char};
 use core::ptr;
-use heapless;
+use core::slice;
+use core::str;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum StorageError {
-    /// Stockage invalide ou corrompu (magic number incorrect)
-    InvalidStorage,
-    /// Fichier non trouvé dans le stockage
-    FileNotFound,
-    /// Pas assez d'espace disponible pour l'écriture
-    InsufficientSpace,
-    /// Nom de fichier invalide ou trop long (max 256 bytes)
-    InvalidInput,
-    /// Magic number invalide à l'adresse de stockage
-    InvalidMagicNumber { expected: u32, found: u32 },
-    /// Stockage plein, position libre null
-    StorageFull,
-    /// Dépassement de la taille du stockage
-    StorageOverflow { available: usize, needed: usize },
-}
-
-pub type Result<T> = core::result::Result<T, StorageError>;
-
-/// Convertit une string Rust en C string (avec null terminator)
-pub fn to_cstring(s: &str) -> Result<heapless::Vec<u8, 256>> {
-    let mut cstr = heapless::Vec::new();
-    cstr.extend_from_slice(s.as_bytes()).map_err(|_| StorageError::InvalidInput)?;
-    cstr.push(0).map_err(|_| StorageError::InvalidInput)?; // Ajouter \0
-    Ok(cstr)
-}
-
-/// Convertit une C string en string Rust
-fn cstring_to_str(s: *const u8) -> Result<&'static str> {
-    unsafe {
-        let len = strlen(s);
-        let slice = core::slice::from_raw_parts(s, len);
-        match core::str::from_utf8(slice) {
-            Ok(str_ref) => Ok(str_ref),
-            Err(_) => Err(StorageError::InvalidInput),
-        }
-    }
-}
-
-/// Calcule la longueur d'une C string (sans le \0)
-unsafe fn strlen(s: *const u8) -> usize {
-    let mut len = 0;
-    let mut p = s;
-    while unsafe { *p != 0 } { // Chercher le null terminator
-        len += 1;
-        p = unsafe { p.add(1) };
-    }
-    len
-}
-
-/// Compare deux C strings
-unsafe fn strcmp(s1: *const u8, s2: *const u8) -> bool {
-    let mut p1 = s1;
-    let mut p2 = s2;
-
-    while unsafe { *p1 != 0 && *p1 == *p2 } { // Comparer jusqu'au null terminator ou différence
-        // Avancer les pointeurs
-        p1 = unsafe { p1.add(1) };
-        p2 = unsafe { p2.add(1) };
-    }
-    unsafe { ((*p1 as i32) - (*p2 as i32)) == 0 } // Différence ASCII, si 0, ce sont les mêmes caractères, donc on est arrivé à la fin des deux chaînes en même temps
-
-}
-/// Copie n bytes de src vers dest (zones non chevauchantes)
-/// 
-/// **Comportement INDÉFINI en cas de CHEVAUCHEMENT des zones !** NON SÉCURISÉ .
-#[cfg(target_os = "none")]
-unsafe fn memcpy(dest: *mut u8, src: *const u8, n: usize) {
-    unsafe { ptr::copy_nonoverlapping(src, dest, n) }
-}
-
-/// Copie `n` bytes de `src:*` vers `dest:*` (zones peuvent chevaucher)
-/// 
-/// **Comportement défini même en cas de chevauchement:** La copie se fait par une mémoire tampon.
-#[cfg(target_os = "none")]
-unsafe fn memmove(dest: *mut u8, src: *const u8, n: usize) {
-    unsafe { ptr::copy(src, dest, n) }
-}
-
-/// Remplit n bytes avec la valeur c
-#[cfg(target_os = "none")]
-unsafe fn memset(s: *mut u8, c: u8, n: usize) {
-    for i in 0..n {
-        unsafe { *s.add(i) = c };
-    }
-}
+// Alloc
+extern crate alloc; 
+use alloc::vec::Vec;
+#[allow(unused_imports)]
+use alloc::string::{String, ToString};
+#[allow(unused_imports)]
+use alloc::ffi::CString;
+#[allow(unused_imports)]
+use alloc::format;
 
 // ============================================================================
 // STORAGE OPERATIONS  
 // ============================================================================
 
-/// Écrit un fichier dans le stockage
-/// 
-/// ## attention:
-/// Le contenu écrit doit être en bytes bruts. Pour écrire du texte, utilisez `write_file_string` qui gère l'encodage UTF-8 et le null terminator. 
-/// 
-/// Format: \[2 bytes taille\] \[nom\0\] \[contenu\]
+
+/// Vérifie que le stockage semble valide. **Ne vérifie pas l'integrité des fichiers !**
 #[cfg(target_os = "none")]
-pub unsafe fn file_write_raw(filename: &str, content: &[u8]) -> Result<()> {
+pub fn is_valid_storage() -> Result<(), GlobalError> {
+    let storage = epsilon::storage();
+    storage.is_valid().map_err(|_| SoftwareError::InvalidStorage.into())
+}
 
-    let filename_cstr = to_cstring(filename)?;
-    let filename_ptr = filename_cstr.as_ptr();
-    let filename_len = filename_cstr.len(); // Avec le null terminator !
+/// Vérifie que la string est un c string valide (pas de null byte à l'intérieur) et pas vide (un nom de fichier vide n'est pas autorisé)
+pub(crate) fn is_valid_cstring(s: &str) -> bool {
+    !s.as_bytes().contains(&0) && !s.is_empty()
+}
 
-    let content_ptr = content.as_ptr();
-    let content_len = content.len();
-
-    unsafe {
-        // Trouver la position libre dans le stockage
-        let free_pos = next_free();
-        if free_pos.is_null() { 
-            return Err(StorageError::StorageFull); 
+/// Trouve le pointeur vers le null terminator d'une string commençant à `start`,
+/// sans dépasser `max` dans un maxium de `epsilon::STORAGE_FILE_MAX_NAME_LEN`.
+pub(crate) fn strnend(start:*const u8, max:*const u8) -> Result<*const u8, StorageError> {
+    //TODO: Separer la fonction en deux, une général pour trouver le nt et celle ici avec limite STORAGE_FILE_MAX_NAME_LEN
+    unsafe  {
+        // limite d'Epsilon et l'imite donnée
+        let len = (max.offset_from(start) as usize).min(epsilon::STORAGE_FILE_MAX_NAME_LEN);
+        
+        for offset in 0..len {
+            if *start.add(offset) == 0 {
+                return Ok(start.add(offset));
+            }
         }
-        
-        // Calculer la taille totale nécessaire
-        let total_size = 2 + filename_len + content_len; // taille_header + nom (avec null terminator) + contenu
-        let storage_end = (address() + size()) as usize;
-        let free_pos_usize = free_pos as usize;
-        let needed_end = free_pos_usize + total_size;
-        
-        // Vérifier qu'on a assez d'espace avec info détaillée
-        if needed_end > storage_end { 
-            return Err(StorageError::StorageOverflow { 
-                available: storage_end.saturating_sub(free_pos_usize),
-                needed: total_size,
-            }); 
-        }
-        
-        // Écrire le header (taille totale sur 2 bytes)
-        let write_pos = free_pos as *mut u8;
-        ptr::write_unaligned(write_pos as *mut u16, total_size as u16);
-        
-        // Écrire le nom du fichier (avec null terminator)
-        let name_pos = write_pos.add(2);
-        memcpy(name_pos, filename_ptr, filename_len);
-        
-        // Écrire le contenu
-        let content_pos = name_pos.add(filename_len);
-        memcpy(content_pos, content_ptr, content_len);
-        
-        // Nettoyer le reste (marquer la fin des enregistrements)
-        let cleanup_pos = content_pos.add(content_len);
-        let cleanup_size = ((address() + size()) as *mut u8).offset_from(cleanup_pos) as usize;
-        memset(cleanup_pos, 0, cleanup_size);
-        
-        Ok(())
+        Err(StorageError::NullTerminatorNotFound { start })
     }
 }
 
-/// Dummy version
+/// Trouve la prochaine position libre dans le stockage
+/// 
+/// Retourne un pointeur vers le début de la fin de l'espace utilisé (le prochain enregistrement vide).
+/// Si le stockage est plein, retourne l'adresse de fin du stockage utilisable
+/// 
+/// @unchecked
+#[cfg(target_os = "none")]
+#[doc(hidden)]
+pub fn next_free() -> *const u8 {
+
+    let storage = epsilon::storage();
+    let usable_end_addr = storage.usable_end_addr;
+    let mut offset = storage.usable_start_addr;
+
+    while offset < usable_end_addr {
+        let size = unsafe { ptr::read_unaligned(offset as *const u16) };
+        if size == 0 {
+            return offset;
+        }
+        offset = unsafe { offset.add(size as usize) };
+    }
+
+    usable_end_addr
+}
+
+
+/// Structure pour représenter un fichier.
+#[doc(hidden)]
+pub struct FileEntry {
+    size: usize,
+    ptr: *const u8,
+    #[allow(unused)]
+    name: *const u8,
+    content: *const u8,
+    content_size: usize,
+}
+
+/// Trouve un fichier par son nom et retourne une structure contenant des pointeurs vers son header, son nom et son contenu, ainsi que sa taille.
+#[doc(hidden)]
+#[cfg(target_os = "none")]
+pub fn _find_file(filename: &str) -> Result<FileEntry, StorageError> {
+    let filename_slice = filename.as_bytes();
+    let filename_len = filename_slice.len();
+
+    let storage = epsilon::storage();
+    let storage_start = storage.usable_start_addr;
+    let storage_end = storage.usable_end_addr;
+
+    let mut offset = storage_start;
+
+    unsafe {
+        while offset < storage_end {
+            let size = ptr::read_unaligned(offset as *const u16) as usize;
+            if size == 0 { break; }
+
+            let name_ptr = offset.add(2);
+            let name_candidate = slice::from_raw_parts(name_ptr, filename_len);
+            let name_null_terminator = name_ptr.add(filename_len);
+
+            if name_candidate == filename_slice && *name_null_terminator == 0 {
+                let content_ptr = name_ptr.add(filename_len + 1);
+                let content_size = size - 2 - (filename_len + 1);
+                return Ok(FileEntry { size: size, ptr: offset, name: name_ptr, content: content_ptr, content_size });
+            }
+
+            offset = offset.add(size);
+        }
+    }
+
+    Err(StorageError::FileNotFound)
+}
+
+
+/// Trouve tous les fichiers dont le nom se termine par un suffix donné et retourne une liste de leurs noms
+/// 
+/// ## Exemple
+/// ```
+/// fn display(file: &str) { ... } // Fonction d'affichage fictive
+/// 
+/// let txt_files = find_files_with_suffix(".txt")?;
+/// for file in txt_files {
+///     display(file); // Affiche tous les fichiers se terminant par .txt
+/// }
+/// ```
+#[cfg(target_os = "none")]
+pub fn find_files_with_suffix(suffix: &str) -> Result<Vec<&str>, GlobalError> {
+
+    // Vérifier que le suffix est un c string valide (pas de null byte à l'intérieur) et pas vide (un suffix vide correspondrait à tous les fichiers)
+    if !is_valid_cstring(suffix) {
+        return Err(SoftwareError::InvalidParameter { param_name: "suffix".to_string(), details: "suffix is empty or contains null bytes".to_string() }.into());
+    }
+
+    let suffix_slice = suffix.as_bytes();
+    let suffix_len = suffix_slice.len();
+
+    let storage = epsilon::storage();
+    let storage_start = storage.usable_start_addr;
+    let storage_end = storage.usable_end_addr;
+
+    let mut offset = storage_start;
+    let mut matching_files = Vec::new();
+
+    unsafe {
+        while offset < storage_end {
+            let size = ptr::read_unaligned(offset as *const u16) as usize;
+            if size == 0 { break; }
+
+            let name_ptr = offset.add(2);
+            
+            // let mut nt_ptr = name_ptr; // Trouver l'adr du nt
+            // while *nt_ptr != 0 {
+            //     nt_ptr = nt_ptr.add(1);
+            // }
+            let nt_ptr = strnend(name_ptr, offset.add(size))?;
+
+            let name_len = nt_ptr.offset_from(name_ptr) as usize;
+            
+            // Vérifier que le nom est assez long pour contenir le suffix
+            if name_len >= suffix_len {
+                let suffix_candidate_ptr = nt_ptr.sub(suffix_len);
+                let suffix_candidate = slice::from_raw_parts(suffix_candidate_ptr, suffix_len);
+                
+                if suffix_candidate == suffix_slice {
+                    // Si trouvé une correspondance, extraire le nom complet du fichier pour le push
+                    let name_slice = slice::from_raw_parts(name_ptr, name_len);
+                    let name_str = str::from_utf8_unchecked(name_slice);  
+                    
+                    matching_files.push(name_str);
+                }
+            }
+
+            offset = offset.add(size);
+        }
+    }
+
+    Ok(matching_files)
+}
+
 #[cfg(not(target_os = "none"))]
-pub unsafe fn file_write_raw(_filename: &str, _content: &[u8]) -> Result<()> {
+pub fn find_files_with_suffix(_suffix: &str) -> Result<Vec<&str>, GlobalError> {
+    Ok(Vec::new())
+}
+
+
+/// Calcule l'espace libre restant dans le stockage
+/// 
+/// Retourne la différence entre l'adresse de fin du stockage utilisable et l'adresse de la position libre actuelle.
+/// Si 0, le stockage est plein.
+/// 
+/// @unchecked
+#[cfg(target_os = "none")]
+pub fn available_space() -> usize {
+
+    let free_addr = next_free() as usize; // Adresse de la prochaine position libre
+    let usable_end = epsilon::storage().usable_end_addr as usize; // Adresse fin stockage utilisable (adresse du footer)
+
+    // Retourner l'espace libre restant, en soustrayant l'adresse de la prochaine position libre de l'adresse de fin du stockage utilisable
+    usable_end - free_addr
+}
+
+
+/// Sous-fonction de `can_store()`. Utilise directement la longueur du contenu sans pointeur. Se réfère à `can_store()` pour la documentation complète.
+#[cfg(target_os = "none")]
+pub fn can_store_len(content_len: usize, filename: &str) -> Result<(), GlobalError> {
+    let filename_size = filename.len() + 1; // +1 pour le null terminator
+    let total_size = 2 + filename_size + content_len; // 2 bytes pour la taille du header
+
+    // Check que le nom peut être une c string valide
+    if !is_valid_cstring(filename) {
+        return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() }.into());
+    }
+
+    // Check nom < 255 bytes (limitation Epsilon)
+    if filename_size > u8::MAX as usize {
+        return Err(StorageError::StorageInvalidName { length: filename_size, string: filename.to_string() }.into());
+    }
+
+    // Check que le content n'est pas vide
+    if content_len == 0 {
+        return Err(StorageError::FileContentEmpty.into());
+    }
+
+    // Check total_size < 65535 bytes (limitation du header sur 2 bytes)
+    if total_size > u16::MAX as usize {
+        return Err(StorageError::FileTooLarge { max_size: u16::MAX as usize, actual_size: total_size }.into());
+    }
+
+    if available_space() >= total_size {
+        Ok(())
+    } else {
+        Err(StorageError::StorageOverflow { available: available_space(), needed: total_size }.into())
+    }
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn can_store_len(_content_len: usize, _filename: &str) -> Result<(), GlobalError> {
+    Ok(())
+}
+
+
+/// Vérifie si un fichier peut être stocké en respectant les contraintes suivantes :
+/// - Espace disponible suffisant
+/// - Nom du fichier ≤ 255 bytes (limite Epsilon)
+/// - Nom du fichier valide (pas de null byte à l'intérieur)
+/// - Taille totale (header + nom + contenu) ≤ 65535 bytes (u16 max)
+/// Retourne `true` si possible, sinon `false`.
+/// 
+/// ## Exemple
+/// ```
+/// let content = b"Hello, world!";
+/// let filename1 = "greeting.txt";
+/// assert!(can_store(content1, filename1).is_ok()); // Vérifie que le fichier peut être stocké
+/// 
+/// let filename2 = "invalid\0name.txt";
+/// let content2 = b"Some content";
+/// assert!(can_store(content2, filename2).is_err()); // Vérifie que le nom de fichier invalide est rejeté
+/// ```
+/// 
+/// @unchecked
+#[cfg(target_os = "none")]
+pub fn can_store(content: &[u8], filename: &str) -> Result<(), GlobalError> {
+    can_store_len(content.len(), filename)
+}
+
+
+/// Écrit un fichier dans le stockage en utilisant un ou plusieur(s) segments de contenu (Pas de copie, directement écrit a l'emplacement)
+/// 
+/// ## Specifications
+/// - Les données sont écrites dans l'ordre de la liste fournie.
+/// - Aucune copie intermédiaire n'est effectuée
+/// 
+/// ## Exemple avec le format de fichier python d'Epsilon:
+/// ```
+/// let filename = "greeting.py";
+/// 
+/// let segment1 = [0x1];                     // Metadata         Écrit en premier
+/// let segment2 = "Hello world!".as_bytes(); // contenu          Écrit en second
+/// let segment3 = [0x0];                     // Null terminator  Écrit en dernier
+/// 
+/// let segments = [&segment1, &segment2, &segment3]; // Assemblage en liste
+/// file_write_segments(filename, &segments)?; // Écrit le fichier
+/// ``` 
+#[cfg(target_os = "none")]
+pub fn file_write_segments(filename: &str, segments: &[&[u8]]) -> Result<(), GlobalError> {
+    let total_content_size: usize = segments.iter().map(|s| s.len()).sum();
+
+    is_valid_storage()?;
+    can_store_len(total_content_size, filename)?;
+
+    // can_store_lken vérifie déja que le nom sois valide
+
+    let write_pos = next_free() as *mut u8; // adr du nouveau fichier (début)
+
+    let size = (2 + filename.len() + 1 + total_content_size) as u16; // Total size (header + nom + term + contenu)
+
+    unsafe {
+        // = Écrire le header et le nom du fichier (avec null terminator) =
+        let filename_len = filename.len();
+        
+        let dest_header_ptr = write_pos as *mut u16;
+        let dest_name_slice = slice::from_raw_parts_mut((dest_header_ptr as *mut u8).add(2), filename_len);
+        let dist_nt_ptr = dest_name_slice.as_mut_ptr().add(filename_len);
+        
+        // Écrire le header
+        ptr::write_unaligned(dest_header_ptr, size);
+
+        // écrire le nom du fichier (sans null terminator)
+        dest_name_slice.copy_from_slice(filename.as_bytes());
+
+        // Écrire le null terminator
+        *dist_nt_ptr = 0;
+
+        // = Écrire les segments de contenu =
+        let mut content_write_ptr = dist_nt_ptr.add(1); // ptr du contenue (juste après le null terminator)
+
+        for segment in segments {
+            let segment_len = segment.len();
+            let dest_content_slice = slice::from_raw_parts_mut(content_write_ptr, segment_len);
+
+            // Écrire le segment de contenu
+            dest_content_slice.copy_from_slice(segment);
+
+            // Avancer le pointeur d'écriture du contenu
+            content_write_ptr = content_write_ptr.add(segment_len); 
+        }
+
+        // = Écrire 2 bytes vide a la fin du fichier par sécurité =
+
+        // Même si le fichie va jusqu'a la tout fin du stockage, la limite de zone définie ici laisse la marche de 2 bytes avent le magic footer
+        ptr::write_unaligned(content_write_ptr as *mut u16, 0);
+    }
+
+    Ok(())
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn file_write_segments(_filename: &str, _segments: &[&[u8]]) -> Result<(), GlobalError> {
+    Ok(())
+}
+
+
+/// Écrit un nouveau fichier dans le stockage
+/// 
+/// ## Warning
+/// Cette fonction wrtie des bytes bruts, si vous voulais stocker du texte utilisez plutôt `file_write_string()`
+/// qui gère le format de fichier texte de Epsilon (notament utiliser pour les fichier python)
+/// 
+/// Format: \[2 bytes taille\] \[nom\0\] \[contenu\]
+#[cfg(target_os = "none")]
+pub fn file_write_raw(filename: &str, content: &[u8]) -> Result<(), GlobalError> {
+    file_write_segments(filename, &[content])?;
     Ok(())
 }
 
 
 /// Lit un fichier et retourne un pointeur vers son contenu
 #[cfg(target_os = "none")]
-pub unsafe fn file_read_raw(filename: &str) -> Result<(*const u8, usize)> {
+pub unsafe fn file_read_raw(filename: &str) -> Result<&[u8], GlobalError> {
 
-    let filename_cstr = to_cstring(filename)?;
-    let filename_ptr = filename_cstr.as_ptr();
+    // Vérifier que le storage est valide
+    is_valid_storage()?;
+    
+    // Localiser le fichier via une recherche directe
+    let file_view = _find_file(filename)?;
 
-    unsafe {
-        let storage_addr = address();
-        let mut offset = (storage_addr as *mut u8).add(4); // Skip magic number
-        let end_addr = (storage_addr + size()) as *mut u8;
-        
-        // Vérifier que le stockage est valide avec info sur le magic number
-        let magic_expected = 0xBADD0BEEu32.swap_bytes();
-        let magic_found = ptr::read_unaligned(storage_addr as *const u32);
-        if magic_found != magic_expected {
-            return Err(StorageError::InvalidMagicNumber { 
-                expected: magic_expected, 
-                found: magic_found 
-            });
-        }
-        
-        // Parcourir tous les enregistrements
-        while offset < end_addr {
-            let size = ptr::read_unaligned(offset as *const u16);
-            if size == 0 { break; } // Fin des enregistrements
-            
-            let name = offset.add(2);
-            if strcmp(name, filename_ptr) { // Fichier trouvé
-                let name_size = strlen(name) + 1;
-                let content_size = size as usize - 2 - name_size;
-                return Ok((offset.add(2 + name_size), content_size));
-            }
-            
-            offset = offset.add(size as usize);
-        }
-        
-        Err(StorageError::FileNotFound)
-    }
+    // Retourner une slice pointant vers le contenu du fichier
+    return Ok(slice::from_raw_parts(file_view.content, file_view.content_size));
 }
 
 /// Dummy version
 #[cfg(not(target_os = "none"))]
-pub unsafe fn file_read_raw(_filename: &str) -> Result<(*const u8, usize)> {
-    Err(StorageError::InvalidStorage)
+pub unsafe fn file_read_raw(_filename: &str) -> Result<&[u8], GlobalError> {
+    Err(SoftwareError::SimulatorNotSupported.into())
 }
 
 
 /// Vérifie si un fichier existe dans le stockage
 #[cfg(target_os = "none")]
-pub fn file_exists(filename: &str) -> bool {
+pub fn file_exists(filename: &str) -> Result<bool, GlobalError> {
     match unsafe { file_read_raw(filename) } {
-        Ok(_) => true,
-        Err(StorageError::FileNotFound) => false,
-        Err(_) => false,
+        Ok(_) => Ok(true),
+        Err(GlobalError::Storage(StorageError::FileNotFound)) => Ok(false),
+        Err(e) => Err(e),
     }
 }
 
 /// Dummy version
 #[cfg(not(target_os = "none"))]
-pub unsafe fn file_exists(_filename: &str) -> bool {
-    false
+pub fn file_exists(_filename: &str) -> Result<bool, GlobalError> {
+    Ok(false)
 }
 
 
-/// Supprime un fichier du stockage
+/// Efface un fichier du stockage (**Irréversible!**)
 #[cfg(target_os = "none")]
-pub unsafe fn file_erase(filename: &str) -> Result<()> {
+pub unsafe fn file_erase(filename: &str) -> Result<(), GlobalError> {
 
-    let filename_cstr = to_cstring(filename)?;
-    let filename_ptr = filename_cstr.as_ptr();
+    is_valid_storage()?;
 
+    let file_to_erase = _find_file(filename)?;
+
+    let free_space_before_deletion = next_free();
+    let next_file_pos = file_to_erase.ptr.add(file_to_erase.size);
+
+    // Déplacer tout depuis la fin du fichier supprimé jusqu'à la fin de l'espace utilisé vers le début du fichier supprimé pour combler le trou
+    // Normalement ptr::copy devrait automatiquement détecter le chvauchement et faire la copie de manière sûre.
+    ptr::copy(
+        next_file_pos,
+        file_to_erase.ptr as *mut u8,
+        free_space_before_deletion.offset_from(next_file_pos) as usize
+    );
+
+    // Nettoyer l'espace libéré à la fin du stockage (obligatoire)
+    ptr::write_bytes(
+        free_space_before_deletion.sub(file_to_erase.size) as *mut u8,
+        0,
+        file_to_erase.size
+    );
+
+    Ok(())
+}
+
+/// Dummy version
+#[cfg(not(target_os = "none"))]
+pub unsafe fn file_erase(_filename: &str) -> Result<(), GlobalError> {
+    Ok(())
+}
+
+
+/// Écrit un fichier texte dans le stockage en utilisant le format de fichier texte d'Epsilon
+/// 
+/// Ce format est notament utilisé pour les fichiers python d'Epsilon. **A utiliser pour type de fichier texte pour une universification !**
+#[cfg(target_os = "none")]
+pub fn file_write_string(filename: &str, content: &str) -> Result<(), GlobalError> {
+    
+    let header_slice = [0u8];
+    let content_slice = content.as_bytes();
+    let footer_slice = [0u8];
+
+    // 1 bytes de metadata + contenu en utf-8 + 1 bytes de null terminator car c'est comme ça
+    let segments: [&[u8]; 3] = [&header_slice, content_slice, &footer_slice];
+
+    // Écrire le fichier par segmentation, aucune copie intermédiaire
+    file_write_segments(filename, &segments)?;
+
+    Ok(())
+}
+
+/// Dummy version
+#[cfg(not(target_os = "none"))]
+pub fn file_write_string(_filename: &str, _content: &str) -> Result<(), GlobalError> {
+    Ok(())
+}
+
+
+/// Lit un fichier texte en utilisant le format de fichier texte d'Epsilon et retourne une slice de string pointant vers son contenu.
+/// 
+/// ## Warning
+/// **Retourne une string statique pointant directement vers le contenu du fichier dans le stockage !**
+/// 
+/// Si vous supprimez le fichier ou le modifiez/déplacez, assurez-vous de ne plus utiliser la string obtenue via cette fonction,
+/// car elle ne pointera plus vers le bon contenu. **Réutilisez la fonction pour obtenir une nouvelle string après toute modification du fichier.**
+#[cfg(target_os = "none")] 
+pub fn file_read_string(filename: &str) -> Result<&'static str, GlobalError> {
     unsafe {
-        let storage_addr = address();
-        let mut offset = (storage_addr as *mut u8).add(4);
-        let end_addr = (storage_addr + size()) as *mut u8;
-        
-        // Vérifier que le stockage est valide
-        let magic_expected = 0xBADD0BEEu32.swap_bytes();
-        let magic_found = ptr::read_unaligned(storage_addr as *const u32);
-        if magic_found != magic_expected {
-            return Err(StorageError::InvalidMagicNumber { 
-                expected: magic_expected, 
-                found: magic_found 
-            });
+        // Obtenir le contenu brut du fichier
+        let raw_content = file_read_raw(filename)?;
+
+        if raw_content.len() < 2 { // Il faut au moins 2 bytes (metadata et nt)
+            return Err(StorageError::FileContentTooShort { expected: 2, actual: raw_content.len() }.into());
         }
+
+        // Ignorer le premier bytes de metadata et le dernier byte de nt pour uniquement le texte
+        let trimmed_content = &raw_content[1..raw_content.len() - 1];
         
-        // Chercher le fichier
-        while offset < end_addr {
-            let size = ptr::read_unaligned(offset as *const u16);
-            if size == 0 { break; }
-            
-            let name = offset.add(2);
-            if strcmp(name, filename_ptr) { // Fichier trouvé
-                // Déplacer tous les enregistrements suivants pour combler le trou
-                let next_free_pos = next_free() as *mut u8;
-                let move_size = next_free_pos.offset_from(offset) as usize;
-                memmove(offset, offset.add(size as usize), move_size);
-                
-                // Nettoyer l'espace libéré
-                memset(next_free_pos.sub(size as usize), 0, size as usize);
-                return Ok(());
-            }
-            
-            offset = offset.add(size as usize);
-        }
-        
-        Err(StorageError::FileNotFound)
+        // Manipulation pour convertire en static str. 
+        let static_slice = slice::from_raw_parts(trimmed_content.as_ptr(), trimmed_content.len());
+        let static_str = str::from_utf8_unchecked(static_slice);
+
+        Ok(static_str) // Cast en 'static car le contenu du fichier est supposé rester valide tant que le fichier existe (et on ne gère pas la suppression dans cette fonction)
     }
 }
 
 /// Dummy version
 #[cfg(not(target_os = "none"))]
-pub unsafe fn file_erase(_filename: &str) -> Result<()> {
-    Ok(())
-}
-
-/// Écrit une string dans le stockage (avec encodage UTF-8 et null terminator)
-#[cfg(target_os = "none")]
-pub unsafe fn file_write_string(filename: &str, content: &str) -> Result<()> {
-    let content_cstr = to_cstring(content)?;
-    let content_bytes = content_cstr.as_slice(); // Obtenir les octets, y compris le null terminator
-
-    unsafe { file_write_raw(filename, content_bytes) }
-}
-
-/// Dummy version
-#[cfg(not(target_os = "none"))]
-pub unsafe fn file_write_string(_filename: &str, _content: &str) -> Result<()> {
-    Ok(())
-}
-
-#[cfg(target_os = "none")]
-pub unsafe fn file_read_string(filename: &str) -> Result<&'static str> {
-    // Obtenir les bytes bruts du fichier
-    let (content_ptr, content_len) = unsafe { file_read_raw(filename)? };
-
-    // Convertir les bytes en slice
-    let content_slice = unsafe { core::slice::from_raw_parts(content_ptr, content_len) };
-
-    // Vérifier la présence du null terminator à la fin et que ce ne soit pas vide.
-    if content_slice.is_empty() || content_slice.last() != Some(&0) {
-        return Err(StorageError::InvalidInput);
-    }
-
-    // Convertir la slice en C string
-    let cstr_ptr = content_slice.as_ptr();
-
-    // Convertir la C string en string Rust
-    return cstring_to_str(cstr_ptr)
-}
-
-/// Dummy version
-#[cfg(not(target_os = "none"))]
-pub unsafe fn file_read_string(_filename: &str) -> Result<&'static str> {
+pub fn file_read_string(_filename: &str) -> Result<&'static str, GlobalError> {
     Ok("Dummy content")
 }
 
-// ============================================================================
-// HARDWARE INTERFACE
-// ============================================================================
-
-/// Retourne l'adresse de base du stockage
-#[cfg(target_os = "none")]
-unsafe fn address() -> u32 {
-    unsafe { ptr::read_unaligned((userland_address() + 0xC) as *const u32) }
-}
-
-/// Retourne la taille totale du stockage
-#[cfg(target_os = "none")]
-unsafe fn size() -> u32 {
-    unsafe { ptr::read_unaligned((userland_address() + 0x10) as *const u32) }
-}
-
-/// Trouve la prochaine position libre dans le stockage
-#[cfg(target_os = "none")]
-unsafe fn next_free() -> *const u32 {
-    unsafe {
-        let storage_addr = address();
-        let mut offset = (storage_addr as *mut u8).add(4);
-        let end_addr = (storage_addr + size()) as *mut u8;
-        
-        // Vérifier validité mais ignorer l'erreur (retourne null si invalide)
-        if is_valid(storage_addr as *const u32).is_err() { return ptr::null(); }
-        
-        // Parcourir jusqu'à trouver un enregistrement vide (size=0)
-        while offset < end_addr {
-            let size = ptr::read_unaligned(offset as *const u16);
-            if size == 0 { return offset as *const u32; }
-            offset = offset.add(size as usize);
-        }
-        
-        end_addr as *const u32
-    }
-}
-
-/// Vérifie si le stockage est valide (magic number)
-#[cfg(target_os = "none")]
-unsafe fn is_valid(addr: *const u32) -> Result<()> {
-    let magic_expected = 0xBADD0BEEu32.swap_bytes();
-    let magic_found = unsafe { ptr::read_unaligned(addr) };
-    if magic_found == magic_expected {
-        Ok(())
-    } else {
-        Err(StorageError::InvalidMagicNumber { expected: magic_expected, found: magic_found })
-    }
-}
-
-/// Détecte le modèle de calculatrice et retourne l'adresse userland
-#[cfg(target_os = "none")]
-unsafe fn userland_address() -> u32 {
-    unsafe {
-        // Adresses des slots magic pour chaque modèle
-        let slots_n0110 = [0x90010000 as *const u32, 0x90410000 as *const u32];
-        let slots_n0120 = [0x90020000 as *const u32, 0x90420000 as *const u32];
-        let magic = 0xfeedc0deu32.swap_bytes();
-        
-        // Compter les slots valides pour chaque modèle
-        let count_n0110 = slots_n0110.iter().filter(|&&slot| ptr::read_unaligned(slot) == magic).count();
-        let count_n0120 = slots_n0120.iter().filter(|&&slot| ptr::read_unaligned(slot) == magic).count();
-        
-        // Choisir l'adresse de base selon le modèle détecté
-        let base_addr = if count_n0110 > count_n0120 {
-            ptr::read_unaligned(0x20000004 as *const u32).wrapping_add(0x10000) // N0110
-        } else {
-            ptr::read_unaligned(0x24000004 as *const u32).wrapping_add(0x20000) // N0120
-        };
-        
-        base_addr.wrapping_sub(0x8)
-    }
-}
