@@ -192,26 +192,26 @@ impl CalculatorModel {
 /// Filesystem addresses and metadata
 /// 
 /// Repertorie les adresses et tailles du système de fichiers embarqué dans la RAM.
-/// Calcule les zones utilisables en fonction des headers et footers magiques.
+/// Calcule les zones utilisables en fonction du header magique.
 /// 
-/// ## Layout du Filesystem :
+/// ## Layout du Filesystem (référence Ion) :
 /// ```
 /// Adresse de base : storage_address_ram
-/// Taille totale   : storage_size_ram (43016 bytes)
+/// Taille buffer    : storage_size_ram (43008 bytes)
 ///
-///  Offset 0            Offset 4                            Offset 43010     Offset 43012    Offset 43016  
-///  ↓                   ↓                                   ↓                ↓               ↓         
-/// ┌───────────────────┬───────────────────────────────────┬────────────────┬────────────────┐
-/// │  Magic Header     │     Buffer utilisable (42 Ko)     │    Marge       │  Magic Footer  │
-/// │   (4 bytes)       │           (43008 bytes)           │  (2 bytes)     │   (4 bytes)    │
-/// └───────────────────┴───────────────────────────────────┴────────────────┴────────────────┘
-///  ↑                   ↑                                   ↑                ↑
-///  storage_start_addr  usable_start_addr                   usable_end_addr  storage_end_addr
-///  header_addr                                             footer_addr
+///  Offset 0            Offset 4                         Offset 4+N-2     Offset 4+N         Offset 4+N+4
+///  ↓                   ↓                                ↓                ↓                  ↓
+/// ┌───────────────────┬─────────────────────────────────┬────────────────┬──────────────────┐
+/// │  Magic Header     │     Buffer utilisable (N-2)     │ End marker (0) │   Magic Footer   │
+/// │   (4 bytes)       │                                 │   (2 bytes)    │    (4 bytes)     │
+/// └───────────────────┴─────────────────────────────────┴────────────────┴──────────────────┘
+///  ↑                   ↑                                ↑                ↑                  ↑
+///  storage_start_addr  usable_start_addr                usable_end_addr  footer_addr        storage_end_addr
+///  header_addr
 /// ```
 #[derive(Debug)]
 pub struct Filesystem {
-    /// Taille totale du stockage, y compris header/footer
+    /// Taille du buffer de stockage (sans header/footer)
     pub storage_size: u32,
     
     /// Adresse de début du stockage
@@ -223,11 +223,11 @@ pub struct Filesystem {
     /// Adresse du footer magique
     pub footer_addr: *const u32,
     
-    /// Taille utilisable (total - header/footer)
+    /// Taille utilisable (buffer moins 2 bytes de fin)
     pub usable_size: u32,
     /// Adresse de début de la zone utilisable (juste après le header)
     pub usable_start_addr: *const u8,
-    /// Adresse de fin de la zone utilisable (même adresse que le footer / juste après la zone utilisable, `range semi-ouvert [start, end)`)
+    /// Adresse de fin de la zone utilisable (2 bytes avant la fin du buffer, `range semi-ouvert [start, end)`)
     /// 
     /// Suit la convention des ranges Rust : [usable_start_addr, usable_end_addr)
     /// où usable_end_addr est **exclusif** (premier byte non utilisable)
@@ -243,13 +243,13 @@ impl Filesystem {
             storage_size: user_land.storage_size_ram, 
 
             storage_start_addr: user_land.storage_address_ram,
-            storage_end_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize) }, // Fin du stockage = début + taille
+            storage_end_addr: unsafe { user_land.storage_address_ram.add(4 + user_land.storage_size_ram as usize + 4) }, // Fin du stockage = header + buffer + footer
             header_addr: user_land.storage_address_ram as *const u32, // Adresse du header (début du stockage)
-            footer_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize - 4) as *const u32 }, // fin du stockage - 4 bytes (taille footer)
+            footer_addr: unsafe { user_land.storage_address_ram.add(4 + user_land.storage_size_ram as usize) as *const u32 }, // Adresse du footer (apres le buffer)
 
-            usable_size: user_land.storage_size_ram - 8, // Taille utilisable (total - header/footer)
-            usable_start_addr: unsafe { user_land.storage_address_ram.add(4)}, // Adresse juste après le header
-            usable_end_addr: unsafe { user_land.storage_address_ram.add(user_land.storage_size_ram as usize - 4 - 2)} // adresse du footer = fin de la zone utilisable, 2 bytes de marge de sécurité pour éviter de lire le booter
+            usable_size: user_land.storage_size_ram - 2, // Taille utilisable (buffer - 2 bytes de fin)
+            usable_start_addr: unsafe { user_land.storage_address_ram.add(4)}, // Adresse juste apres le header
+            usable_end_addr: unsafe { user_land.storage_address_ram.add(4 + user_land.storage_size_ram as usize - 2) }, // Fin utilisable (adresse exclusive)
         }
     }
 
@@ -257,11 +257,11 @@ impl Filesystem {
     pub fn is_valid(&self) -> Result<(), SoftwareError> {
         unsafe {
             let header = ptr::read_unaligned(self.header_addr);
-            let footer = ptr::read_unaligned(self.footer_addr);
-
             if header != FILESYSTEM_MAGIC {
                 return Err(SoftwareError::InvalidMagicNumber { expected: FILESYSTEM_MAGIC, found: header });
             }
+
+            let footer = ptr::read_unaligned(self.footer_addr);
             if footer != FILESYSTEM_MAGIC {
                 return Err(SoftwareError::InvalidMagicNumber { expected: FILESYSTEM_MAGIC, found: footer });
             }
