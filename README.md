@@ -1,40 +1,37 @@
 
 <h1 align="center">
-    <img src="docs/assets/eadkp_full_logo.svg" alt="eadkp logo" style="vertical-align: middle; width: 30%;"/>
-    <br/>
-    <sub>Alpha 1</sub>
-    <br/>
-    <p align="center">
-        <p align="center">
-            <a href="https://github.com/Oignontom8283/eadkp/actions">
-                <img src="https://img.shields.io/github/actions/workflow/status/Oignontom8283/eadkp/rust.yml?style=flat&logo=github" alt="Build Status"/>
-            </a>
-            <img src="https://img.shields.io/badge/Target-NumWorks_Epsilon-ffb734?style=flat" alt="Target Hardware"/>
-            <a href="https://github.com/Oignontom8283/eadkp/blob/main/LICENSE">
-                <img src="https://img.shields.io/github/license/Oignontom8283/eadkp?style=flat&color=ff6912" alt="License"/>
-            </a>
-            <br>
-            <a href="https://github.com/Oignontom8283/eadkp/graphs/commit-activity">
-                <img src="https://img.shields.io/github/last-commit/Oignontom8283/eadkp?style=flat" alt="Last Commit"/>
-            </a>
-            <img src="https://img.shields.io/github/repo-size/Oignontom8283/eadkp?style=flat" alt="Repo Size"/>
-            <img src="https://img.shields.io/github/languages/top/Oignontom8283/eadkp?style=flat&logo=rust&color=red" alt="Top Language"/>
-            <br>
-            <a href="https://github.com/Oignontom8283/eadkp/stargazers">
-                <img src="https://img.shields.io/github/stars/Oignontom8283/eadkp?style=flat&logo=github&color=gold" alt="GitHub stars"/>
-            </a>
-            <a href="https://github.com/Oignontom8283/eadkp/network/members">
-                <img src="https://img.shields.io/github/forks/Oignontom8283/eadkp?style=flat&logo=github&color=pink" alt="GitHub forks"/>
-            </a>
-            <a href="https://github.com/Oignontom8283/eadkp/issues">
-                <img src="https://img.shields.io/github/issues/Oignontom8283/eadkp?style=flat&logo=github" alt="GitHub issues"/>
-            </a>
-            <a href="https://github.com/Oignontom8283/eadkp/pulls">
-                <img src="https://img.shields.io/github/issues-pr/Oignontom8283/eadkp?style=flat&logo=github" alt="GitHub pull requests"/>
-            </a>
-        </p>
-    </p>
+  <img src="docs/assets/eadkp_full_logo.svg" alt="eadkp logo" width="300"/><br/>
+  <span style="opacity: 0.6; font-size: 0.9rem; font-family: monospace;">alpha-v1.0.0</span>
 </h1>
+
+<p align="center">
+    <a href="https://github.com/Oignontom8283/eadkp/actions">
+        <img src="https://img.shields.io/github/actions/workflow/status/Oignontom8283/eadkp/rust.yml?style=flat&logo=github" alt="Build Status"/>
+    </a>
+    <img src="https://img.shields.io/badge/Target-NumWorks_Epsilon-ffb734?style=flat" alt="Target Hardware"/>
+    <a href="https://github.com/Oignontom8283/eadkp/blob/main/LICENSE">
+        <img src="https://img.shields.io/github/license/Oignontom8283/eadkp?style=flat&color=ff6912" alt="License"/>
+    </a>
+    <br/>
+    <a href="https://github.com/Oignontom8283/eadkp/graphs/commit-activity">
+        <img src="https://img.shields.io/github/last-commit/Oignontom8283/eadkp?style=flat" alt="Last Commit"/>
+    </a>
+    <img src="https://img.shields.io/github/repo-size/Oignontom8283/eadkp?style=flat" alt="Repo Size"/>
+    <img src="https://img.shields.io/github/languages/top/Oignontom8283/eadkp?style=flat&logo=rust&color=red" alt="Top Language"/>
+    <br/>
+    <a href="https://github.com/Oignontom8283/eadkp/stargazers">
+        <img src="https://img.shields.io/github/stars/Oignontom8283/eadkp?style=flat&logo=github&color=gold" alt="GitHub stars"/>
+    </a>
+    <a href="https://github.com/Oignontom8283/eadkp/network/members">
+        <img src="https://img.shields.io/github/forks/Oignontom8283/eadkp?style=flat&logo=github&color=pink" alt="GitHub forks"/>
+    </a>
+    <a href="https://github.com/Oignontom8283/eadkp/issues">
+        <img src="https://img.shields.io/github/issues/Oignontom8283/eadkp?style=flat&logo=github" alt="GitHub issues"/>
+    </a>
+    <a href="https://github.com/Oignontom8283/eadkp/pulls">
+        <img src="https://img.shields.io/github/issues-pr/Oignontom8283/eadkp?style=flat&logo=github" alt="GitHub pull requests"/>
+    </a>
+</p>
 
 **Eadkp** est une bibliothèque Rust destinée au développement d’applications pour
 les calculatrices **NumWorks** sous **Epsilon**.
