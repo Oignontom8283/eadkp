@@ -1,7 +1,7 @@
 
 <h1 align="center">
-  <img src="docs/assets/eadkp_full_logo.svg" alt="eadkp logo" width="300"/><br/>
-  <span style="opacity: 0.6; font-size: 0.9rem; font-family: monospace;">alpha-v1.0.0</span>
+  <img src="docs/assets/eadkp_full_logo.svg" alt="eadkp logo" width="300"><br>
+  <kbd>alpha-v1.0.0</kbd>
 </h1>
 
 <p align="center">
