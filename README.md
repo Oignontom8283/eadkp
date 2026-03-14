@@ -1,9 +1,35 @@
 
 <h1>
     <img src="docs/assets/eadkp_full_logo.svg" alt="eadkp logo" style="vertical-align: middle; width: 30%;"/>
+    <sub>Alpha 1</sub>
+    <br/>
+    <p align="center">
+        <a href="https://github.com/Oignontom8283/eadkp/actions">
+            <img src="https://github.com/Oignontom8283/eadkp/actions/workflows/rust.yml/badge.svg" alt="Build Status"/>
+        </a>
+        <a href="https://github.com/Oignontom8283/eadkp/issues">
+            <img src="https://img.shields.io/github/issues/Oignontom8283/eadkp.svg" alt="Issues"/>
+        </a>
+        <a href="https://github.com/Oignontom8283/eadkp/pulls">
+            <img src="https://img.shields.io/github/issues-pr/Oignontom8283/eadkp.svg" alt="Pull Requests"/>
+        </a>
+        <a href="https://github.com/Oignontom8283/eadkp">
+            <img src="https://img.shields.io/github/license/Oignontom8283/eadkp.svg" alt="License"/>
+        </a>
+        <a href="https://github.com/Oignontom8283/eadkp">
+            <img src="https://img.shields.io/github/v/release/Oignontom8283/eadkp.svg?label=release" alt="Latest Release"/>
+        </a>
+        <a href="https://github.com/Oignontom8283/eadkp/stargazers">
+            <img src="https://img.shields.io/github/stars/Oignontom8283/eadkp.svg?style=social" alt="Stars"/>
+        </a>
+        <a href="https://github.com/Oignontom8283/eadkp/network/members">
+            <img src="https://img.shields.io/github/forks/Oignontom8283/eadkp.svg?style=social" alt="Forks"/>
+        </a>
+        <a href="https://github.com/Oignontom8283/eadkp/watchers">
+            <img src="https://img.shields.io/github/watchers/Oignontom8283/eadkp.svg?style=social" alt="Watchers"/>
+        </a>
+    </p>
 </h1>
-
-Version : **Alpha 1**
 
 **Eadkp** est une bibliothèque Rust destinée au développement d’applications pour
 les calculatrices **NumWorks** sous **Epsilon**.
