@@ -50,7 +50,110 @@ Install Eadkp via Cargo:
 cargo add eadkp
 ```
 
-## 
+## Fonctionnement
+
+Eadkp a deux champs de fonctionnement principaux, **Officiel** et **Bypass** :
+- **Officiel: SDK étendu/abstract** : Fournit des handlers Rust pour l'ABI d'Epsilon, ainsi que des abstractions pour interagir avec cette API de manière plus ergonomique.
+- **Bypass: Appel de registres** : Fournit des fonctions pour faire des appels directs aux CPU, comme des appels SVC pour interagir avec le Power Manager.
+- **Bypass: Hot patching de la RAM** : Fournit des fonctions qui par hot patch de la RAM, permettent par exemple de manipuler le file system (Storage) de la calculatrice.
+
+### Schema de positionnement et interaction d'eadkp :
+```mermaid		
+flowchart LR
+
+    %% =====================================================
+    %% APPLICATION
+    %% =====================================================
+    X[External App]
+
+    %% =====================================================
+    %% SDK
+    %% =====================================================
+    subgraph SDK_Layer
+        T[eadkp - Extended SDK]
+        B[eadk ABI - Official]
+        T -->|uses| B
+    end
+
+    X -->|lib use| T
+
+    %% =====================================================
+    %% OS
+    %% =====================================================
+    subgraph OS_Epsilon
+        A[Epsilon Core]
+        DM[Diplay Manager]
+        PM[Power Manager]
+        KM[Keyboard Manager]
+        UM[USB Manager]
+
+        B -->|limited API| A
+        A --> PM
+        A --> KM
+        A --> UM
+    end
+
+    %% =====================================================
+    %% MEMORY MAP
+    %% =====================================================
+    subgraph Memory
+
+        subgraph RAM
+            ST[Storage]
+            FB[Framebuffer]
+            STACK_OS[OS Heap / Stack]
+
+            subgraph App_Reserved_RAM
+                STACK_EX[External App Heap / Stack]
+            end
+        end
+
+        subgraph Flash
+            subgraph Bootloader
+                Launcher[Launcher]
+                Slot1[OS Slot 1]
+                Slot2[OS Slot 2 - Save]
+            end
+
+            NWA[NWA - External Apps Code]
+        end
+    end
+
+    %% =====================================================
+    %% HARDWARE
+    %% =====================================================
+    subgraph Hardware
+        Screen[Screen]
+        BAT[Battery]
+        Keyboard
+        Clock
+        USB
+    end
+
+    %% =====================================================
+    %% OS <-> MEMORY
+    %% =====================================================
+    A -->|executes| NWA
+    A --> ST
+    A --> DM
+    DM --> FB
+    FB --> Screen
+
+    %% =====================================================
+    %% OS <-> HARDWARE
+    %% =====================================================
+    PM --> BAT
+    KM --> Keyboard
+    UM --> USB
+    A --> Clock
+
+    %% =====================================================
+    %% EADKP BYPASS
+    %% =====================================================
+    T -. RAM hot patch .-> ST
+    T -. SVC call .-> PM
+    T -. alloc macro .-> STACK_EX
+```
 
 ## Contribution
 
