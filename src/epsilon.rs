@@ -196,18 +196,19 @@ impl CalculatorModel {
 /// 
 /// ## Layout du Filesystem (référence Ion) :
 /// ```
-/// Adresse de base : storage_address_ram
-/// Taille buffer    : storage_size_ram (43008 bytes)
+/// Adresse de base   : storage_address_ram
+/// Taille buffer (N) : storage_size_ram (43008 bytes)
 ///
-///  Offset 0            Offset 4                         Offset 4+N-2     Offset 4+N         Offset 4+N+4
-///  ↓                   ↓                                ↓                ↓                  ↓
-/// ┌───────────────────┬─────────────────────────────────┬────────────────┬──────────────────┐
-/// │  Magic Header     │     Buffer utilisable (N-2)     │ End marker (0) │   Magic Footer   │
-/// │   (4 bytes)       │                                 │   (2 bytes)    │    (4 bytes)     │
-/// └───────────────────┴─────────────────────────────────┴────────────────┴──────────────────┘
-///  ↑                   ↑                                ↑                ↑                  ↑
-///  storage_start_addr  usable_start_addr                usable_end_addr  footer_addr        storage_end_addr
-///  header_addr
+///  Offset 0            Offset 4                         Offset 4+N-2      Offset 4+N    Offset 4+N+4
+///  ↓                   ↓                                ↓                 ↓             ↓
+/// ┌───────────────────┬─────────────────────────────────┬────────────────┬──────────────┐
+/// │  Magic Header     │     Buffer utilisable (N-2)     │ End marker (0) │ Magic Footer │
+/// │   (4 bytes)       │                                 │   (2 bytes)    │   (4 bytes)  │
+/// └───────────────────┴─────────────────────────────────┴────────────────┴──────────────┘
+///  ↑                   ↑                                ↑                ⭡↑             ↑
+///  storage_start_addr  usable_start_addr                usable_end_addr  │footer_addr   storage_end_addr
+///  header_addr                                                           RAW-storage_size_ram
+/// 
 /// ```
 #[derive(Debug)]
 pub struct Filesystem {
