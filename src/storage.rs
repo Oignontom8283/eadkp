@@ -155,6 +155,7 @@ pub fn _find_file(filename: &str) -> Result<FileEntry, StorageError> {
 ///     display(file); // Affiche tous les fichiers se terminant par .txt
 /// }
 /// ```
+#[cfg(target_os = "none")]
 pub fn find_files_with_suffix(suffix: &str) -> Result<Vec<&str>, GlobalError> {
 
     // Vérifier que le suffix est un c string valide (pas de null byte à l'intérieur) et pas vide (un suffix vide correspondrait à tous les fichiers)
@@ -206,6 +207,11 @@ pub fn find_files_with_suffix(suffix: &str) -> Result<Vec<&str>, GlobalError> {
     }
 
     Ok(matching_files)
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn find_files_with_suffix(_suffix: &str) -> Result<Vec<&str>, GlobalError> {
+    Ok(Vec::new())
 }
 
 
