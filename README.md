@@ -32,23 +32,64 @@ des applications **NWA**.
 - [ ] Support des graphiques avancés
 - [ ] Débogage via USB (Pas encore évaluée la faisabilité)
 
-## Installation
+## Installation et utilisation
 
-**Cette section est incomplète et en cours de rédaction.**
+La méthode recommandée pour utiliser Eadkp est d'utiliser la [template de projet](https://github.com/Oignontom8283/eadkp_template) officielle.
+Nous détailleons donc son utilisation et installation ici.
 
-Configurez votre projet pour la cible `thumbv7em-none-eabihf` et les options de compilation spécifiques aux NWA.
+### 1. Prérequis
+- Docker
+- Git
+- Bash (wsl sur windows)
 
-> Voir ./cargo/config.toml pour un exemple de configuration.
-> 
-> Voir ./examples/eadkp_example pour un exemple de projet utilisant eadkp.
-> 
-> Voir  ./build.rs pour la configuration de la chaîne d'outils
-> et ./docker-compose.yml, ./dockerfile pour un environnement de compilation Dockerisé.
+### 2. Download de la template
+Vous avez le choix entre cloner le dépôt git, créer votre repôt à partir de la template sur GitHub, ou utiliser le script automatique.
 
-Install Eadkp via Cargo:
+#### Cloner le dépôt git
 ```bash
-cargo add eadkp
+git clone https://github.com/Oignontom8283/eadkp_template my_eadkp_project
+cd my_eadkp_project
+chmod +x bootstrap.sh
+./bootstrap.sh
 ```
+
+#### Créer un dépôt à partir de la template sur GitHub
+1. Allez sur la page de la template : https://github.com/Oignontom8283/eadkp_template
+2. Cliquez sur "Use this template" et suivez les instructions pour créer votre propre dépôt.
+3. Clonez votre nouveau dépôt localement et exécutez le script de bootstrap :
+```bash
+git clone https://github.com/VotreNom/votre_depot
+cd votre_depot
+chmod +x bootstrap.sh
+./bootstrap.sh
+```
+
+#### Utiliser le script automatique
+
+Utiliser la commande suivante pour initialiser un projet eadkp. Suivez les instructions si demandé :
+
+```bash
+bash <(curl -s https://raw.githubusercontent.com/Oignontom8283/eadkp_template/main/bootstrap.sh)
+cd my_app
+```
+OU
+```bash
+bash <(curl -s https://raw.githubusercontent.com/Oignontom8283/eadkp_template/main/bootstrap.sh) --name "my_app"
+cd my_app
+```
+
+### 3. Lancer docker
+
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+Attendez que le conteneur soit prêt. Cela peut prendre plusieur minutes lors du premier lancement.
+
+### 4. ...
+
+**En cours de rédaction...**
 
 ## Fonctionnement
 
