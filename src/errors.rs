@@ -1,6 +1,6 @@
 use alloc::string::String;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug)]
 pub enum StorageError {
     /// Fichier non trouvé dans le stockage
     FileNotFound,
@@ -24,7 +24,7 @@ pub enum StorageError {
     NullTerminatorNotFound { start: *const u8 },
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug)]
 pub enum SoftwareError {
     /// Simulateur non supporté
     SimulatorNotSupported,
@@ -46,6 +46,7 @@ pub enum SoftwareError {
 
 
 /// Erreur globale englobant tout les types d"erreurs
+#[derive(Debug)]
 pub enum GlobalError {
     Storage(StorageError),
     Software(SoftwareError),
