@@ -103,7 +103,7 @@ pub fn run(log_list: &Vec<String, 12>) -> isize {
             }
         }
 
-        let mut adjust_scroll = |selected: Option<usize>, scroll_start: &mut usize, available_rows: usize| {
+        let adjust_scroll = |selected: Option<usize>, scroll_start: &mut usize, available_rows: usize| {
             let total = log_list.len();
             if total == 0 {
                 *scroll_start = 0;
@@ -287,7 +287,7 @@ pub fn run(log_list: &Vec<String, 12>) -> isize {
             }
         };
 
-        let mut render_visible = || {
+        let render_visible = || {
             let mut y = y_base;
             let mut rows_left = available_lines;
             let mut index = scroll_start;
