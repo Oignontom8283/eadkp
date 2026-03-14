@@ -110,6 +110,7 @@ pub struct FileEntry {
 
 /// Trouve un fichier par son nom et retourne une structure contenant des pointeurs vers son header, son nom et son contenu, ainsi que sa taille.
 #[doc(hidden)]
+#[cfg(target_os = "none")]
 pub fn _find_file(filename: &str) -> Result<FileEntry, StorageError> {
     let filename_slice = filename.as_bytes();
     let filename_len = filename_slice.len();
