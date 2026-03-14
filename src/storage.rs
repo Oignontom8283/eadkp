@@ -455,7 +455,7 @@ pub unsafe fn file_erase(filename: &str) -> Result<(), GlobalError> {
 
 /// Dummy version
 #[cfg(not(target_os = "none"))]
-pub unsafe fn file_erase(_filename: &str) -> Result<()> {
+pub unsafe fn file_erase(_filename: &str) -> Result<(), GlobalError> {
     Ok(())
 }
 
