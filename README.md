@@ -2,19 +2,20 @@
 <h1 align="center">
   <img src="docs/assets/eadkp_full_logo_no_marge.svg" alt="eadkp logo" width="300"><br>
   <kbd>v0.11.2-alpha.2</kbd>
+  <img src="https://img.shields.io/badge/language-fr-blue.svg" alt="Status"/>
 </h1>
 
 <p align="center">
-    <a href="https://github.com/Oignontom8283/eadkp/actions">
-        <img src="https://img.shields.io/github/actions/workflow/status/Oignontom8283/eadkp/rust.yml?style=flat&logo=github" alt="Build Status"/>
+    <a href="https://github.com/Oignontom8283/eadkp/graphs/commit-activity">
+        <img src="https://img.shields.io/github/last-commit/Oignontom8283/eadkp?style=flat" alt="Last Commit"/>
     </a>
     <img src="https://img.shields.io/badge/Target-NumWorks_Epsilon-ffb734?style=flat" alt="Target Hardware"/>
     <a href="https://github.com/Oignontom8283/eadkp/blob/main/LICENSE">
         <img src="https://img.shields.io/github/license/Oignontom8283/eadkp?style=flat&color=ff6912" alt="License"/>
     </a>
     <br/>
-    <a href="https://github.com/Oignontom8283/eadkp/graphs/commit-activity">
-        <img src="https://img.shields.io/github/last-commit/Oignontom8283/eadkp?style=flat" alt="Last Commit"/>
+    <a href="https://github.com/Oignontom8283/eadkp/actions">
+        <img src="https://img.shields.io/github/actions/workflow/status/Oignontom8283/eadkp/rust.yml?style=flat&logo=github&color=green" alt="Build Status"/>
     </a>
     <img src="https://img.shields.io/github/repo-size/Oignontom8283/eadkp?style=flat" alt="Repo Size"/>
     <img src="https://img.shields.io/github/languages/top/Oignontom8283/eadkp?style=flat&logo=rust&color=red" alt="Top Language"/>
@@ -66,7 +67,7 @@ La méthode recommandée pour utiliser Eadkp est d'utiliser la [template de proj
 Nous détailleons donc son utilisation et installation ici.
 
 ### 1. Prérequis
-- Docker
+- Docker (Si Windows, docker sur Windows, pas sur WSL)
 - Git
 - Bash (wsl sur windows)
 
@@ -115,9 +116,55 @@ chmod +x start.sh
 
 Attendez que le conteneur soit prêt. Cela peut prendre plusieur minutes lors du premier lancement.
 
-### 4. ...
+### 4. Entrer dans l'environnement
 
-**En cours de rédaction...**
+#### Terminal
+Pour entrer dans le shell du conteneur :
+```bash
+./shell.sh
+```
+> [!IMPORTANT]
+> Pour lancer le simulateur il faut passer par un vrai terminal (pas l'IDE) et utiliser `./shell.sh`, sinon le lien avec le serveur X ne fonctionnera pas.
+
+#### IDE
+
+Pour Visul Studio Code, utilisez l'extension [Remote Developement](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack)
+pour vous connecter au conteneur et utiliser l'environnement comme si vous n'étiez pas dans un conteneur.
+
+> [!NOTE]
+> Permet la compatibilité avec Rust Analyzer et d'autres extensions de développement.
+> Sur Windows, utiliser l'IDE sur Windows, il pourra se connecter au conteneur, même si lancer dans WSL.
+
+### 5. Compiler et Simulator
+
+#### Compilation / Exportation
+Pour compiler le projet utilisez :
+```bash
+just build
+```
+Mais pour compiler l'application empaquetée en NWA, utilisez :
+```bashbash
+just export
+```
+Le fichier .nwa génére se trouvera dans `./build/`.
+
+#### Simulateur
+
+Pour lancer le simulateur officiel NumWorks avec votre application, utilisez :
+```bash
+just sim
+```
+> [!IMPORTANT]
+> Vous devez être dans un vrai terminal (pas l'IDE) et utiliser `./shell.sh` pour que le lien avec le serveur X fonctionne (WSL2 embarque un serveur X et les distributions Linux aussi pour la plupart), sinon le simulateur ne pourra pas se lancer.
+
+La commande va télécharger et lancer le simulateur officiel de Numworks depuis son dépôt.
+A la **première utilisation**, le simulateur va devoir ce compiler, ce qui peut prendre plusieurs minutes ou dixaines de minutes.
+
+Une fenêtre représentant la calculatrice va s'ouvrir, et votre application sera automatiquement lancée dessus.
+
+> [!NOTE]
+> Si vous utiliser des fonctionnalités avancées d'eadkp ou hardware, vous devrez créer une alternative en `#[cfg(target_os = "none")]` et une autre
+> en `#[cfg(not(target_os = "none"))]` qui **dummy** la fonctionnalité, car sur Simulateur, les composants n'existent pas.
 
 ## Fonctionnement
 
