@@ -7,6 +7,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      EADKP_PRIMARY_BUILD: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,20 +41,18 @@ jobs:
 
       - name: Build library (host)
         run: cargo +nightly build --lib --release
-        env:
-          EADKP_PRIMARY_BUILD: 1
 
       - name: Build library (thumbv7em-none-eabihf)
         run: cargo +nightly build --lib --release --target thumbv7em-none-eabihf
-        env:
-          EADKP_PRIMARY_BUILD: 1
 
       - name: Build NWA example (host)
         run: cargo +nightly build --release --example simulator
-        env:
-          EADKP_PRIMARY_BUILD: 1
 
       - name: Build NWA example (thumbv7em-none-eabihf)
         run: cargo +nightly build --release --example device --target thumbv7em-none-eabihf
-        env:
-          EADKP_PRIMARY_BUILD: 1
+
+      - name: Show NWA output info
+        run: |
+          ls -lah target/thumbv7em-none-eabihf/release/examples/device
+          file target/thumbv7em-none-eabihf/release/examples/device
+          sha256sum target/thumbv7em-none-eabihf/release/examples/device
