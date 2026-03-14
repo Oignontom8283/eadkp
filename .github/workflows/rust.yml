@@ -13,6 +13,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -28,8 +39,14 @@ jobs:
         with:
           targets: thumbv7em-none-eabihf
 
-      - name: Full Build (Verify everything)
-        # On lance le build complet. 
-        # Cela va executer build.rs (npx nwlink + compilation C via arm-gcc)
-        # puis compiler la logique Rust.
-        run: cargo build --release --target thumbv7em-none-eabihf
+      - name: Build library (host)
+        run: cargo +nightly build --lib --release
+
+      - name: Build library (thumbv7em-none-eabihf)
+        run: cargo +nightly build --lib --release --target thumbv7em-none-eabihf
+
+      - name: Build NWA example (host)
+        run: cargo +nightly build --release --example simulator
+
+      - name: Build NWA example (thumbv7em-none-eabihf)
+        run: cargo +nightly build --release --example device --target thumbv7em-none-eabihf
