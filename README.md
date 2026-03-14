@@ -163,8 +163,8 @@ A la **première utilisation**, le simulateur va devoir ce compiler, ce qui peut
 Une fenêtre représentant la calculatrice va s'ouvrir, et votre application sera automatiquement lancée dessus.
 
 > [!NOTE]
-> Si vous utiliser des fonctionnalités avancées d'eadkp ou hardware, vous devrez créer une alternative en `#[cfg(target_os = "none")]` et une autre
-> en `#[cfg(not(target_os = "none"))]` qui **dummy** la fonctionnalité, car sur Simulateur, les composants n'existent pas.
+> Si vous utiliser des fonctionnalités avancées d'eadkp ou hardware, vous devrez séparer votre code en une version `#[cfg(target_os = "none")]` et une autre
+> en `#[cfg(not(target_os = "none"))]` qui **dummy** la fonctionnalité, car sur Simulateur, les composants / objets en RAM n'existent pas.
 
 ## Fonctionnement
 
