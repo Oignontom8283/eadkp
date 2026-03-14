@@ -1,5 +1,5 @@
 use heapless::Vec;
-use alloc::string::String;
+use alloc::{format, string::String};
 
 pub fn run(log_list: &Vec<String, 12>) -> isize {
     let mut prev = eadkp::input::KeyboardState::scan();
@@ -37,7 +37,7 @@ pub fn run(log_list: &Vec<String, 12>) -> isize {
         let total_lines = log_list.len();
         let mut new_selected = selected_index;
         let mut new_scroll_start = scroll_start;
-        let mut new_show_caret = show_caret;
+        let mut new_show_caret: bool;
         let mut available_lines = max_lines;
 
         while h_offsets.len() < total_lines {
@@ -146,7 +146,7 @@ pub fn run(log_list: &Vec<String, 12>) -> isize {
         show_caret = new_show_caret;
         dirty = false;
 
-        let mut render_line = |index: usize| {
+        let render_line = |index: usize| {
             if index < scroll_start || index >= end {
                 return;
             }

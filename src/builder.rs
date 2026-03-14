@@ -1,4 +1,5 @@
 use image::{self, GenericImageView, ImageReader};
+#[allow(unused_imports)]
 use regex::Regex;
 use std::{fs, process::Command};
 use cc;
@@ -9,6 +10,7 @@ mod utils {
 
 const ASSETS_DIR: &str = "assets/";
 const POSSIBLE_C_DIRS: [&str; 4] = ["src/libs", "src/lib", "src/c", "src/cpp"];
+#[allow(dead_code)]
 const KEYBOARD_MAPPING_FILE: &str = "epsilon_simulator/ion/src/simulator/shared/keyboard.cpp";
 
 const ICON_WIDTH: u32 = 55;
