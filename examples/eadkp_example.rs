@@ -122,6 +122,7 @@ fn main() -> isize {
     log("consectetur adipiscing elit,".to_string());
     log("sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".to_string());
     log("consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim venia".to_string());
+    log("Bonjour\nle monde\ncomment ca va ?\n...".to_string());
 
     log("Press Home to exit.".to_string());
 

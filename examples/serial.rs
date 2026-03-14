@@ -13,6 +13,33 @@ pub fn run(log_list: &Vec<String, 12>) -> isize {
     let mut h_offset: usize = 0;
     let mut h_offsets: Vec<usize, 12> = Vec::new();
     let mut last_status = String::new();
+    let count_rows = |msg: &str| -> usize {
+        let mut rows = 1usize;
+        for b in msg.as_bytes() {
+            if *b == b'\n' {
+                rows += 1;
+            }
+        }
+        rows
+    };
+    let max_line_len = |msg: &str| -> usize {
+        let mut max_len = 0usize;
+        let mut current = 0usize;
+        for ch in msg.chars() {
+            if ch == '\n' {
+                if current > max_len {
+                    max_len = current;
+                }
+                current = 0;
+            } else {
+                current += 1;
+            }
+        }
+        if current > max_len {
+            max_len = current;
+        }
+        max_len
+    };
 
     while h_offsets.len() < log_list.len() {
         let _ = h_offsets.push(0);
@@ -76,28 +103,56 @@ pub fn run(log_list: &Vec<String, 12>) -> isize {
             }
         }
 
-        if let Some(i) = new_selected {
-            if i < new_scroll_start {
-                new_scroll_start = i;
-            } else if i >= new_scroll_start + available_lines {
-                new_scroll_start = i + 1 - available_lines;
+        let mut adjust_scroll = |selected: Option<usize>, scroll_start: &mut usize, available_rows: usize| {
+            let total = log_list.len();
+            if total == 0 {
+                *scroll_start = 0;
+                return;
             }
-        } else {
-            new_scroll_start = total_lines.saturating_sub(available_lines);
-        }
+
+            if let Some(sel) = selected {
+                if sel < *scroll_start {
+                    *scroll_start = sel;
+                    return;
+                }
+
+                let mut start = *scroll_start;
+                loop {
+                    let mut rows = 0usize;
+                    for idx in start..=sel {
+                        if let Some(msg) = log_list.get(idx) {
+                            rows += count_rows(msg);
+                        }
+                    }
+                    if rows <= available_rows || start >= sel {
+                        break;
+                    }
+                    start += 1;
+                }
+                *scroll_start = start;
+            } else {
+                let mut start = total;
+                let mut rows = 0usize;
+                while start > 0 {
+                    let idx = start - 1;
+                    if let Some(msg) = log_list.get(idx) {
+                        rows += count_rows(msg);
+                    }
+                    start -= 1;
+                    if rows >= available_rows {
+                        break;
+                    }
+                }
+                *scroll_start = start;
+            }
+        };
+
+        adjust_scroll(new_selected, &mut new_scroll_start, available_lines);
 
         new_show_caret = new_scroll_start > 0;
         if new_show_caret && max_lines > 1 {
             available_lines = max_lines - 1;
-            if let Some(i) = new_selected {
-                if i < new_scroll_start {
-                    new_scroll_start = i;
-                } else if i >= new_scroll_start + available_lines {
-                    new_scroll_start = i + 1 - available_lines;
-                }
-            } else {
-                new_scroll_start = total_lines.saturating_sub(available_lines);
-            }
+            adjust_scroll(new_selected, &mut new_scroll_start, available_lines);
             new_show_caret = new_scroll_start > 0;
         }
 
@@ -116,9 +171,9 @@ pub fn run(log_list: &Vec<String, 12>) -> isize {
 
         if let Some(i) = new_selected {
             if let Some(msg) = log_list.get(i) {
-                let line_len = msg.chars().count();
-                let max_offset = line_len.saturating_sub(max_chars.saturating_sub(3));
-                if line_len <= max_chars {
+                let max_len = max_line_len(msg);
+                let max_offset = max_len.saturating_sub(max_chars.saturating_sub(3));
+                if max_len <= max_chars {
                     h_offset = 0;
                 } else if h_offset > max_offset {
                     h_offset = max_offset;
@@ -131,10 +186,13 @@ pub fn run(log_list: &Vec<String, 12>) -> isize {
 
         let selection_bg = eadkp::Color::from_888(230, 230, 230);
         let y_base = if new_show_caret { 10 + line_height } else { 10 };
-        let end = (new_scroll_start + available_lines).min(total_lines);
-        let full_redraw = new_scroll_start != old_scroll_start || new_show_caret != old_show_caret || dirty;
         let hscroll_changed = h_offset != old_h_offset;
         let selection_changed = new_selected != old_selected;
+        let full_redraw = new_scroll_start != old_scroll_start
+            || new_show_caret != old_show_caret
+            || dirty
+            || selection_changed
+            || hscroll_changed;
         let mut status = String::new();
         if let Some(i) = new_selected {
             status = format!("{}/{}", i + 1, total_lines);
@@ -146,59 +204,125 @@ pub fn run(log_list: &Vec<String, 12>) -> isize {
         show_caret = new_show_caret;
         dirty = false;
 
-        let render_line = |index: usize| {
-            if index < scroll_start || index >= end {
-                return;
+        let draw_segment = |segment: &str, y: usize, is_selected: bool, use_offset: usize| {
+            let bg = if is_selected { selection_bg } else { eadkp::COLOR_WHITE };
+            let mut line = String::new();
+            let mut show_left = false;
+            let mut show_right = false;
+
+            let line_len = segment.chars().count();
+            if line_len <= max_chars {
+                line.push_str(segment);
+            } else {
+                let max_offset = line_len.saturating_sub(max_chars.saturating_sub(3));
+                let use_offset = use_offset.min(max_offset);
+                let left_ellipsis = use_offset > 0;
+                let right_ellipsis = use_offset + max_chars < line_len;
+                let mut content_width = max_chars;
+                if left_ellipsis {
+                    content_width = content_width.saturating_sub(1);
+                    line.push(' ');
+                }
+                if right_ellipsis {
+                    content_width = content_width.saturating_sub(3);
+                }
+
+                let mut count = 0usize;
+                for (i, ch) in segment.chars().enumerate() {
+                    if i < use_offset {
+                        continue;
+                    }
+                    if count >= content_width {
+                        break;
+                    }
+                    line.push(ch);
+                    count += 1;
+                }
+
+                if right_ellipsis {
+                    line.push_str("...");
+                }
+
+                if is_selected {
+                    show_left = left_ellipsis;
+                    show_right = right_ellipsis;
+                }
             }
-            if let Some(msg) = log_list.get(index) {
-                let is_selected = selected_index == Some(index);
-                let bg = if is_selected { selection_bg } else { eadkp::COLOR_WHITE };
-                let mut line = String::new();
-                let mut show_left = false;
-                let mut show_right = false;
 
-                let line_len = msg.chars().count();
-                if line_len <= max_chars {
-                    line.push_str(msg.as_str());
-                } else {
+            eadkp::display::push_rect_uniform(
+                eadkp::Rect {
+                    x: 0,
+                    y: y as u16,
+                    width: eadkp::SCREEN_RECT.width,
+                    height: line_height as u16,
+                },
+                bg,
+            );
+            eadkp::display::draw_string(
+                line.as_str(),
+                eadkp::Point { y: y as u16, x: 5 },
+                false,
+                eadkp::COLOR_BLACK,
+                bg,
+            );
+
+            if is_selected && show_left {
+                eadkp::display::draw_string(
+                    "<",
+                    eadkp::Point { y: y as u16, x: 0 },
+                    false,
+                    eadkp::COLOR_BLACK,
+                    bg,
+                );
+            }
+            if is_selected && show_right {
+                let x = eadkp::SCREEN_RECT.width.saturating_sub(eadkp::SMALL_FONT.width) as u16;
+                eadkp::display::draw_string(
+                    ">",
+                    eadkp::Point { y: y as u16, x },
+                    false,
+                    eadkp::COLOR_BLACK,
+                    bg,
+                );
+            }
+        };
+
+        let mut render_visible = || {
+            let mut y = y_base;
+            let mut rows_left = available_lines;
+            let mut index = scroll_start;
+
+            while index < total_lines && rows_left > 0 {
+                if let Some(msg) = log_list.get(index) {
+                    let is_selected = selected_index == Some(index);
                     let use_offset = if index < h_offsets.len() { h_offsets[index] } else { 0 };
-                    let left_ellipsis = use_offset > 0;
-                    let max_offset = line_len.saturating_sub(max_chars.saturating_sub(3));
-                    let use_offset = use_offset.min(max_offset);
-                    let right_ellipsis = use_offset + max_chars < line_len;
-                    let mut content_width = max_chars;
-                    if left_ellipsis {
-                        content_width = content_width.saturating_sub(1);
-                        line.push(' ');
-                    }
-                    if right_ellipsis {
-                        content_width = content_width.saturating_sub(3);
-                    }
+                    let mut start = 0usize;
 
-                    let mut count = 0usize;
-                    for (i, ch) in msg.chars().enumerate() {
-                        if i < use_offset {
-                            continue;
+                    for (i, b) in msg.as_bytes().iter().enumerate() {
+                        if *b == b'\n' {
+                            let segment = &msg[start..i];
+                            draw_segment(segment, y, is_selected, use_offset);
+                            y += line_height;
+                            rows_left = rows_left.saturating_sub(1);
+                            start = i + 1;
+                            if rows_left == 0 {
+                                break;
+                            }
                         }
-                        if count >= content_width {
-                            break;
-                        }
-                        line.push(ch);
-                        count += 1;
                     }
 
-                    if right_ellipsis {
-                        line.push_str("...");
-                    }
-
-                    if is_selected {
-                        show_left = left_ellipsis;
-                        show_right = right_ellipsis;
+                    if rows_left > 0 {
+                        let segment = &msg[start..];
+                        draw_segment(segment, y, is_selected, use_offset);
+                        y += line_height;
+                        rows_left = rows_left.saturating_sub(1);
                     }
                 }
 
-                let row = index - scroll_start;
-                let y = y_base + row * line_height;
+                index += 1;
+            }
+
+            while rows_left > 0 {
                 eadkp::display::push_rect_uniform(
                     eadkp::Rect {
                         x: 0,
@@ -206,35 +330,10 @@ pub fn run(log_list: &Vec<String, 12>) -> isize {
                         width: eadkp::SCREEN_RECT.width,
                         height: line_height as u16,
                     },
-                    bg,
+                    eadkp::COLOR_WHITE,
                 );
-                eadkp::display::draw_string(
-                    line.as_str(),
-                    eadkp::Point { y: y as u16, x: 5 },
-                    false,
-                    eadkp::COLOR_BLACK,
-                    bg,
-                );
-
-                if is_selected && show_left {
-                    eadkp::display::draw_string(
-                        "<",
-                        eadkp::Point { y: y as u16, x: 0 },
-                        false,
-                        eadkp::COLOR_BLACK,
-                        bg,
-                    );
-                }
-                if is_selected && show_right {
-                    let x = eadkp::SCREEN_RECT.width.saturating_sub(eadkp::SMALL_FONT.width) as u16;
-                    eadkp::display::draw_string(
-                        ">",
-                        eadkp::Point { y: y as u16, x },
-                        false,
-                        eadkp::COLOR_BLACK,
-                        bg,
-                    );
-                }
+                y += line_height;
+                rows_left -= 1;
             }
         };
 
@@ -272,40 +371,8 @@ pub fn run(log_list: &Vec<String, 12>) -> isize {
                 );
             }
 
-            let mut y = y_base;
-            for index in scroll_start..end {
-                render_line(index);
-                y += line_height;
-            }
-
-            let mut remaining = available_lines.saturating_sub(end.saturating_sub(scroll_start));
-            while remaining > 0 {
-                eadkp::display::push_rect_uniform(
-                    eadkp::Rect {
-                        x: 0,
-                        y: y as u16,
-                        width: eadkp::SCREEN_RECT.width,
-                        height: line_height as u16,
-                    },
-                    eadkp::COLOR_WHITE,
-                );
-                y += line_height;
-                remaining -= 1;
-            }
+            render_visible();
         } else {
-            if selection_changed {
-                if let Some(old) = old_selected {
-                    render_line(old);
-                }
-                if let Some(new_sel) = selected_index {
-                    render_line(new_sel);
-                }
-            } else if hscroll_changed {
-                if let Some(sel) = selected_index {
-                    render_line(sel);
-                }
-            }
-
             if status_changed || show_caret != old_show_caret {
                 let status_width = (last_status.chars().count() * eadkp::SMALL_FONT.width as usize) as u16;
                 let status_x = eadkp::SCREEN_RECT.width.saturating_sub(status_width) as u16;
