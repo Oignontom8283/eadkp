@@ -1,33 +1,26 @@
 
-<h1>
+<h1 align="center">
     <img src="docs/assets/eadkp_full_logo.svg" alt="eadkp logo" style="vertical-align: middle; width: 30%;"/>
+    <br/>
     <sub>Alpha 1</sub>
     <br/>
     <p align="center">
-        <a href="https://github.com/Oignontom8283/eadkp/actions">
-            <img src="https://github.com/Oignontom8283/eadkp/actions/workflows/rust.yml/badge.svg" alt="Build Status"/>
+        <a href="https://github.com/Oignontom8283/eadkp/stargazers">
+            <img src="https://img.shields.io/badge/Stars-$(stars)-brightgreen?style=flat-square" alt="GitHub stars"/>
+        </a>
+        <a href="https://github.com/Oignontom8283/eadkp/fork">
+            <img src="https://img.shields.io/badge/Forks-$(forks)-blue?style=flat-square" alt="GitHub forks"/>
         </a>
         <a href="https://github.com/Oignontom8283/eadkp/issues">
-            <img src="https://img.shields.io/github/issues/Oignontom8283/eadkp.svg" alt="Issues"/>
+            <img src="https://img.shields.io/badge/Issues-$(issues)-orange?style=flat-square" alt="GitHub issues"/>
         </a>
         <a href="https://github.com/Oignontom8283/eadkp/pulls">
-            <img src="https://img.shields.io/github/issues-pr/Oignontom8283/eadkp.svg" alt="Pull Requests"/>
+            <img src="https://img.shields.io/badge/PRs-$(prs)-purple?style=flat-square" alt="GitHub pull requests"/>
         </a>
-        <a href="https://github.com/Oignontom8283/eadkp">
-            <img src="https://img.shields.io/github/license/Oignontom8283/eadkp.svg" alt="License"/>
+        <a href="./LICENSE">
+            <img src="https://img.shields.io/badge/License-GPL--3.0-lightgrey?style=flat-square" alt="License"/>
         </a>
-        <a href="https://github.com/Oignontom8283/eadkp">
-            <img src="https://img.shields.io/github/v/release/Oignontom8283/eadkp.svg?label=release" alt="Latest Release"/>
-        </a>
-        <a href="https://github.com/Oignontom8283/eadkp/stargazers">
-            <img src="https://img.shields.io/github/stars/Oignontom8283/eadkp.svg?style=social" alt="Stars"/>
-        </a>
-        <a href="https://github.com/Oignontom8283/eadkp/network/members">
-            <img src="https://img.shields.io/github/forks/Oignontom8283/eadkp.svg?style=social" alt="Forks"/>
-        </a>
-        <a href="https://github.com/Oignontom8283/eadkp/watchers">
-            <img src="https://img.shields.io/github/watchers/Oignontom8283/eadkp.svg?style=social" alt="Watchers"/>
-        </a>
+    </p>
     </p>
 </h1>
 
