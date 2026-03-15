@@ -1,3 +1,5 @@
+
+/// Représente le niveau de charge de la batterie, avec des variantes allant de "Empty" (vide) à "Full" (plein).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum BatteryCharge {

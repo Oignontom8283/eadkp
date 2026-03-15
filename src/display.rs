@@ -46,7 +46,7 @@ pub fn draw_string(
     text_color: Color,
     background_color: Color,
 ) {
-    let c_string = CString::new(text).expect("Can't convert str to C_String. Maybe invalid caracter.");
+    let c_string = CString::new(text).expect("Failed to convert string to C string");
     unsafe {
         eadk_display_draw_string(
             c_string.as_ptr(),

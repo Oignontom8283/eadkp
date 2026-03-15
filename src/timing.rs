@@ -1,21 +1,22 @@
 
-/// Sleep for the specified number of microseconds.
+/// Sleep pour un nombre de microsecondes donné. (Arrête le thread pendant ce temps)
 pub fn usleep(us: u32) {
     unsafe {
         eadk_timing_usleep(us);
     }
 }
 
-/// Sleep for the specified number of milliseconds.
+/// Sleep pour un nombre de millisecondes donné. (Arrête le thread pendant ce temps)
 pub fn msleep(ms: u32) {
     unsafe {
         eadk_timing_msleep(ms);
     }
 }
 
-/// Get the number of milliseconds since the system started.
+/// Obtient le nombre de millisecondes depuis le démarrage du système. ()
 /// 
-/// Does not take sleep modes into account.
+/// - Ne prend pas en compte les modes de veille.
+/// - Depuis le démarrage/redémarrage/crash du système
 pub fn millis() -> u64 {
     unsafe { eadk_timing_millis() }
 }
