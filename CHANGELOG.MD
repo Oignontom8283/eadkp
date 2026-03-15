@@ -17,3 +17,4 @@
 0.13.0 - ...
     - Refactor input.rs for better documentation and clarity. 
     - Added to_alphanumeric, is_alphanumeric and documentation in input.rs.
+    - Update documentation for backlight, battery, color, display, timing, and utils modules with French descriptions
