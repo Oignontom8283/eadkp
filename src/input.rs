@@ -258,6 +258,7 @@ impl Event {
         }
     }
 
+    /// Vérifie si l'événement correspond à une touche alphanumérique (lettre ou symbole) plutôt qu'à une touche de navigation ou de fonction.
     pub fn is_alphanumeric(&self) -> bool {
         !matches!(
             self,
@@ -284,6 +285,18 @@ impl Event {
         )
     }
 
+    /// Convertit une touche alphanumérique en sa représentation string correspondante (Retourne None si ce n'est pas une touche alphanumérique).
+    /// 
+    /// Exemples :
+    /// ```
+    /// A -> "A"
+    /// a -> "a"
+    /// 1 -> "1"
+    /// + -> "+"
+    /// Cosine -> "cos("
+    /// Pi -> "π"
+    /// ...
+    /// ```
     pub fn to_alphanumeric(&self) -> Option<&'static str> {
         match self {
             Event::Zero =>  Some("0"),
