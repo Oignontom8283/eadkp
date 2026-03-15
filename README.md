@@ -1,7 +1,7 @@
 
 <h1 align="center">
   <img src="docs/assets/eadkp_full_logo_no_marge.svg" alt="eadkp logo" width="300"><br>
-  <img src="https://img.shields.io/github/v/release/Oignontom8283/eadkp?style=flat&logo=github" alt="Version"/>
+  <img src="https://img.shields.io/github/v/release/Oignontom8283/eadkp?include_prereleases&style=flat&logo=github" alt="Version"/>
   <img src="https://img.shields.io/badge/language-fr-blue.svg" alt="Status"/>
 </h1>
 
