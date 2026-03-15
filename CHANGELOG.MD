@@ -13,3 +13,7 @@
     - Add Rust CI workflow for automated testing.
     - Synced justfile (from eadkp_template)
     - Updated example/testing code file
+
+0.13.0 - ...
+    - Refactor input.rs for better documentation and clarity. 
+    - Added to_alphanumeric, is_alphanumeric and documentation in input.rs.
