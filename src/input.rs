@@ -1,9 +1,14 @@
 
 use enum_iterator::Sequence;
 
-
+/// Représente l'état du clavier en utilisant un entier de 64 bits, où chaque bit correspond à une touche spécifique.
 type EadkKeyboardState = u64;
 
+/// Représentation binaire brute de chaque touche du clavier.
+/// 
+/// Permet a l'aide de `KeyboardState::key_down` de vérifier si une touche spécifique est enfoncée ou relâchée.
+/// **Différent de `Event`** qui représente des événements de touches individuelles (y compris les touches alphanumériques)
+/// plutôt que l'état global du clavier.
 #[allow(dead_code)]
 #[derive(Clone, Copy, PartialEq, Eq, Sequence, Debug)]
 #[repr(u8)]
@@ -56,45 +61,64 @@ pub enum Key {
     Exe = 52,
 }
 
-unsafe extern "C" {
-    fn eadk_keyboard_scan() -> EadkKeyboardState;
-}
 
+/// Fournit des méthodes pour interagir avec l'état du clavier.
+/// 
+/// Permet :
+/// - de savoir quelles touches sont actuellement enfoncées ou relâchées.
+/// - de détecter les touches qui viennent d'être enfoncées
+/// - de détecter les touches qui viennent d'être relâchées
+/// 
+/// # Attention
+/// `Event` et `Key` sont deux types différents :
+/// - `Key` représente les touches physiques du clavier et est utilisé pour vérifier l'état de ces touches dans `KeyboardState`.
+/// - `Event` représente des événements de touches individuelles (y compris les touches alphanumériques) et est utilisé pour détecter
+/// les événements de touches spécifiques via `event_get`.
 #[derive(Clone, Copy)]
 pub struct KeyboardState(EadkKeyboardState);
 
 impl Default for KeyboardState {
+    /// Crée un nouvel état de clavier avec toutes les touches relâchées.
     fn default() -> Self {
         Self::new()
     }
 }
 
 impl KeyboardState {
+    /// Scanne l'état actuel du clavier et retourne une nouvelle instance de KeyboardState représentant cet état.
     pub fn scan() -> Self {
         Self::from_raw(unsafe { eadk_keyboard_scan() })
     }
 
+    /// Crée un nouvel état de clavier avec toutes les touches relâchées (valeur par défaut).
     pub fn new() -> Self {
         KeyboardState(0)
     }
 
+    /// Crée une instance de KeyboardState à partir d'un état brut (EadkKeyboardState).
     pub fn from_raw(state: EadkKeyboardState) -> Self {
         Self(state)
     }
 
+    /// Vérifie si une touche spécifique est actuellement enfoncée.
+    /// 
+    /// Permet de vérifier l'**état d'une touche physique** spécifique (pas un événement de touche) !
     pub fn key_down(&self, key: Key) -> bool {
         (self.0 >> (key as u8)) & 1 != 0
     }
-
+    
+    /// Vérifie si une touche spécifique est actuellement relâchée.
     pub fn get_just_pressed(&self, old: KeyboardState) -> Self {
         KeyboardState(self.0 & (!old.0))
     }
 
+    /// Vérifie si une touche spécifique vient d'être relâchée par rapport à un état précédent.
     pub fn get_just_realeased(&self, old: KeyboardState) -> Self {
         KeyboardState((!self.0) & old.0)
     }
 }
 
+/// Représente un événement de touche, qui peut être une touche de navigation, une touche de fonction ou une touche alphanumérique.
 #[allow(dead_code)]
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[repr(u16)]
@@ -226,6 +250,7 @@ pub enum Event {
 }
 
 impl Event {
+    /// Vérifie si l'événement correspond à une touche numérique (0-9).
     pub fn is_digit(&self) -> bool {
         matches!(
             self,
@@ -242,6 +267,7 @@ impl Event {
         )
     }
 
+    /// Convertit une touche numérique en sa valeur correspondante (0-9). Retourne None si ce n'est pas une touche numérique.
     pub fn to_digit(&self) -> Option<u8> {
         match self {
             Event::Zero => Some(0),
@@ -414,6 +440,10 @@ impl Event {
 
 unsafe extern "C" {
     fn eadk_event_get(timeout: &i32) -> Event;
+}
+
+unsafe extern "C" {
+    fn eadk_keyboard_scan() -> EadkKeyboardState;
 }
 
 pub fn event_get(timeout: i32) -> Event {
