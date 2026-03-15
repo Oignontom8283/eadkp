@@ -257,6 +257,146 @@ impl Event {
             _ => None,
         }
     }
+
+    pub fn is_alphanumeric(&self) -> bool {
+        !matches!(
+            self,
+            Event::Left
+            | Event::Up
+            | Event::Down
+            | Event::Right
+            | Event::Ok
+            | Event::Back
+            | Event::Shift
+            | Event::Alpha
+            | Event::Backspace
+            | Event::Toolbox
+            | Event::Exe
+            | Event::AlphaLock
+            | Event::Cut
+            | Event::Copy
+            | Event::Paste 
+            | Event::Clear
+            | Event::ShiftLeft
+            | Event::ShiftUp
+            | Event::ShiftDown
+            | Event::ShiftRight
+        )
+    }
+
+    pub fn to_alphanumeric(&self) -> Option<&'static str> {
+        match self {
+            Event::Zero =>  Some("0"),
+            Event::One =>   Some("1"),
+            Event::Two =>   Some("2"),
+            Event::Three => Some("3"),
+            Event::Four =>  Some("4"),
+            Event::Five =>  Some("5"),
+            Event::Six =>   Some("6"),
+            Event::Seven => Some("7"),
+            Event::Eight => Some("8"),
+            Event::Nine =>  Some("9"),
+
+            Event::Space =>            Some(" "),
+            Event::Question =>         Some("?"),
+            Event::Exclamation =>      Some("!"),
+            Event::Comma =>            Some(","),
+            Event::Colon =>            Some(":"),
+            Event::Semicolon =>        Some(";"),
+            Event::DoubleQuotes =>     Some("\""),
+            Event::Percent =>          Some("%"),
+            Event::Plus =>             Some("+"),
+            Event::Minus =>            Some("-"),
+            Event::Multiplication =>   Some("*"),
+            Event::Division =>         Some("/"),
+            Event::Dot =>              Some("."),
+            Event::Equal =>            Some("="),
+            Event::Underscore =>       Some("_"),
+            Event::Greater =>          Some(">"),
+            Event::Lower =>            Some("<"),
+            Event::Sto =>              Some("→"),
+            Event::Pi =>               Some("π"),
+            Event::Imaginary =>        Some("i"),
+            Event::Square =>           Some("^2"),
+            Event::Power =>            Some("^"),
+            Event::LeftParenthesis =>  Some("("),
+            Event::RightParenthesis => Some(")"),
+            Event::LeftBrace =>        Some("{"),
+            Event::RightBrace =>       Some("}"),
+            Event::LeftBracket =>      Some("["),
+            Event::RightBracket =>     Some("]"),
+            Event::Ee =>               Some("*10^"),
+            
+            Event::Log =>        Some("log("),
+            Event::Ln =>         Some("ln("),
+            Event::Sine =>       Some("sin("),
+            Event::Cosine =>     Some("cos("),
+            Event::Tangent =>    Some("tan("),
+            Event::Sqrt =>       Some("sqrt("),
+//          Event::Ans =>        Some("Ans"),
+            Event::Xnt =>        Some("xnt("),
+            Event::Var =>        Some("var("),
+            Event::Exp =>        Some("exp("),
+            Event::Arcsine =>    Some("arsin("),
+            Event::Arccosine =>  Some("arcos("),
+            Event::Arctangent => Some("artan("),
+
+            Event::UpperA => Some("A"),
+            Event::UpperB => Some("B"),
+            Event::UpperC => Some("C"),
+            Event::UpperD => Some("D"),
+            Event::UpperE => Some("E"),
+            Event::UpperF => Some("F"),
+            Event::UpperG => Some("G"),
+            Event::UpperH => Some("H"),
+            Event::UpperI => Some("I"),
+            Event::UpperJ => Some("J"),
+            Event::UpperK => Some("K"),
+            Event::UpperL => Some("L"),
+            Event::UpperM => Some("M"),
+            Event::UpperN => Some("N"),
+            Event::UpperO => Some("O"),
+            Event::UpperP => Some("P"),
+            Event::UpperQ => Some("Q"),
+            Event::UpperR => Some("R"),
+            Event::UpperS => Some("S"),
+            Event::UpperT => Some("T"),
+            Event::UpperU => Some("U"),
+            Event::UpperV => Some("V"),
+            Event::UpperW => Some("W"),
+            Event::UpperX => Some("X"),
+            Event::UpperY => Some("Y"),
+            Event::UpperZ => Some("Z"),
+
+            Event::LowerA => Some("a"),
+            Event::LowerB => Some("b"),
+            Event::LowerC => Some("c"),
+            Event::LowerD => Some("d"),
+            Event::LowerE => Some("e"),
+            Event::LowerF => Some("f"),
+            Event::LowerG => Some("g"),
+            Event::LowerH => Some("h"),
+            Event::LowerI => Some("i"),
+            Event::LowerJ => Some("j"),
+            Event::LowerK => Some("k"),
+            Event::LowerL => Some("l"),
+            Event::LowerM => Some("m"),
+            Event::LowerN => Some("n"),
+            Event::LowerO => Some("o"),
+            Event::LowerP => Some("p"),
+            Event::LowerQ => Some("q"),
+            Event::LowerR => Some("r"),
+            Event::LowerS => Some("s"),
+            Event::LowerT => Some("t"),
+            Event::LowerU => Some("u"),
+            Event::LowerV => Some("v"),
+            Event::LowerW => Some("w"),
+            Event::LowerX => Some("x"),
+            Event::LowerY => Some("y"),
+            Event::LowerZ => Some("z"),
+             _=> None,
+        }
+    }
 }
 
 unsafe extern "C" {
