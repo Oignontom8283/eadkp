@@ -41,7 +41,7 @@ impl BatteryCharge {
 pub fn level() -> BatteryCharge {
     let result: u8;
     unsafe {
-        core::arch::asm!( // Get battery level from SVC
+        core::arch::asm!( // Obtenir le niveau de charge de la batterie via un appel système (svc)
             "svc {svc_num}",
             "mov {out}, r0",
             svc_num = const 4,
@@ -54,7 +54,7 @@ pub fn level() -> BatteryCharge {
 
 #[cfg(not(target_os = "none"))]
 pub fn level() -> BatteryCharge {
-    BatteryCharge::High // Dummy value for non-embedded targets
+    BatteryCharge::High // Valeur Dummy pour les cibles non-embarquées
 }
 
 #[cfg(target_os = "none")]
@@ -74,7 +74,7 @@ pub fn voltage() -> f32 {
 
 #[cfg(not(target_os = "none"))]
 pub fn voltage() -> f32 {
-    4.2 // Dummy value for non-embedded targets
+    4.2 // Valeur Dummy pour les cibles non-embarquées
 }
 
 #[cfg(target_os = "none")]
@@ -94,7 +94,7 @@ pub fn is_charging() -> bool {
 
 #[cfg(not(target_os = "none"))]
 pub fn is_charging() -> bool {
-    false // Dummy value for non-embedded targets
+    false // Valeur Dummy pour les cibles non-embarquées
 }
 
 pub fn percentage() -> u8 {

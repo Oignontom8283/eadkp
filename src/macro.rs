@@ -1,31 +1,31 @@
 
-// Macro to set up EADK application boilerplate
-// This macro generates all the necessary embedded configuration
+// Macro pour configurer le boilerplate d'application EADK
+// Cette macro génère toute la configuration embarquée nécessaire
 #[macro_export]
 macro_rules! eadk_setup {
     (name = $app_name:expr) => {
         eadk_setup!(name = $app_name, icon = concat!(env!("OUT_DIR"), "/icon.nwi"), api_level = 0);
     };
     (name = $app_name:expr, icon = $icon_path:expr, api_level = $api_level:expr) => {
-        // Import necessary crates for embedded targets
+        // Importer les crates nécessaires pour les cibles embarquées
         #[cfg(target_os = "none")]
         use embedded_alloc::LlffHeap as Heap;
 
-        // Set up global allocator
+        // Configurer l'allocateur global
         #[global_allocator]
         #[cfg(target_os = "none")]
         static HEAP: Heap = Heap::empty();
 
-        // Import alloc for heap allocations
+        // Importer alloc pour les allocations sur le tas
         extern crate alloc;
 
-        // Common imports for embedded development
+        // Importations communes pour le développement embarqué
         use alloc::format;
 
-        // Import panic handler traits
+        // Importer les traits du gestionnaire de panique
         use core::panic::PanicInfo;
 
-        // Panic handler préconfiguré
+        // Gestionnaire de panique préconfiguré
         #[cfg(target_os = "none")]
         #[panic_handler]
         fn panic(panic: &PanicInfo<'_>) -> ! {
@@ -62,7 +62,7 @@ macro_rules! eadk_setup {
             }
         }
 
-        // Generate null-terminated app name
+        // Générer le nom d'application terminé par un null terminator
         const _APP_NAME_STR: &str = $app_name;
         const _APP_NAME_LEN: usize = _APP_NAME_STR.len();
         
@@ -80,13 +80,13 @@ macro_rules! eadk_setup {
             arr
         };
 
-        // EADK API level
+        // Niveau d'API EADK (Pas le choix du niveau pour app externe)
         #[used]
         #[cfg(target_os = "none")]
         #[unsafe(link_section = ".rodata.eadk_api_level")]
         pub static EADK_APP_API_LEVEL: u32 = $api_level;
 
-        // EADK app icon
+        // Icône de l'application EADK
         #[used]
         #[cfg(target_os = "none")]
         #[unsafe(link_section = ".rodata.eadk_app_icon")]
@@ -94,12 +94,12 @@ macro_rules! eadk_setup {
             const ICON_DATA: &[u8] = include_bytes!($icon_path);
             const ICON_SIZE: usize = ICON_DATA.len();
             
-            const _: () = assert!(ICON_SIZE > 0, "Icon file is empty");
+            const _: () = assert!(ICON_SIZE > 0, "Le fichier d'icône est vide");
             
             ICON_SIZE
         }] = *include_bytes!($icon_path);
 
-        // Helper function to initialize the heap
+        // Fonction d'initialisation de l'application, appelée par le système au démarrage de l'application
         #[cfg(target_os = "none")]
         #[inline]
         fn _eadk_init_heap() {
@@ -108,26 +108,25 @@ macro_rules! eadk_setup {
             unsafe { HEAP.init(eadkp::HEAP_START as usize, heap_size_val) }
         }
 
-        // Dummy function for non-embedded targets
+        // Fonction vide pour les cibles non-embarquées
         #[cfg(not(target_os = "none"))]
         #[inline]
         fn _eadk_init_heap() {}
     };
 }
 
-/// Macro to include asset files from the assets directory.
-/// This macro simplifies the inclusion of asset files by automatically.
+/// Macro pour inclure les fichiers d'assets depuis le répertoire assets.
+/// Cette macro simplifie l'inclusion des fichiers d'assets en automatisant
+/// l'inclusion des octets du répertoire cible des assets avec l'extension `.eif`.
 /// 
-/// Including the bytes from the target assets directory with a .bin extension.
-/// 
-/// ## Example
-/// Usage:
+/// ## Exemple
+/// Utilisation :
 /// ```
 /// static IMG_DATA: &[u8] = include_asset!("images/image1.png");
 /// ```
-/// Output:
+/// Résultat :
 /// ```
-/// static IMG_DATA: &[u8] = include_bytes!("<project_root>/target/<cible>/assets/images/image1.png.bin");
+/// static IMG_DATA: &[u8] = include_bytes!("<racine_du_projet>/target/<cible>/assets/images/image1.png.eif");
 /// ```
 #[macro_export]
 macro_rules! include_image {

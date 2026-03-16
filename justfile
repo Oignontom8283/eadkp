@@ -37,7 +37,7 @@ run_nwb:
     ./epsilon_simulator/output/release/simulator/linux/epsilon.bin --nwb ./target/release/examples/libsimulator.so & # Run in background to free up terminal. If simulator freezes, kill it with `pkill epsilon.bin`.
 
 sim jobs="1":
-    -git clone https://github.com/numworks/epsilon.git epsilon_simulator -b version-20 --depth 1 # Broken with version 21. Nice!
+    git clone https://github.com/numworks/epsilon.git epsilon_simulator -b version-20 --depth 1 # Version 20, others seem incompatible
     just build_simulator
     if [ -d "{{simulator_dir}}" ]; then \
         cd {{simulator_dir}}; \
