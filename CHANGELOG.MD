@@ -19,3 +19,6 @@
     - Added to_alphanumeric, is_alphanumeric and documentation in input.rs.
     - Update documentation and comments with French
     - MAJOR: Switched to LGPL-3.0 license for allow non-viral integration in external projects.
+
+0.14.0 - Wayland support
+
