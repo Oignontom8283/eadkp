@@ -280,15 +280,29 @@ Pour apprendre à utiliser le projet, consultez les guides suivants :
 - [Guide de compilation de l'exemple de test](docs/SETUPS/BuildExample.md)
 - [Guide d'utilisation du simulateur](docs/SETUPS/Simulator.md)
 
-## Licence
-Ce projet est sous licence [GPL-3.0](./LICENSE) (GNU General Public License v3.0).
+## Licence & Crédits
 
-Technologie de `storage.rs` basée sur [NumWorks Extapp Storage](https://framagit.org/Yaya.Cout/numworks-extapp-storage) sous [licence MIT](https://framagit.org/Yaya.Cout/numworks-extapp-storage/-/blob/master/LICENSE-MIT) (commit: 62e3d4c44437b93a8f14ce687a1c45d6dded87d9).
+Ce projet est distribué sous [licence LGPL-3.0](./LICENSE) (GNU Lesser General Public License v3.0).
 
-Projet basé sur l'eadk et utilitaire de [NumCraft version v0.1.4](https://github.com/yannis300307/NumcraftRust/tree/v0.1.4) sous [licence GPL-3.0](https://github.com/yannis300307/NumcraftRust/blob/v0.1.4/LICENSE).
+Bien que ce projet ait bénéficié d'une refonte architecturale majeure, il reconnaît l'héritage des travaux suivants :
+
+- **Sous-module de Stockage (file system):**
+La logique bas niveau du sous module `storage` a été initialement inspirée par
+[NumWorks Extapp Storage](https://framagit.org/Yaya.Cout/numworks-extapp-storage/-/tree/62e3d4c44437b93a8f14ce687a1c45d6dded87d9). (Licence MIT)
+- **Handlers Rust pour l'ABI Epsilon:**
+Les premières implémentations des handlers Rust pour l'ABI d'Epsilon EADK proviennent de
+[NumCraft Rust v0.1.4](https://github.com/yannis300307/NumcraftRust/tree/b61d72214f116ce81a9a296426a27ba4a7ee1f6c). (Licence GPL-3.0)
+
+Conformément à la LGPL-3.0, les travaux originaux sont reconnus et crédités.
+Les modifications substantielles et les nouvelles fonctionnalités introduites dans ce projet sont couvertes par la licence LGPL-3.0 actuelle,
+afin de permettre une meilleure interopérabilité de la bibliothèque avec d'autres projets.
 
 ## Remerciements
 
-Merci à [Yannis300307](https://github.com/yannis300307) pour son travail sur NumCraft Rust, qui a servi de base à ce projet.
+Un grand merci aux développeurs suivants pour leurs travails dans la communauté NumWorks  :
+- [Yannis300307](https://github.com/yannis300307)
+- [Yaya Cout](https://framagit.org/Yaya.Cout) (*Special thanks*)
 
-Également merci à [Yaya Cout](https://framagit.org/Yaya.Cout) pour son travail sur la manipulation du file system interne de la NumWorks par des applications externes.
+## Informations légales
+
+Eadkp n'est en aucun cas affilié à NumWorks, Epsilon (OS) ou leurs partenaires. Eadkp est un projet open-source communautaire et indépendant.

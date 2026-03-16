@@ -17,4 +17,5 @@
 0.13.0 - ...
     - Refactor input.rs for better documentation and clarity. 
     - Added to_alphanumeric, is_alphanumeric and documentation in input.rs.
-    - Update documentation for backlight, battery, color, display, timing, and utils modules with French descriptions
+    - Update documentation and comments with French
+    - MAJOR: Switched to LGPL-3.0 license for allow non-viral integration in external projects.

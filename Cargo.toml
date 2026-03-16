@@ -1,11 +1,11 @@
 cargo-features = ["profile-rustflags", "public-dependency"]
 [package]
 name = "eadkp"
-version = "0.12.0"
+version = "0.13.0"
 authors = ["Oignontom8283 <www.github.com/Oignontom8283>"]
 edition = "2021"
 description = "Rust library for developing applications for NumWorks calculators running Epsilon OS. Provides low-level hardware interaction and high-level abstractions for display, input, battery, storage, and more."
-license = "GPL-3.0"
+license = "LGPL-3.0"
 repository = "https://github.com/Oignontom8283/eadkp"
 documentation = "https://docs.rs/eadkp"
 homepage = "https://github.com/Oignontom8283/eadkp"
