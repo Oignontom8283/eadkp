@@ -20,5 +20,6 @@
     - Update documentation and comments with French
     - MAJOR: Switched to LGPL-3.0 license for allow non-viral integration in external projects.
 
-0.14.0 - Wayland support
+0.14.0, 0.14.1 - Wayland support
+    - feat: add Wayland support to docker-compose
 
