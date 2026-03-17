@@ -21,14 +21,19 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
 
 ENV PATH="/root/.cargo/bin:${PATH}"
 
+# Install Rust toolchain
+RUN rustup toolchain install nightly
+RUN rustup show
+
 # Add ARM target
 RUN rustup target add thumbv7em-none-eabihf
-RUN rustup show 
-RUN cargo install just
-RUN rustup toolchain install nightly
-
 RUN rustup target add thumbv7em-none-eabihf --toolchain nightly
 
+# Install cargo tools
+RUN cargo install just
+RUN cargo install cargo-release
+
+# Add user to dialout group for USB access
 RUN usermod -aG dialout root
 
 WORKDIR /workspace
