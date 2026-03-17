@@ -15,3 +15,5 @@ publish = false
 # patch: Changement interne, qui n'ajoute ou modifie pas l'api publique (ex: fix bug, refactor, docs, etc.)
 # minor: Ajout de fonctionnalités sans casser la compatibilité
 # major: Changement de l'api publique, qui peut casser la compatibilité
+#
+# Il faut executer `git push --tags` pour pousser le tag généré par cargo-release, sinon il ne sera push sur le depot.
