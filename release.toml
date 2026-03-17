@@ -1,8 +1,7 @@
-[package]
+
 allow-branch = ["dev"]
 
 tag-name = "v{{version}}"
-tag-message = "Release v{{version}}"
 
 push = false
 publish = false
