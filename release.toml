@@ -8,9 +8,9 @@ publish = false
 
 # Commands :
 #
-#   cargo release patch --tag-message "global change msg"
-#   cargo release minor --tag-message "global change msg"
-#   cargo release major --tag-message "global change msg"
+#   cargo release patch --execute
+#   cargo release minor --execute
+#   cargo release major --execute
 #
 # patch: Changement interne, qui n'ajoute ou modifie pas l'api publique (ex: fix bug, refactor, docs, etc.)
 # minor: Ajout de fonctionnalités sans casser la compatibilité
