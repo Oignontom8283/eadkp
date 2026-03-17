@@ -23,3 +23,8 @@
 0.14.0, 0.14.1 - Wayland support
     - feat: add Wayland support to docker-compose
 
+0.15.0 - Cargo release configuration
+    - feat: add Cargo release configuration
+    - docs: usage instructions for cargo release in release.toml
+    - refactor: reorganize dockerfile
+    - feat: add cargo-release installation to dockerfile
