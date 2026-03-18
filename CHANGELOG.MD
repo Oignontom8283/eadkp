@@ -28,3 +28,7 @@
     - docs: usage instructions for cargo release in release.toml
     - refactor: reorganize dockerfile
     - feat: add cargo-release installation to dockerfile
+
+0.15.3
+    - remove: cargo-release config and docker install
+    - add: custom script for dumping version
