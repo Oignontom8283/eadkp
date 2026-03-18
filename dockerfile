@@ -31,7 +31,7 @@ RUN rustup target add thumbv7em-none-eabihf --toolchain nightly
 
 # Install cargo tools
 RUN cargo install just
-RUN cargo install cargo-release
+RUN cargo install cargo-edit
 
 # Add user to dialout group for USB access
 RUN usermod -aG dialout root
