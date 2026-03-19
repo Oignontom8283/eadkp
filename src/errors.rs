@@ -44,12 +44,20 @@ pub enum SoftwareError {
     InvalidParameter { param_name: String, details: String },
 }
 
+#[derive(Debug)]
+pub enum ImageError {
+    /// Format de fichier d'image non supporté
+    UnsupportedFormat { magic_number: u32 },
+    /// Données d'image corrompues ou incomplètes
+    CorruptedData { details: String },
+}
 
 /// Erreur globale englobant tout les types d"erreurs
 #[derive(Debug)]
 pub enum GlobalError {
     Storage(StorageError),
     Software(SoftwareError),
+    Image(ImageError),
 }
 
 impl From<StorageError> for GlobalError { // Convertire un StorageError en GlobalError automatiquement
@@ -61,5 +69,11 @@ impl From<StorageError> for GlobalError { // Convertire un StorageError en Globa
 impl From<SoftwareError> for GlobalError { // De même pour SoftwareError
     fn from(err: SoftwareError) -> Self {
         GlobalError::Software(err)
+    }
+}
+
+impl From<ImageError> for GlobalError { // De même pour ImageError
+    fn from(err: ImageError) -> Self {
+        GlobalError::Image(err)
     }
 }
