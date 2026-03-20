@@ -65,11 +65,9 @@ pub fn draw_string(
 
 /// Pousser une image à l'écran à partir de ses pixels et de sa position.
 pub fn push_image(image: &Image, point: Point) {
-    push_rect(
-        image.for_coordinates(point.x, point.y),
-        &image.get_pixels()
-    );
+    image.draw(point);
 }
+
 
 unsafe extern "C" {
     fn eadk_display_push_rect_uniform(rect: Rect, color: Color);
