@@ -201,6 +201,7 @@ impl<S: PixelsSource> ImageFormat for Eif1<S> {
     }
 }
 impl<S: PixelsSource> Eif1<S> {
+    /// Créer une instance d'Eif1 a partir d'une source de pixels. Ne **vérifie pas la validité des données !**
     pub unsafe fn new(source: S)-> Self {
         let buf = source.buffer();
 
