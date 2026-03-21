@@ -1,3 +1,8 @@
+
+/*!
+Sous-module fournissant divers fonctions de génération de nombres pseudo-aléatoires.
+*/
+
 use core::sync::atomic::{AtomicU32, AtomicU8, Ordering};
 
 unsafe extern "C" {
