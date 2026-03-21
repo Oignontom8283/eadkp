@@ -101,3 +101,16 @@ pub fn random_bool() -> bool {
     // Simplement check un bit
     (random() & 1) != 0 
 }
+
+/// Génére un booléen pseudo-aléatoire avec une probabilité donnée d'être `true` (entre 0.0 et 1.0)
+/// - Voir `random()` pour les détails de l'algorithme de génération
+#[inline(always)]
+pub fn random_bool_prob(probability: f32)-> bool {
+    debug_assert!((0.0..=1.0).contains(&probability), "La probabilité doit être entre 0.0 et 1.0");
+
+    // Convertir la probabilité en un seuil sur l'intervale de u32
+    let threshold = (probability * 4_294_967_300.0) as u32;
+
+    // si le random est inférieur au seuil
+    random() < threshold
+}
