@@ -49,7 +49,7 @@ pub fn random() -> u32 {
 }
 
 /// Génére un nombre f32 pseudo-aléatoire dans l'intervale 0.0 et 1.0 (exclus)
-/// - Voir `random()` pour les détails
+/// - Voir `random()` pour les détails de l'algorithme de génération
 #[inline(always)]
 pub fn random_f32() -> f32 {
     let rand_bites = random();
@@ -60,5 +60,13 @@ pub fn random_f32() -> f32 {
 
     // Soustraire 1.0 donne un résultat dans l'intervale [0.0, 1.0)
     f32::from_bits(float_bits) - 1.0
+}
+
+/// Génére un nombre f32 pseudo-aléatoire dans l'intervale min et max (exclus)
+/// - Voir `random()` pour les détails de l'algorithme de génération
+#[inline(always)]
+pub fn random_f32_range(min: f32, max: f32) -> f32 {
+    debug_assert!(min < max, "min must be less than max");
+    min + (max - min) * random_f32()
 }
 
