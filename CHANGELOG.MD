@@ -35,3 +35,6 @@
 
 0.16.0
     - Refactor: New image gestion system for support ram or flash source and image format versions
+
+0.17.0
+    - Refactor: Optimized and documented the random module
