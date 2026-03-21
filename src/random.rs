@@ -70,3 +70,26 @@ pub fn random_f32_range(min: f32, max: f32) -> f32 {
     min + (max - min) * random_f32()
 }
 
+/// Génére un nombre u32 pseudo-aléatoire dans une plage donnée : `min` et `max` (exclus)
+/// - Voir `random()` pour les détails de l'algorithme de génération
+/// - Utilise l'algorithme de Lemire (version **fast path**) pour un échantillonnage rapide et sans biais statistique significatif
+#[inline(always)]
+pub fn randint(min: u32, max: u32) -> u32 {
+    debug_assert!(min <= max, "min doit être inférieur ou égal à max");
+    
+    // En cas de plage complètes (0 - u32::MAX) on returne directement un u32 aléatoire
+    // évite l'overflow du `+ 1` à la ligne suivante.
+    if min == 0 && max == u32::MAX {
+        return random();
+    }
+    
+    // max est inclus donc le nombre de valeurs possibles est (max - min) + 1.
+    // Garanti sans overflow grace à la condition du dessus
+    let range = max - min + 1;
+    
+    // Fast path de Lemire*
+    let m = (random() as u64) * (range as u64);
+    let offset = (m >> 32) as u32;
+    
+    min + offset
+}
