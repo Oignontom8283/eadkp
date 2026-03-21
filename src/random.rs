@@ -93,3 +93,11 @@ pub fn randint(min: u32, max: u32) -> u32 {
     
     min + offset
 }
+
+/// Génére un booléen peudo-aléatoire
+/// - Voir `random()` pour les détails de l'algorithme de génération
+#[inline(always)]
+pub fn random_bool() -> bool {
+    // Simplement check un bit
+    (random() & 1) != 0 
+}
