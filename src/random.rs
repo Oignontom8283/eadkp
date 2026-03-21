@@ -1,116 +1,140 @@
+use core::sync::atomic::{AtomicU32, AtomicU8, Ordering};
 
 unsafe extern "C" {
-    fn eadkp_random() -> u32;
+    fn eadk_random() -> u32;
 }
 
-/// Génére un nombre u32 aléatoire en appelant l'ABi Epsilon sans optimisation
+/// Génère un nombre u32 aléatoire en appelant l'ABI Epsilon sans optimisation
 pub fn random_c() -> u32 {
-    unsafe { eadkp_random()}
+    unsafe { eadk_random() }
 }
 
 
-/// état du générateur Xorshift32 (ne doit jamais être 0)
-static mut FAST_RNG_STATE: u32 = 0x12345678;
-/// Compteur pour le reseed matériel périodique
-static mut SEED_COUNTER: u8 = 0;
+/// État du générateur protégé via Atomics (Zero-cost avec Ordering::Relaxed)
+static FAST_RNG_STATE: AtomicU32 = AtomicU32::new(0x12345678);
+static SEED_COUNTER: AtomicU8 = AtomicU8::new(0);
 
 
 /// Génére un nombre u32 pseudo-aléatoire ultra-rapidement
+/// - Rapide
 /// - Utilise l'algorithme Xorshift32 pour une génération rapide de nombres pseudo-aléatoires
 /// - Reseed de l'entropie matérielle tout les 256 appels
 /// - Non cryptographiquement sécurisé
-/// - Rapide
 #[inline(always)]
 pub fn random() -> u32 {
-    unsafe {
-        // Reseed matériel tout les 256 appels
-        if SEED_COUNTER == 0 {
-            
-            let hardware_seed = random_c();
+    
+    let mut counter = SEED_COUNTER.load(Ordering::Relaxed); // Charger le compteur actuel (0-255)
+    let mut state = FAST_RNG_STATE.load(Ordering::Relaxed); // Charger l'état actuel du RNG rapide
 
-            // Mélanger le seed matériel dans l'état du RNG pour améliorer l'entropie
-            FAST_RNG_STATE ^= hardware_seed;
-            if FAST_RNG_STATE == 0 {
-                FAST_RNG_STATE = 0x12345678; // Assurer que l'état ne soit jamais 0
-            }
+    // Reseed de l'entropie matérielle tous les 256 appels pour éviter la stagnation statistique
+    if counter == 0 {
+        let hardware_seed = random_c();
+        state ^= hardware_seed;
+        
+        // Ne doit jamais être égal à 0 pour éviter de rester bloqué sur 0
+        if state == 0 {
+            state = 0x12345678;
         }
-
-        // Incrémenter le compteur de seed (revient à 0 après 256 appels, déclenchant un nouveau reseed)
-        SEED_COUNTER = SEED_COUNTER.wrapping_add(1);
-
-        // Xorshift32 algorithm
-        let mut x = FAST_RNG_STATE;
-        x ^= x << 13;
-        x ^= x >> 17;
-        x ^= x << 5;
-        FAST_RNG_STATE = x;
-        x
     }
+
+    // Incrémentation et sauvegarde du compteur
+    counter = counter.wrapping_add(1);
+    SEED_COUNTER.store(counter, Ordering::Relaxed);
+
+    // Xorshift32 pur (3 cycles)
+    state ^= state << 13;
+    state ^= state >> 17;
+    state ^= state << 5;
+    
+    FAST_RNG_STATE.store(state, Ordering::Relaxed);
+    
+    state
 }
 
 /// Génére un nombre f32 pseudo-aléatoire dans l'intervale 0.0 et 1.0 (exclus)
 /// - Voir `random()` pour les détails de l'algorithme de génération
 #[inline(always)]
 pub fn random_f32() -> f32 {
-    let rand_bites = random();
-
-    // Construire un float dans l'intervale [1.0, 2.0)
-    // ox3f80_0000 est l'exposant 127. On y ajoute 23 bits aléatoire de mentisse
-    let float_bits = 0x3f80_0000_u32 | (rand_bites >> 9);
-
-    // Soustraire 1.0 donne un résultat dans l'intervale [0.0, 1.0)
+    let rand_bits = random();
+    let float_bits = 0x3F80_0000_u32 | (rand_bits >> 9);
     f32::from_bits(float_bits) - 1.0
 }
 
-/// Génére un nombre f32 pseudo-aléatoire dans l'intervale min et max (exclus)
+/// Génére un nombre f32 pseudo-aléatoire dans un intervale donné : `min` et `max` (exclus)
 /// - Voir `random()` pour les détails de l'algorithme de génération
 #[inline(always)]
 pub fn random_f32_range(min: f32, max: f32) -> f32 {
-    debug_assert!(min < max, "min must be less than max");
+    debug_assert!(min <= max, "min doit être inférieur ou égal à max");
     min + (max - min) * random_f32()
 }
 
 /// Génére un nombre u32 pseudo-aléatoire dans une plage donnée : `min` et `max` (exclus)
 /// - Voir `random()` pour les détails de l'algorithme de génération
-/// - Utilise l'algorithme de Lemire (version **fast path**) pour un échantillonnage rapide et sans biais statistique significatif
+/// - Utilise l'algorithme de Lemire (version **fast path**)
+/// - **Très rapide**
+/// - Peut introduire un léger biais statistique pour les plages qui ne sont pas des puissances de 2. Une chance sur `2^32/(max-min+1)`
+/// - *Probabilité de biais : 0.0000000002328% pour une plage de 1000*
 #[inline(always)]
 pub fn randint(min: u32, max: u32) -> u32 {
     debug_assert!(min <= max, "min doit être inférieur ou égal à max");
     
-    // En cas de plage complètes (0 - u32::MAX) on returne directement un u32 aléatoire
-    // évite l'overflow du `+ 1` à la ligne suivante.
     if min == 0 && max == u32::MAX {
         return random();
     }
     
-    // max est inclus donc le nombre de valeurs possibles est (max - min) + 1.
-    // Garanti sans overflow grace à la condition du dessus
     let range = max - min + 1;
     
-    // Fast path de Lemire*
+    // Fast path de Lemire : 1 multiplication matérielle + 1 décalage
     let m = (random() as u64) * (range as u64);
-    let offset = (m >> 32) as u32;
     
-    min + offset
+    min + (m >> 32) as u32
+}
+
+/// Génére un nombre u32 pseudo-aléatoire dans une plage donnée : `min` et `max` (exclus)
+/// - Voir `random()` pour les détails de l'algorithme de génération
+/// - Utilise l'algorithme de Lemire (version **complète**)
+/// - **Plus lent que `randint()`**. Déconseillé dans la plupart des cas, sauf si une uniformité parfaite est requise (ex: simulations scientifiques, jeux de hasard, etc.)
+/// - Garantit une uniformité parfaite sans biais statistique, même pour les plages qui ne sont pas des puissances de 2.
+#[inline(always)]
+pub fn randint_unbiased(min: u32, max: u32) -> u32 {
+    debug_assert!(min <= max, "min doit être inférieur ou égal à max");
+    
+    if min == 0 && max == u32::MAX {
+        return random();
+    }
+    
+    let range = max - min + 1;
+    
+    // Algorithme complet de Lemire
+    let mut m = (random() as u64) * (range as u64);
+    let mut l = m as u32; // Partie fractionnaire (les 32 bits de poids faible)
+    
+    // Rejection sampling pour garantir une uniformité mathématiquement parfaite
+    // Probabilité : range / 2^32
+    if l < range {
+        let t = range.wrapping_neg() % range; // Modulo matériel ARM (calcul du seuil de rejet)
+        while l < t {
+            m = (random() as u64) * (range as u64);
+            l = m as u32;
+        }
+    }
+    
+    // Retourne les 32 bits de poids fort (offset sans biais)
+    min + (m >> 32) as u32
 }
 
 /// Génére un booléen peudo-aléatoire
 /// - Voir `random()` pour les détails de l'algorithme de génération
 #[inline(always)]
 pub fn random_bool() -> bool {
-    // Simplement check un bit
     (random() & 1) != 0 
 }
 
 /// Génére un booléen pseudo-aléatoire avec une probabilité donnée d'être `true` (entre 0.0 et 1.0)
 /// - Voir `random()` pour les détails de l'algorithme de génération
 #[inline(always)]
-pub fn random_bool_prob(probability: f32)-> bool {
+pub fn random_bool_prob(probability: f32) -> bool {
     debug_assert!((0.0..=1.0).contains(&probability), "La probabilité doit être entre 0.0 et 1.0");
 
-    // Convertir la probabilité en un seuil sur l'intervale de u32
-    let threshold = (probability * 4_294_967_300.0) as u32;
-
-    // si le random est inférieur au seuil
-    random() < threshold
+    random_f32() < probability
 }
