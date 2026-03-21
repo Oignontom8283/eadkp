@@ -32,3 +32,6 @@
 0.15.3
     - remove: cargo-release config and docker install
     - add: custom script for dumping version
+
+0.16.0
+    - Refactor: New image gestion system for support ram or flash source and image format versions
