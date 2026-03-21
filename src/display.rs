@@ -62,6 +62,7 @@ pub fn draw_string(
         )
     }
 }
+// TODO: Faire une version unsafe de draw_string qui prend un *const c_char
 
 /// Pousser une image à l'écran à partir de ses pixels et de sa position.
 pub fn push_image(image: &Image, point: Point) {
