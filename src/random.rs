@@ -64,7 +64,7 @@ pub fn random_f32() -> f32 {
 /// - Voir `random()` pour les détails de l'algorithme de génération
 #[inline(always)]
 pub fn random_f32_range(min: f32, max: f32) -> f32 {
-    debug_assert!(min <= max, "min doit être inférieur ou égal à max");
+    debug_assert!(min <= max, "min must be less than or equal to max");
     min + (max - min) * random_f32()
 }
 
@@ -76,7 +76,7 @@ pub fn random_f32_range(min: f32, max: f32) -> f32 {
 /// - *Probabilité de biais : 0.0000000002328% pour une plage de 1000*
 #[inline(always)]
 pub fn randint(min: u32, max: u32) -> u32 {
-    debug_assert!(min <= max, "min doit être inférieur ou égal à max");
+    debug_assert!(min <= max, "min must be less than or equal to max");
     
     if min == 0 && max == u32::MAX {
         return random();
@@ -97,7 +97,7 @@ pub fn randint(min: u32, max: u32) -> u32 {
 /// - Garantit une uniformité parfaite sans biais statistique, même pour les plages qui ne sont pas des puissances de 2.
 #[inline(always)]
 pub fn randint_unbiased(min: u32, max: u32) -> u32 {
-    debug_assert!(min <= max, "min doit être inférieur ou égal à max");
+    debug_assert!(min <= max, "min must be less than or equal to max");
     
     if min == 0 && max == u32::MAX {
         return random();
@@ -134,7 +134,7 @@ pub fn random_bool() -> bool {
 /// - Voir `random()` pour les détails de l'algorithme de génération
 #[inline(always)]
 pub fn random_bool_prob(probability: f32) -> bool {
-    debug_assert!((0.0..=1.0).contains(&probability), "La probabilité doit être entre 0.0 et 1.0");
+    debug_assert!((0.0..=1.0).contains(&probability), "probability must be between 0.0 and 1.0");
 
     random_f32() < probability
 }
