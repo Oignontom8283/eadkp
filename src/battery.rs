@@ -96,21 +96,3 @@ pub fn is_charging() -> bool {
 pub fn is_charging() -> bool {
     false // Valeur Dummy pour les cibles non-embarquées
 }
-
-pub fn percentage() -> u8 {
-    let voltage = voltage();
-    
-    // Constants for typical Li-ion battery
-    const V_MIN: f32 = 3.0;  // 0% - Minimum safe voltage
-    const V_MAX: f32 = 4.2;  // 100% - Maximum charge voltage
-    
-    // Clamp the voltage within the valid range
-    let voltage_clamped = voltage.max(V_MIN).min(V_MAX);
-    
-    // Linear calculation of percentage
-    // NOTE: In reality, the discharge curve of a Li-ion battery is not perfectly linear !
-    // but this approximation is sufficient for a general estimate
-    let percentage = ((voltage_clamped - V_MIN) / (V_MAX - V_MIN)) * 100.0;
-    
-    (percentage + 0.5) as u8
-}

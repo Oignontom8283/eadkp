@@ -54,10 +54,8 @@ fn main() -> isize {
 
     let voltage = eadkp::battery::voltage();
     let level = eadkp::battery::level();
-    let percent = eadkp::battery::percentage();
     log(format!("Battery: {:.2}V", voltage));
     log(format!("Battery level: {}", level.to_str()));
-    log(format!("Battery: {}%", percent));
 
     let is_existing = storage::file_exists(FILE_NAME);
 
