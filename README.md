@@ -33,6 +33,11 @@
         <img src="https://img.shields.io/github/issues-pr/Oignontom8283/eadkp?style=flat&logo=github" alt="GitHub pull requests"/>
     </a>
 </p>
+<br/>
+<p align="center">
+  <a href="./README_EN.md">English</a> | <strong>Français</strong>
+</p>
+
 
 **Eadkp** est une bibliothèque Rust destinée au développement d’applications pour
 les calculatrices **NumWorks** sous **Epsilon**.
