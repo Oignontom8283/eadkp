@@ -47,3 +47,18 @@ pub fn random() -> u32 {
         x
     }
 }
+
+/// Génére un nombre f32 pseudo-aléatoire dans l'intervale 0.0 et 1.0 (exclus)
+/// - Voir `random()` pour les détails
+#[inline(always)]
+pub fn random_f32() -> f32 {
+    let rand_bites = random();
+
+    // Construire un float dans l'intervale [1.0, 2.0)
+    // ox3f80_0000 est l'exposant 127. On y ajoute 23 bits aléatoire de mentisse
+    let float_bits = 0x3f80_0000_u32 | (rand_bites >> 9);
+
+    // Soustraire 1.0 donne un résultat dans l'intervale [0.0, 1.0)
+    f32::from_bits(float_bits) - 1.0
+}
+
