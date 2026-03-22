@@ -43,7 +43,7 @@ It provides low-level features to interact with calculator hardware, including d
 
 The library also offers higher-level abstractions to simplify Rust application development, such as panic handler support, global allocator setup, and **NWA** application property declarations.
 
-![Demo video of a test application using eadkp](./docs/assets/eadkp_demo.mp4)
+![Demo video of a test application using eadkp](https://www.youtube.com/watch?v=KNKvgqE-Wmg)
 
 ## Features
 

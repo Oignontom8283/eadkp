@@ -51,7 +51,7 @@ simplifier le développement d’applications en Rust, telles que la gestion du
 *panic handler*, de l’allocateur global, ainsi que la déclaration des propriétés
 des applications **NWA**.
 
-![Vidéo de démonstration d'une application de test utilisant eadkp](./docs/assets/eadkp_demo.mp4)
+![Vidéo de démonstration d'une application de test utilisant eadkp](https://www.youtube.com/watch?v=KNKvgqE-Wmg)
 
 ## Fonctionnalités
 
