@@ -16,13 +16,13 @@ Nous veillons à un environnement inclusif, où chacun(e), débutant(e) ou expé
 * Harcèlement, intimidation ou discrimination
 * Propos offensants, haineux ou moqueurs
 * Critiques agressives ou non constructives
-* Inacceptation de remarque(s) visant à améliorer la qualité du code ou la contribution sans argumentation constructive
-* Partage de contenu inapproprié ou **violation de la vie privée**
+* Inacceptation de remarque(s) visant à améliorer la qualité du code ou la contribution sans argumentation
+* Partage de contenu inapproprié ou **violation de la vie privée !**
 
 ## Valeurs clés
 * Inclusivité et respect
 * Bienveillance et pédagogie
-* Qualité du code élevée, mais accompagnement priorisé pour les débutant(e)(s)
+* Aide et accompagnement
 
 ---
 
