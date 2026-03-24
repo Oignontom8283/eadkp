@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     gcc-arm-none-eabi binutils-arm-none-eabi gdb-multiarch pkg-config libpng-dev libjpeg-dev libfreetype6-dev \
     python3 python3-pip \
     libusb-1.0-0 libusb-1.0-0-dev \
+    libudev-dev python-is-python3 \
     nodejs npm \
     libx11-dev libxext-dev libxrender-dev libxrandr-dev libxinerama-dev \
     libgl1-mesa-dev libglu1-mesa-dev \
@@ -14,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     micro nano \
     && rm -rf /var/lib/apt/lists/*
 
+RUN npm install -g --unsafe-perm usb nwlink
 
 # Install Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
