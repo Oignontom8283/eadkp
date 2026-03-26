@@ -287,6 +287,17 @@ Pour apprendre à utiliser le projet, consultez les guides suivants :
 - [Guide de compilation de l'exemple de test](docs/SETUPS/BuildExample.md)
 - [Guide d'utilisation du simulateur](docs/SETUPS/Simulator.md)
 
+## Pourquoi en Francais ?
+
+Eadkp est un projet destiné à la communauté Numworks. Or, la calculatrice 
+Numworks étant quasi exclusivement démocratisée en France, la majorité de 
+la communauté est francophone. 
+
+Il est donc plus logique de documenter le projet en français afin de le 
+rendre plus accessible à la cible visée. Nous visons particulièrement 
+une bonne intégration des nouveaux venus, qui seront probablement de 
+jeunes étudiants francophones.
+
 ## Licence & Crédits
 
 Ce projet est distribué sous [licence LGPL-3.0](./LICENSE) (GNU Lesser General Public License v3.0).

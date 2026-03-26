@@ -278,6 +278,20 @@ To learn how to use the project, check these guides:
 - [Test example build guide](docs/SETUPS/BuildExample.md)
 - [Simulator usage guide](docs/SETUPS/Simulator.md)
 
+ ## Why in French?
+
+Eadkp is a project dedicated to the Numworks community. Since Numworks 
+calculators are almost exclusively popular in France, the vast majority 
+of the community is French-speaking.
+
+It is therefore more logical to document the project in French to make 
+it more accessible to our target audience, especially as we aim to 
+onboard newcomers who are likely to be young French-speaking students.
+
+> *You are reading the English version of the README, but the internal code documentation and guides are written in French.
+If you are not a French speaker and wish to actively contribute to the project,
+please let us know. We will handle translating the specific areas of code you are targeting into English.*
+
 ## License & Credits
 
 This project is distributed under the [LGPL-3.0 license](./LICENSE) (GNU Lesser General Public License v3.0).
