@@ -87,7 +87,7 @@ pub fn randint(min: u32, max: u32) -> u32 {
         return random();
     }
     
-    let range = max - min + 1;
+    let range = max - min;
     
     // Fast path de Lemire : 1 multiplication matérielle + 1 décalage
     let m = (random() as u64) * (range as u64);
@@ -108,7 +108,7 @@ pub fn randint_unbiased(min: u32, max: u32) -> u32 {
         return random();
     }
     
-    let range = max - min + 1;
+    let range = max - min;
     
     // Algorithme complet de Lemire
     let mut m = (random() as u64) * (range as u64);
