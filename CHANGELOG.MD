@@ -37,4 +37,12 @@
     - Refactor: New image gestion system for support ram or flash source and image format versions
 
 0.17.0
+    - Refactor: New image gestion system for support ram or flash source and image format versions
+
+0.18.0
     - Refactor: Optimized and documented the random module
+
+0.19.0
+    - fix: Correction of bounds (range) calculation in the randint function of random.rs #8
+    - add: Addition of dependencies in the DockerFile
+    - remove: Abandonment of cargo nightly
