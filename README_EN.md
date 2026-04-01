@@ -182,7 +182,7 @@ To learn how to use the project, check these guides:
 - [Test example build guide](docs/SETUPS/BuildExample.md)
 - [Simulator usage guide](docs/SETUPS/Simulator.md)
 
- ## Why in French?
+## Why in French?
 
 Eadkp is a project dedicated to the Numworks community. Since Numworks 
 calculators are almost exclusively popular in France, the vast majority 
