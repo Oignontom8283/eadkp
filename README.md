@@ -39,19 +39,22 @@
 </p>
 
 
-**Eadkp** est une bibliothèque Rust destinée au développement d’applications pour
+**Eadkp** est un **framework** Rust destinée au développement d’applications pour
 les calculatrices **NumWorks** sous **Epsilon**.
 
 Elle fournit des fonctionnalités de bas niveau permettant d’interagir avec le
 matériel de la calculatrice, notamment la gestion de l’affichage, des entrées
 utilisateur, de la batterie et du stockage.
 
-La bibliothèque propose également des abstractions de plus haut niveau afin de
+Le framework propose également des abstractions de plus haut niveau afin de
 simplifier le développement d’applications en Rust, telles que la gestion du
 *panic handler*, de l’allocateur global, ainsi que la déclaration des propriétés
 des applications **NWA**.
 
-[Vidéo de démonstration d'une application de test utilisant eadkp](https://www.youtube.com/watch?v=KNKvgqE-Wmg)
+Ce repot est la librairie `eadkp`, le core du projet, qui peut être utilisé indépendamment de la template de projet officielle,
+mais il est recommandé d'utiliser la template pour une meilleure expérience de développement. 
+
+[Vidéo de démonstration d'une application de test propulsée par eadkp](https://www.youtube.com/watch?v=KNKvgqE-Wmg)
 
 ## Fonctionnalités
 
@@ -68,110 +71,11 @@ des applications **NWA**.
 - [ ] Support des graphiques avancés
 - [ ] Débogage via USB (Pas encore évaluée la faisabilité)
 
-## Installation et utilisation
+## Créer votre propre application propulsée par eadkp
 
-La méthode recommandée pour utiliser Eadkp est d'utiliser la [template de projet](https://github.com/Oignontom8283/eadkp_template) officielle.
-Nous détailleons donc son utilisation et installation ici.
+Eadkp a besouin d'un environnement spécifique pour fonctionner correctement.
 
-### 1. Prérequis
-- Docker (Si Windows, docker sur Windows, pas sur WSL)
-- Git
-- Bash (wsl sur windows)
-
-### 2. Download de la template
-Vous avez le choix entre cloner le dépôt git, créer votre repôt à partir de la template sur GitHub, ou utiliser le script automatique.
-
-#### Cloner le dépôt git
-```bash
-git clone https://github.com/Oignontom8283/eadkp_template my_eadkp_project
-cd my_eadkp_project
-chmod +x bootstrap.sh
-./bootstrap.sh
-```
-
-#### Créer un dépôt à partir de la template sur GitHub
-1. Allez sur la page de la template : https://github.com/Oignontom8283/eadkp_template
-2. Cliquez sur "Use this template" et suivez les instructions pour créer votre propre dépôt.
-3. Clonez votre nouveau dépôt localement et exécutez le script de bootstrap :
-```bash
-git clone https://github.com/VotreNom/votre_depot
-cd votre_depot
-chmod +x bootstrap.sh
-./bootstrap.sh
-```
-
-#### Utiliser le script automatique
-
-Utiliser la commande suivante pour initialiser un projet eadkp. Suivez les instructions si demandé :
-
-```bash
-bash <(curl -s https://raw.githubusercontent.com/Oignontom8283/eadkp_template/main/bootstrap.sh)
-cd my_app
-```
-OU
-```bash
-bash <(curl -s https://raw.githubusercontent.com/Oignontom8283/eadkp_template/main/bootstrap.sh) --name "my_app"
-cd my_app
-```
-
-### 3. Lancer docker
-
-```bash
-chmod +x start.sh
-./start.sh
-```
-
-Attendez que le conteneur soit prêt. Cela peut prendre plusieur minutes lors du premier lancement.
-
-### 4. Entrer dans l'environnement
-
-#### Terminal
-Pour entrer dans le shell du conteneur :
-```bash
-./shell.sh
-```
-> [!IMPORTANT]
-> Pour lancer le simulateur il faut passer par un vrai terminal (pas l'IDE) et utiliser `./shell.sh`, sinon le lien avec le serveur X ne fonctionnera pas.
-
-#### IDE
-
-Pour Visul Studio Code, utilisez l'extension [Remote Developement](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack)
-pour vous connecter au conteneur et utiliser l'environnement comme si vous n'étiez pas dans un conteneur.
-
-> [!NOTE]
-> Permet la compatibilité avec Rust Analyzer et d'autres extensions de développement.
-> Sur Windows, utiliser l'IDE sur Windows, il pourra se connecter au conteneur, même si lancer dans WSL.
-
-### 5. Compiler et Simulator
-
-#### Compilation / Exportation
-Pour compiler le projet utilisez :
-```bash
-just build
-```
-Mais pour compiler l'application empaquetée en NWA, utilisez :
-```bashbash
-just export
-```
-Le fichier .nwa génére se trouvera dans `./build/`.
-
-#### Simulateur
-
-Pour lancer le simulateur officiel NumWorks avec votre application, utilisez :
-```bash
-just sim
-```
-> [!IMPORTANT]
-> Vous devez être dans un vrai terminal (pas l'IDE) et utiliser `./shell.sh` pour que le lien avec le serveur X fonctionne (WSL2 embarque un serveur X et les distributions Linux aussi pour la plupart), sinon le simulateur ne pourra pas se lancer.
-
-La commande va télécharger et lancer le simulateur officiel de Numworks depuis son dépôt.
-A la **première utilisation**, le simulateur va devoir ce compiler, ce qui peut prendre plusieurs minutes ou dixaines de minutes.
-
-Une fenêtre représentant la calculatrice va s'ouvrir, et votre application sera automatiquement lancée dessus.
-
-> [!NOTE]
-> Si vous utiliser des fonctionnalités avancées d'eadkp ou hardware, vous devrez séparer votre code en une version `#[cfg(target_os = "none")]` et une autre
-> en `#[cfg(not(target_os = "none"))]` qui **dummy** la fonctionnalité, car sur Simulateur, les composants / objets en RAM n'existent pas.
+Consultez le [Quick Start sur le wiki](https://github.com/Oignontom8283/eadkp/wiki/FR-Home#d%C3%A9marrage-rapide) pour créer votr propre application propulsée par eadkp.
 
 ## Fonctionnement
 
@@ -282,7 +186,7 @@ flowchart LR
 
 Les contributions sont les bienvenues ! N'hésitez pas à ouvrir des issues ou à soumettre des pull requests.
 
-Pour apprendre à utiliser le projet, consultez les guides suivants :
+Pour apprendre comment contribuer, consultez les guides suivants :
 - [Guide de setup du projet](docs/SETUPS/Setup.md)
 - [Guide de compilation de l'exemple de test](docs/SETUPS/BuildExample.md)
 - [Guide d'utilisation du simulateur](docs/SETUPS/Simulator.md)
