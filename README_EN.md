@@ -66,7 +66,7 @@ This repository is the `eadkp` library, the core of the project, which can be us
 
 Eadkp requires a specific environment to function properly.
 
-Check out the [Quick Start on the wiki](https://github.com/Oignontom8283/eadkp/wiki/EN-Home#quick-start) to create your own eadkp-powered application.
+Check out the [Quick Start on the wiki](https://github.com/Oignontom8283/eadkp/wiki#getting-started) to create your own eadkp-powered application.
 
 ## How It Works
 

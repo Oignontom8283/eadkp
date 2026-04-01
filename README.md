@@ -75,7 +75,7 @@ mais il est recommandé d'utiliser la template pour une meilleure expérience de
 
 Eadkp a besouin d'un environnement spécifique pour fonctionner correctement.
 
-Consultez le [Quick Start sur le wiki](https://github.com/Oignontom8283/eadkp/wiki/FR-Home#d%C3%A9marrage-rapide) pour créer votr propre application propulsée par eadkp.
+Consultez le [Quick Start sur le wiki](https://github.com/Oignontom8283/eadkp/wiki#getting-started) pour créer votr propre application propulsée par eadkp.
 
 ## Fonctionnement
 
