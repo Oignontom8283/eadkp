@@ -37,13 +37,20 @@
   <strong>English</strong> | <a href="./README.md">Français</a>
 </p>
 
-**Eadkp** is a Rust **framework** designed for developing applications for **NumWorks** calculators running **Epsilon**.
+**Eadkp** is a Rust **framework** designed for developing applications for [**NumWorks**](https://fr.wikipedia.org/wiki/NumWorks)
+calculators running **Epsilon** (Upsilon/Omega are not supported).
 
-It provides low-level features to interact with calculator hardware, including display management, user input handling, battery access, and storage operations.
+Eadkp is comparable to React, but for calculators. Eadkp-based projects use the `eadkp` library and the tools it provides,
+just as React projects use the React library and its tooling.
 
-The framework also offers higher-level abstractions to simplify Rust application development, such as panic handler support, global allocator setup, and **NWA** application property declarations.
+It provides low-level features to interact with calculator hardware, including display management,
+user input handling, battery access, and storage operations.
 
-This repository is the `eadkp` library, the core of the project, which can be used independently of the official project template, but it is recommended to use the template for a better development experience.
+The framework also offers higher-level abstractions to simplify Rust application development,
+such as panic handler support, global allocator setup, and **NWA** application property declarations.
+
+**⚠️ This repository is the `eadkp` library, the core of the project, which can be used independently of the official project template,
+but it is recommended to use the template for a better development experience.**
 
 [Demo video of an eadkp-powered test application](https://www.youtube.com/watch?v=KNKvgqE-Wmg)
 

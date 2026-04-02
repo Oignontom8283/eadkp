@@ -40,7 +40,10 @@
 
 
 **Eadkp** est un **framework** Rust destinée au développement d’applications pour
-les calculatrices **NumWorks** sous **Epsilon**.
+les calculatrices [**NumWorks**](https://fr.wikipedia.org/wiki/NumWorks) sous **Epsilon** (Upsilon/Omega ne sont pas supportés).
+
+Eadkp est comparable a React mais version calculatrice, il y a des projet eadkp qui utilisent la libraiie eadkp et les outils fournis,
+tout comme dans un projet React on utilise la librairie React et les outils fournis par React.
 
 Elle fournit des fonctionnalités de bas niveau permettant d’interagir avec le
 matériel de la calculatrice, notamment la gestion de l’affichage, des entrées
