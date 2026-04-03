@@ -1,8 +1,8 @@
-# Guide d'utilisation du simulateur
+# Simulator Usage Guide
 
-Ce guide explique comment utiliser le simulateur Numworks officiel pour tester le fonctionnement de l'exemple de test.
+This guide explains how to use the official NumWorks simulator to test the execution of the test example.
 
-## Prérequis
+## Prerequisites
 - [Setup](./Setup.md)
 
 ## Launching the simulator

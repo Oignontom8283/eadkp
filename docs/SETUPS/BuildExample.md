@@ -1,13 +1,13 @@
-# Guide de compilation de l'exemple de test
+# Test Example Compilation Guide
 
-Ce guide vous montre comment compiler et exporter le projet d'exemple/teste pour le matériel NumWorks.
+This guide shows you how to compile and export the test/example project for the NumWorks hardware.
 
-## Prérequis
+## Prerequisites
 - [Setup](./Setup.md)
 
 ## Compilation
 
-Ne fait que compiler, pas exploitable.
+Only compiles, not executable.
 
 ```
 just build
@@ -15,10 +15,10 @@ just build
 
 ## Exportation
 
-Exporter le projet sous forme d'archive `.nwa` (format d'archive pour les applications NumWorks).
+Export the project as a `.nwa` archive (archive format for NumWorks applications).
 
 ```
 just export
 ```
 
-Le `.nwa` est généré dans le dossier `build/`. Pour l'installer sur votre calculatrice, [suivez ce guide](https://yaya-cout.github.io/Nwagyu/guide/help/how-to-install.html)
+The `.nwa` is generated in the `build/` folder. To install it on your calculator, [follow this guide](https://yaya-cout.github.io/Nwagyu/guide/help/how-to-install.html)

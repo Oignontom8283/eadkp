@@ -1,15 +1,15 @@
-## Guide de mise en place de l'environnement de développement Dockerisé
+## Dockerized Development Environment Setup Guide
 
-Ce guide vous aide à configurer l'environnement de développement pour Eadkp.
+This guide helps you set up the development environment for Eadkp.
 
-## Pré-requis
-- **Docker** et Docker Compose installés sur votre machine (Si vous êtes sous Windows, installez Docker Desktop sur Windows et non dans WSL).
-- **Git** installé pour cloner le dépôt (Si vous êtes sous Windows, installez Git dans WSL).
-- Un éditeur de code, prenant en charge Rust et l'intégration avec Docker (par exemple, VSCode avec l'extension Dev Containers).
+## Prerequisites
+- **Docker** and Docker Compose installed on your machine (If you are on Windows, install Docker Desktop on Windows and not in WSL).
+- **Git** installed to clone the repository (If you are on Windows, install Git in WSL).
+- A code editor supporting Rust and Docker integration (e.g., VSCode with the Dev Containers extension).
 
 ## Installation
 
-### Cloner le dépôt
+### Clone the repository
 
 ```bash
 git clone https://github.com/Oignontom8283/eadkp.git
@@ -17,11 +17,11 @@ cd eadkp
 ```
 
 > [!IMPORTANT]
-> Sous Windows, utilisez WSL et exécutez les commandes dans WSL.
+> On Windows, use WSL and run the commands in WSL.
 
-## Démarrage
+## Launch
 
-Un fichier `start.sh` est fourni pour automatiser le démarrage de l'environnement Docker.
+A `start.sh` file is provided to automate the start of the Docker environment.
 
 ```bash
 chmod +x start.sh
@@ -31,32 +31,32 @@ chmod +x start.sh
 ```
 
 > [!NOTE]
-> La construction de l'image Docker peut prendre un certain temps lors du premier lancement car elle inclut de nombreuses dépendances.
+> Building the Docker image may take some time on the first launch because it includes many dependencies.
 
-## Accéder au conteneur
+## Access the container
 
-Une fois le conteneur lancé, pour commencer à développer il faut entrer dans le conteneur.
+Once the container is launched, to start developing you need to enter the container.
 
 ### VSCode
 
-Sur votre OS principal, ouvrez VSCode.
-Téléchargez l'extension [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers).
+On your main OS, open VSCode.
+Download the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 
-Connectez-vous à votre conteneur Docker via VSCode en utilisant l'extension.
+Connect to your Docker container via VSCode using the extension.
 
 ![Connect to container](.//assets/Tuto_dev-container_1.png)
 
-Vous pouvez maintenant travailler à l'intérieur de votre conteneur Docker.
+You can now work inside your Docker container.
 
 ### Terminal
-Dans votre terminal, utilisez le script `shell.sh` pour accéder au conteneur Docker.
+In your terminal, use the `shell.sh` script to access the Docker container.
 
 ```bash
 chmod +x shell.sh
 ./shell.sh
 ```
 
-## Étapes suivantes
+## Next steps
 
-- [Compiler l'example de test (exportation)](./BuildExample.md)
-- [Pour utiliser l'example de test dans un simulateur](./Simulator.md)
+- [Compile the test example (export)](./BuildExample.md)
+- [Use the test example in a simulator](./Simulator.md)
