@@ -25,6 +25,7 @@ pub mod battery;
 pub mod input;
 pub mod storage;
 pub mod epsilon;
+pub mod os;
 mod errors;
 
 // Module builder uniquement disponible pour les build scripts (OS hôte, pas embarqué)
