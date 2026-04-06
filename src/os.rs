@@ -12,7 +12,7 @@ use crate::epsilon;
 #[cfg(target_os = "none")]
 pub fn version() -> &'static str {
     unsafe {
-        let version_buffer = epsilon::kernel_header().epsilon_version; // slice de 8 bytes
+        let version_buffer = &epsilon::kernel_header().epsilon_version; // slice de 8 bytes
         let ptr = version_buffer.as_ptr();
 
         let mut len = 0;
