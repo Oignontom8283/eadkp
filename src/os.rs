@@ -1,6 +1,6 @@
 use alloc::{slice, str};
-
 use crate::epsilon;
+
 
 /// Obtenir la version du Sytem d'exploitation en cours d'utilisation.
 /// 
