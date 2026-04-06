@@ -11,16 +11,15 @@ use crate::epsilon;
 /// ```
 #[cfg(target_os = "none")]
 pub fn version() -> &'static str {
-    // Pour Epsilon (prévision)
     unsafe {
-        let version_buffer = epsilon::kernel_header().epsilon_version;
+        let version_buffer = epsilon::kernel_header().epsilon_version; // slice de 8 bytes
         let ptr = version_buffer.as_ptr();
-        let mut len = version_buffer.len();
 
-        // Trouver le début de la chaine de caractères
-        while *ptr.add(len) != 0 {
-            if len == 0 { panic!("Epsilon version string is not null-terminated"); } // Sécurité : éviter comportement indéfini
-            len -= 1;
+        let mut len = 0;
+
+        // Trouver la taille de la chaine
+        while len < version_buffer.len() && *ptr.add(len) != 0 {
+            len += 1;
         }
 
         let slice = slice::from_raw_parts(ptr, len);
