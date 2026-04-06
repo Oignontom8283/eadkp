@@ -35,3 +35,26 @@ pub fn version() -> &'static str {
 }
 
 
+/// Obtenir le hash du commit de compilation du noyau de l'os en cours d'utilisation.
+/// 
+/// Exemple :
+/// ```
+/// let hash = eadkp::os::hash_commit();
+/// assert_eq!(hash, "abcdef12"); // OK
+/// ```
+#[cfg(target_os = "none")]
+pub fn hash_commit() -> &'static str {
+    unsafe {
+        let hash_slice_raw = &epsilon::kernel_header().commit_hash; // slice de 8 bytes
+        
+        // Ne pas prendre le dernier bytes (le null terminator)
+        let hash_slice = &hash_slice_raw[..hash_slice_raw.len() - 1];
+
+        str::from_utf8_unchecked(hash_slice) // envoyer la str
+    }
+}
+
+#[cfg(not(target_os = "none"))] // Version dummy
+pub fn hash_commit() -> &'static str {
+    "abcdef12"
+}
