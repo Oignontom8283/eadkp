@@ -13,17 +13,19 @@ use crate::epsilon;
 pub fn version() -> &'static str {
     // Pour Epsilon (prévision)
     unsafe {
-        let bufffer_before = epsilon::kernel_header().epsilon_version;
-        let ptr = bufffer_before.as_ptr();
-        let mut len = bufffer_before.len();
+        let version_buffer = epsilon::kernel_header().epsilon_version;
+        let ptr = version_buffer.as_ptr();
+        let mut len = version_buffer.len();
 
+        // Trouver le début de la chaine de caractères
         while *ptr.add(len) != 0 {
-            if len == 0 { panic!("Epsilon version string is not null-terminated"); } // Ou cas ou, éviter d'anlyser tout la mémoire, vaut mieux panic
+            if len == 0 { panic!("Epsilon version string is not null-terminated"); } // Sécurité : éviter comportement indéfini
             len -= 1;
         }
 
         let slice = slice::from_raw_parts(ptr, len);
 
+        // Convertir en str et retourner
         str::from_utf8_unchecked(slice)
     }
 }
