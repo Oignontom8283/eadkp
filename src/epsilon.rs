@@ -111,8 +111,8 @@ impl UserlandHeader {
 #[derive(Debug)]
 pub struct KernelHeader {
     pub header: u32,                      // +0x00: 0xDEC00DF0
-    pub epsilon_version: [u8; 8],         // +0x04: Version Epsilon (ex: "23.2.1")
-    pub patch_level: [u8; 8],             // +0x0C: Niveau de patch (ex: "official")
+    pub epsilon_version: [u8; 8],         // +0x04: Version Epsilon (ex: "23.2.1"), l'espace en trop est rempli de 0 (ex: "23.2.1\0\0")
+    pub commit_hash: [u8; 8],             // +0x0C: Hash du commit de compilation (ex: "abcdef12")
     pub footer: u32,                      // +0x14: 0xDEC00DF0
 }
 
