@@ -17,25 +17,26 @@ RUN apt-get update && apt-get install -y \
 
 RUN npm install -g --unsafe-perm usb nwlink
 
-# Install Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-    | sh -s -- -y
+# Create a user 'dev' and add it to the 'dialout' group for USB access
+RUN useradd -m -s /bin/bash dev && \
+    usermod -aG dialout dev
 
-ENV PATH="/root/.cargo/bin:${PATH}"
+# Install Rust (in /opt/rust)
+ENV RUSTUP_HOME=/opt/rustup
+ENV CARGO_HOME=/opt/cargo
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+ENV PATH="/opt/cargo/bin:${PATH}"
 
-# Install Rust toolchain
-RUN rustup toolchain install nightly
-RUN rustup show
+# Set permissions for Rust
+RUN chmod -R 777 /opt/cargo /opt/rustup
 
-# Add ARM target
+# RUN rustup toolchain install nightly && \
+#     rustup target add thumbv7em-none-eabihf && \
+#     rustup target add thumbv7em-none-eabihf --toolchain nightly
+
 RUN rustup target add thumbv7em-none-eabihf
-RUN rustup target add thumbv7em-none-eabihf --toolchain nightly
 
 # Install cargo tools
-RUN cargo install just
-RUN cargo install cargo-edit
-
-# Add user to dialout group for USB access
-RUN usermod -aG dialout root
+RUN cargo install just cargo-edit
 
 WORKDIR /workspace
