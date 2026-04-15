@@ -1,8 +1,10 @@
 FROM debian:bookworm
 
+ARG DEBIAN_FRONTEND=noninteractive
+
 # Build tools & deps
 RUN apt-get update && apt-get install -y \
-    build-essential cmake git curl wget unzip usbutils \
+    build-essential cmake git curl wget unzip usbutils sudo \
     gcc-arm-none-eabi binutils-arm-none-eabi gdb-multiarch pkg-config libpng-dev libjpeg-dev libfreetype6-dev \
     python3 python3-pip \
     libusb-1.0-0 libusb-1.0-0-dev \
@@ -10,30 +12,33 @@ RUN apt-get update && apt-get install -y \
     nodejs npm \
     libx11-dev libxext-dev libxrender-dev libxrandr-dev libxinerama-dev \
     libgl1-mesa-dev libglu1-mesa-dev \
-    libpng-dev libjpeg-dev python3-lz4 \
-    imagemagick lz4 jq \
+    python3-lz4 imagemagick lz4 jq \
     micro nano \
     && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g --unsafe-perm usb nwlink
 
-# Create a user 'dev' and add it to the 'dialout' group for USB access
-RUN useradd -m -s /bin/bash dev && \
-    usermod -aG dialout dev
+#  Create a non-root user
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+RUN groupadd -g ${GROUP_ID} dev_group || true && \
+    useradd -l -u ${USER_ID} -g ${GROUP_ID} -m dev || \
+    (usermod -u ${USER_ID} dev && groupmod -g ${GROUP_ID} $(id -gn dev))
 
-# Install Rust (in /opt/rust)
-ENV RUSTUP_HOME=/opt/rustup
-ENV CARGO_HOME=/opt/cargo
+# Allow the dev user to use sudo without a password
+RUN echo "dev ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/dev && \
+    chmod 0440 /etc/sudoers.d/dev
+
+# Switch to the dev user to correctly configure Cargo/Rust toolchains right into its home directory
+USER dev
+ENV USER=dev
+ENV HOME=/home/dev
+ENV PATH="/home/dev/.cargo/bin:${PATH}"
+
+# Install Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
-ENV PATH="/opt/cargo/bin:${PATH}"
 
-# Set permissions for Rust
-RUN chmod -R 777 /opt/cargo /opt/rustup
-
-# RUN rustup toolchain install nightly && \
-#     rustup target add thumbv7em-none-eabihf && \
-#     rustup target add thumbv7em-none-eabihf --toolchain nightly
-
+# Add required target
 RUN rustup target add thumbv7em-none-eabihf
 
 # Install cargo tools
