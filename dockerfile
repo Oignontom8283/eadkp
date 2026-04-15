@@ -44,4 +44,7 @@ RUN rustup target add thumbv7em-none-eabihf
 # Install cargo tools
 RUN cargo install just cargo-edit
 
+# Create cargo cache directories so Docker named volumes inherit the correct permissions
+RUN mkdir -p /home/dev/.cargo/registry /home/dev/.cargo/git
+
 WORKDIR /workspace
