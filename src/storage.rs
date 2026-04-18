@@ -385,6 +385,12 @@ pub fn file_write_raw(filename: &str, content: &[u8]) -> Result<(), GlobalError>
     Ok(())
 }
 
+// Dummy version
+#[cfg(not(target_os = "none"))]
+pub fn file_write_raw(_filename: &str, _content: &[u8]) -> Result<(), GlobalError> {
+    Err(SoftwareError::SimulatorNotSupported.into())
+}
+
 
 /// Lit un fichier et retourne un pointeur vers son contenu
 #[cfg(target_os = "none")]
