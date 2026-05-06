@@ -1,0 +1,37 @@
+services:
+  eadkp-dev:
+    build: 
+      context: https://github.com/Oignontom8283/eadkp.git#dev
+      dockerfile: dockerfile
+      args:
+        USER_ID: ${HOST_UID:-1000}
+        GROUP_ID: ${HOST_GID:-1000}
+    image: nraddi:latest
+    privileged: true # Required for USB device access
+    volumes:
+      # Support X11
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      # Support Wayland (fallback to wayland-0 if WAYLAND_DISPLAY is unset)
+      - ${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY:-wayland-0}:/tmp/${WAYLAND_DISPLAY:-wayland-0}
+      # Mount the entire USB bus to allow hotplug support
+      - /dev/bus/usb:/dev/bus/usb
+      # Provide access to GPU rendering (required for graphical apps / OpenGL)
+      - /dev/dri:/dev/dri
+      # Provide access to udev for device management (recommanded for USB device access)
+      - /run/udev:/run/udev:ro
+      # For Wakaatime support
+      - ${HOME}/.wakatime.cfg:/home/dev/.wakatime.cfg:ro
+    device_cgroup_rules:
+      - 'c 189:* rmw'   # All USB devices
+      - 'c 166:* rmw'   # ttyACM devices
+      - 'c 204:* rmw'   # ttyAMA / alternatives
+    tty: true
+    stdin_open: true
+    environment:
+      - DISPLAY=${DISPLAY}
+      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY}
+      - XDG_RUNTIME_DIR=/tmp
+      - HOME=/home/dev
+      - EADKP_PRIMARY_BUILD=1
+      # Uncomment for detailed libusb debugging
+      # - LIBUSB_DEBUG=3

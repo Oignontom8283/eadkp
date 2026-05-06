@@ -1,33 +1,25 @@
-version: "3.9"
 
 services:
   eadkp-dev:
-    build: 
+    extends:
+      file: .eadkp/docker-compose.base.yml
+      service: eadkp-dev
+    build:
       context: .
-      dockerfile: dockerfile 
-    image: nraddi:latest
-    container_name: eadkp
-    working_dir: /workspace/eadkp
-    volumes:
-      - ./:/workspace/eadkp
-      # Support X11
-      - /tmp/.X11-unix:/tmp/.X11-unix
-      # Support Wayland (Utilise un fallback pour éviter les erreurs si vide)
-      - ${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY:-wayland-0}:/tmp/${WAYLAND_DISPLAY:-wayland-0}
-      # USB & GPU
-      - /dev/bus/usb:/dev/bus/usb
-      - /dev/dri:/dev/dri
-    tty: true
-    stdin_open: true
+      dockerfile: dockerfile
+    container_name: ${PROJECT_NAME}
+    working_dir: /workspace/${PROJECT_NAME}
     environment:
-      - DISPLAY=${DISPLAY}
-      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY}
-      - XDG_RUNTIME_DIR=/tmp
       - EADKP_PRIMARY_BUILD=1
-    device_cgroup_rules:
-      - 'c 189:* rmw'
-      - 'c 166:* rmw'
-      - 'c 204:* rmw'
+    volumes:
+      - ./:/workspace/${PROJECT_NAME}
+      # Cargo registry and git cache
+      - cargo-registry:/home/dev/.cargo/registry
+      - cargo-git:/home/dev/.cargo/git
+
+volumes:
+  cargo-registry:
+  cargo-git:
 
 # X11 et Wayland support (normalement) !
 # Pour Windows, WSL2 intègre un serveur X11, le lien avec le WM de Windows sera automatique.
