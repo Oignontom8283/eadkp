@@ -29,20 +29,38 @@ test = false
 crate-type = ["rlib", "cdylib"]
 name = "eadkp"
 
+
 [[example]]
-name = "device"
-path = "examples/eadkp_example.rs"
+name = "specs-device"
+path = "examples/specs.rs"
 test = false
 doctest = false
 bench = false
 
 [[example]]
-name = "simulator"
-path = "examples/eadkp_example.rs"
+name = "specs-simulator"
+path = "examples/specs.rs"
 test = false
 doctest = false
 bench = false
 crate-type = ["cdylib"]
+
+
+[[example]]
+name = "snake-device"
+path = "examples/snake.rs"
+test = false
+doctest = false
+bench = false
+
+[[example]]
+name = "snake-simulator"
+path = "examples/snake.rs"
+test = false
+doctest = false
+bench = false
+crate-type = ["cdylib"]
+
 
 [profile.dev]
 panic="abort"
@@ -67,9 +85,9 @@ embedded-alloc = { version = "0.6.0", public = true }
 enum-iterator = "2.3.0"
 postcard = {version = "1.1.2", features=["alloc"]}
 serde = {version = "1.0.219", default-features=false}
-image = {version = "0.25.6", optional = true}
 cc = {version = "1.2.27", optional = true}
-regex = {version = "1.11.1", optional = true}
+image = { version = "0.25.6", optional = true }
+regex = { version = "1.11.1", optional = true }
 
 [build-dependencies]
 image = "0.25.6"
