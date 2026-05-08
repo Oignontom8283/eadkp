@@ -21,10 +21,10 @@ build example="specs" variant="device":
 
 export example="specs" remove="true":
     just build {{example}} device
-    rm -rf {{out_dir}} 2>/dev/null
     if {{remove}}; then \
-        mkdir -p {{out_dir}}; \
+        rm -rf {{out_dir}} 2>/dev/null; \
     fi
+    mkdir -p {{out_dir}}
     if mv target/thumbv7em-none-eabihf/release/examples/{{example}}-device {{out_dir}}{{example}}.nwa; then \
         echo -e "\n\n\033[1;92m{{example}} build successfully!\n\n-> $(realpath {{out_dir}}{{example}}.nwa)\033[0m\n"; \
     else \
