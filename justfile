@@ -44,6 +44,7 @@ exports:
     for example_path in `just list_examples`; do \
         just export `just example_name "$example_path"` "false"; \
     done
+    echo -e "\n\n\033[1;92mAll examples exported successfully to $(realpath {{out_dir}})!\033[0m\n"
 
 run_nwb example="specs":
     @echo -e "\033[1;95mRunning simulator... (if it freezes, kill it with 'pkill epsilon.bin')\033[0m"
