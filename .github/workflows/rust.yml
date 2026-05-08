@@ -39,20 +39,21 @@ jobs:
         with:
           targets: thumbv7em-none-eabihf
 
-      - name: Build library (host)
-        run: cargo +nightly build --lib --release
+      - name: Install just
+        run: cargo install just
 
-      - name: Build library (thumbv7em-none-eabihf)
+      - name: Build library for device
         run: cargo +nightly build --lib --release --target thumbv7em-none-eabihf
 
-      - name: Build NWA example (host)
-        run: cargo +nightly build --release --example simulator
+      - name: Build library for simulator
+        run: cargo +nightly build --lib --release
 
-      - name: Build NWA example (thumbv7em-none-eabihf)
-        run: cargo +nightly build --release --example device --target thumbv7em-none-eabihf
+      - name: Build all examples
+        run: just exports
 
-      - name: Show NWA output info
+      - name: Show build output
         run: |
-          ls -lah target/thumbv7em-none-eabihf/release/examples/device
-          file target/thumbv7em-none-eabihf/release/examples/device
-          sha256sum target/thumbv7em-none-eabihf/release/examples/device
+          echo "Device examples:"
+          ls -lah target/thumbv7em-none-eabihf/release/examples/ || true
+          echo "Build directory:"
+          ls -lah build/ || true
