@@ -1,8 +1,16 @@
 out_dir := "build/"
 simulator_dir := "epsilon_simulator/"
 
+# List all example files (absolute path) excluding _lib files
+list_examples:
+    @find {{`realpath examples`}} -name "*.rs" ! -name "*_lib.rs"
+
+# Get the name of an example from its path
+example_name path:
+    @basename -s .rs {{path}}
 
 send example="specs":
+    just check {{example}}
     cargo run --release --example {{example}}-device --target=thumbv7em-none-eabihf
 
 check example="specs":
@@ -33,12 +41,12 @@ export example="specs" remove="true":
 
 exports:
     rm -rf {{out_dir}} 2>/dev/null
-    for example in specs snake; do \
-        just export "$example" "false"; \
+    for example_path in `just list_examples`; do \
+        just export `just example_name "$example_path"` "false"; \
     done
 
 run_nwb example="specs":
-    echo -e "\033[1;95mRunning simulator... (if it freezes, kill it with 'pkill epsilon.bin')\033[0m"
+    @echo -e "\033[1;95mRunning simulator... (if it freezes, kill it with 'pkill epsilon.bin')\033[0m"
     ./epsilon_simulator/output/release/simulator/linux/epsilon.bin --nwb ./target/release/examples/lib{{example}}_simulator.so & # Run in background to free up terminal. If simulator freezes, kill it with `pkill epsilon.bin`.
 
 sim example="specs" jobs="1":
@@ -53,6 +61,21 @@ sim example="specs" jobs="1":
         cd ..; \
     fi
     just run_nwb {{example}}
+
+list_build_dir:
+    @echo "Build directory:"
+    @ls -lah build/ || true
+
+list_nwa_symbols:
+    @echo "NWA symbols:"
+    @for nwa in `find build -name "*.nwa"`; do \
+        echo "Symbols for $nwa:"; \
+        arm-none-eabi-nm -C $nwa; \
+    done
+
+list_binaries:
+    @echo "Device examples binaries:"
+    @ls -lah target/thumbv7em-none-eabihf/release/examples/ || true
 
 [confirm("This will clean the built app AND the simulator. Do you want to continue ?")]
 clean:
