@@ -6,7 +6,7 @@ extern crate eadkp;
 use heapless::Vec;
 use eadkp::storage;
 use alloc::string::{String, ToString};
-mod serial;
+mod serial_lib;
 
 eadk_setup!(name = "Snake");
 
@@ -124,5 +124,5 @@ fn main() -> isize {
 
 	log("Press Home to exit.".to_string());
 
-	serial::run(&log_list)
+	serial_lib::run(&log_list)
 }
