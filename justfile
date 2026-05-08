@@ -1,6 +1,13 @@
 out_dir := "build/"
 simulator_dir := "epsilon_simulator/"
 
+
+send example="specs":
+    cargo run --release --example {{example}}-device --target=thumbv7em-none-eabihf
+
+check example="specs":
+    cargo build --release --example {{example}}-device --target=thumbv7em-none-eabihf
+
 build example="specs" variant="device":
     if [ "{{variant}}" = "device" ]; then \
         just target; \
@@ -12,16 +19,12 @@ build example="specs" variant="device":
         exit 1; \
     fi
 
-send example="specs":
-    cargo run --release --example {{example}}-device --target=thumbv7em-none-eabihf
-
-check example="specs":
-    cargo build --release --example {{example}}-device --target=thumbv7em-none-eabihf
-
-export example="specs":
+export example="specs" remove="true":
     just build {{example}} device
     rm -rf {{out_dir}} 2>/dev/null
-    mkdir -p {{out_dir}}
+    if {{remove}}; then \
+        mkdir -p {{out_dir}}; \
+    fi
     if mv target/thumbv7em-none-eabihf/release/examples/{{example}}-device {{out_dir}}{{example}}.nwa; then \
         echo -e "\n\n\033[1;92m{{example}} build successfully!\n\n-> $(realpath {{out_dir}}{{example}}.nwa)\033[0m\n"; \
     else \
@@ -29,15 +32,11 @@ export example="specs":
     fi
 
 exports:
+    rm -rf {{out_dir}} 2>/dev/null
     for example in specs snake; do \
-        just export "$example"; \
+        just export "$example" "false"; \
     done
 
-[macos]
-run_nwb example="specs":
-    ./epsilon_simulator/output/release/simulator/macos/epsilon.app/Contents/MacOS/Epsilon --nwb ./target/release/examples/lib{{example}}_simulator.dylib
-
-[linux]
 run_nwb example="specs":
     echo -e "\033[1;95mRunning simulator... (if it freezes, kill it with 'pkill epsilon.bin')\033[0m"
     ./epsilon_simulator/output/release/simulator/linux/epsilon.bin --nwb ./target/release/examples/lib{{example}}_simulator.so & # Run in background to free up terminal. If simulator freezes, kill it with `pkill epsilon.bin`.
