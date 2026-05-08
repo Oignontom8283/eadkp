@@ -24,6 +24,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
+      - name: Cache apt packages
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-apt-${{ hashFiles('**/Cargo.lock') }} # Use Cargo.lock to bust cache
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -34,26 +42,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi
 
-      - name: Install nightly toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          targets: thumbv7em-none-eabihf
-
       - name: Install just
         run: cargo install just
 
       - name: Build library for device
-        run: cargo +nightly build --lib --release --target thumbv7em-none-eabihf
+        run: cargo build --lib --release --target thumbv7em-none-eabihf
 
       - name: Build library for simulator
-        run: cargo +nightly build --lib --release
+        run: cargo build --lib --release
 
       - name: Build all examples
         run: just exports
 
       - name: Show build output
         run: |
-          echo "Device examples:"
-          ls -lah target/thumbv7em-none-eabihf/release/examples/ || true
-          echo "Build directory:"
-          ls -lah build/ || true
+          just list_build_dir
+          just list_binaries
+          just list_nwa_symbols
