@@ -1,0 +1,352 @@
+/**
+ * Customize default theme styling by overriding CSS variables:
+ * https://github.com/vuejs/vitepress/blob/main/src/client/theme-default/styles/vars.css
+ */
+
+/**
+ * Colors
+ *
+ * Each colors have exact same color scale system with 3 levels of solid
+ * colors with different brightness, and 1 soft color.
+ *
+ * - `XXX-1`: The most solid color used mainly for colored text. It must
+ *   satisfy the contrast ratio against when used on top of `XXX-soft`.
+ *
+ * - `XXX-2`: The color used mainly for hover state of the button.
+ *
+ * - `XXX-3`: The color for solid background, such as bg color of the button.
+ *   It must satisfy the contrast ratio with pure white (#ffffff) text on
+ *   top of it.
+ *
+ * - `XXX-soft`: The color used for subtle background such as custom container
+ *   or badges. It must satisfy the contrast ratio when putting `XXX-1` colors
+ *   on top of it.
+ *
+ *   The soft color must be semi transparent alpha channel. This is crucial
+ *   because it allows adding multiple "soft" colors on top of each other
+ *   to create a accent, such as when having inline code block inside
+ *   custom containers.
+ *
+ * - `default`: The color used purely for subtle indication without any
+ *   special meanings attached to it such as bg color for menu hover state.
+ *
+ * - `brand`: Used for primary brand colors, such as link text, button with
+ *   brand theme, etc.
+ *
+ * - `tip`: Used to indicate useful information. The default theme uses the
+ *   brand color for this by default.
+ *
+ * - `warning`: Used to indicate warning to the users. Used in custom
+ *   container, badges, etc.
+ *
+ * - `danger`: Used to show error, or dangerous message to the users. Used
+ *   in custom container, badges, etc.
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --vp-c-default-1: var(--vp-c-gray-1);
+  --vp-c-default-2: var(--vp-c-gray-2);
+  --vp-c-default-3: var(--vp-c-gray-3);
+  --vp-c-default-soft: var(--vp-c-gray-soft);
+
+  --vp-c-brand-1: var(--vp-c-indigo-1);
+  --vp-c-brand-2: var(--vp-c-indigo-2);
+  --vp-c-brand-3: var(--vp-c-indigo-3);
+  --vp-c-brand-soft: var(--vp-c-indigo-soft);
+
+  --vp-c-tip-1: var(--vp-c-brand-1);
+  --vp-c-tip-2: var(--vp-c-brand-2);
+  --vp-c-tip-3: var(--vp-c-brand-3);
+  --vp-c-tip-soft: var(--vp-c-brand-soft);
+
+  --vp-c-warning-1: var(--vp-c-yellow-1);
+  --vp-c-warning-2: var(--vp-c-yellow-2);
+  --vp-c-warning-3: var(--vp-c-yellow-3);
+  --vp-c-warning-soft: var(--vp-c-yellow-soft);
+
+  --vp-c-danger-1: var(--vp-c-red-1);
+  --vp-c-danger-2: var(--vp-c-red-2);
+  --vp-c-danger-3: var(--vp-c-red-3);
+  --vp-c-danger-soft: var(--vp-c-red-soft);
+}
+
+/**
+ * Component: Button
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --vp-button-brand-border: transparent;
+  --vp-button-brand-text: var(--vp-c-white);
+  --vp-button-brand-bg: var(--vp-c-brand-3);
+  --vp-button-brand-hover-border: transparent;
+  --vp-button-brand-hover-text: var(--vp-c-white);
+  --vp-button-brand-hover-bg: var(--vp-c-brand-2);
+  --vp-button-brand-active-border: transparent;
+  --vp-button-brand-active-text: var(--vp-c-white);
+  --vp-button-brand-active-bg: var(--vp-c-brand-1);
+}
+
+/**
+ * Component: Home
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: -webkit-linear-gradient(
+    120deg,
+    #bd34fe 30%,
+    #41d1ff
+  );
+
+  --vp-home-hero-image-background-image: linear-gradient(
+    -45deg,
+    #bd34fe 50%,
+    #47caff 50%
+  );
+  --vp-home-hero-image-filter: blur(44px);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --vp-home-hero-image-filter: blur(56px);
+  }
+}
+
+@media (min-width: 960px) {
+  :root {
+    --vp-home-hero-image-filter: blur(68px);
+  }
+}
+
+/**
+ * Component: Custom Block
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --vp-custom-block-tip-border: transparent;
+  --vp-custom-block-tip-text: var(--vp-c-text-1);
+  --vp-custom-block-tip-bg: var(--vp-c-brand-soft);
+  --vp-custom-block-tip-code-bg: var(--vp-c-brand-soft);
+}
+
+/**
+ * Component: Algolia
+ * -------------------------------------------------------------------------- */
+
+.DocSearch {
+  --docsearch-primary-color: var(--vp-c-brand-1) !important;
+}
+
+
+
+
+
+
+
+
+:root {
+  /* Modify the background color of the code block */
+  --vp-code-block-bg: #1f1f1f;
+  /* Modify the background color of the line numbers */
+  --vp-code-line-number-bg: #1e1e1e; 
+
+  /* Color of the numbers themselves */
+  --vp-code-line-number-color: #858585;
+}
+
+/* Text in code blocks */
+:root {
+  --vp-font-family-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
+/* Style of the border separating numbers and code */
+.vp-doc [class*='language-'] .line-numbers-wrapper {
+  border-right: 1px solid #404040;
+}
+
+/* Border of the code area itself */
+.vp-doc [class*='language-'] {
+  border: 1px solid #333333;
+}
+
+/* 2. Target the <code> component that actually contains the text */
+.vp-doc [class*='language-'] code {
+  padding-left: 16px !important;
+}
+
+
+
+
+
+
+
+/* Global style for alert blocks */
+.custom-block {
+  border-left-width: 4px;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin: 1rem 0;
+}
+
+/* INFO */
+.custom-block.info {
+  border-color: #0969da;
+  background-color: rgba(9, 105, 218, 0.1);
+}
+.custom-block.info .custom-block-title {
+  color: #0969da;
+  font-weight: 600;
+}
+
+/* TIP */
+.custom-block.tip {
+  border-color: #1a7f37;
+  background-color: rgba(26, 127, 55, 0.1);
+}
+.custom-block.tip .custom-block-title {
+  color: #1a7f37;
+  font-weight: 600;
+}
+
+/* WARNING */
+.custom-block.warning {
+  border-color: #9a6700;
+  background-color: rgba(154, 103, 0, 0.1);
+}
+.custom-block.warning .custom-block-title {
+  color: #9a6700;
+  font-weight: 600;
+}
+
+/* DANGER */
+.custom-block.danger {
+  border-color: #cf222e;
+  background-color: rgba(207, 34, 46, 0.1);
+}
+.custom-block.danger .custom-block-title {
+  color: #cf222e;
+  font-weight: 600;
+}
+
+
+
+
+
+
+
+/* Le boutton de copie du code */
+.vp-doc {
+  --vp-copy-btn-bg: rgba(35, 39, 42, 0.6);
+  --vp-copy-btn-bg-hover: rgba(35, 39, 42, 0.85);
+  --vp-copy-btn-border: 1px solid rgba(255, 255, 255, 0.08);
+  --vp-copy-btn-color: #b5bac1;
+  --vp-copy-btn-color-hover: #e3e5e8;
+  --vp-copy-btn-radius: 6px;
+  --vp-copy-icon-size: 16px;
+  /* SVG source: https://www.svgrepo.com/ */
+  --vp-copy-icon: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'><path d='M9 15H5C3.89543 15 3 14.1046 3 13V5C3 3.89543 3.89543 3 5 3H13C14.1046 3 15 3.89543 15 5V9M11 21H19C20.1046 21 21 20.1046 21 19V11C21 9.89543 20.1046 9 19 9H11C9 9 9 9.89543 9 11V19C9 20.1046 9.89543 21 11 21Z' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  /* SVG source: https://www.svgrepo.com/ */
+  --vp-copied-icon: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='white'><path d='M56.103 16.824L22.807 50.121 8.026 35.341l2.767-2.767 11.952 11.952 30.53-30.53 2.828 2.828z'/></svg>");
+}
+
+.vp-doc div[class*='language-'] > button.copy,
+.vp-doc .vp-code-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: var(--vp-copy-btn-radius);
+  background-color: var(--vp-copy-btn-bg);
+  background-image: none !important;
+  border: var(--vp-copy-btn-border);
+  color: var(--vp-copy-btn-color);
+}
+
+.vp-doc :is(div[class*='language-'] > button.copy, .vp-code-copy) > :is(svg, span) {
+  display: none !important;
+}
+
+.vp-doc :is(
+  div[class*='language-'] > button.copy::after,
+  .vp-code-copy::after,
+  div[class*='language-'] > button.copy.copied::after,
+  .vp-code-copy.copied::after,
+  div[class*='language-'].copied::before,
+  div[class*='language-'].copied::after
+) {
+  content: none !important;
+  display: none !important;
+}
+
+.vp-doc :is(
+  div[class*='language-'] > button.copy.copied,
+  div[class*='language-'] > button.copy:hover.copied,
+  .vp-code-copy.copied,
+  .vp-code-copy:hover.copied,
+  div[class*='language-'].copied > button.copy,
+  div[class*='language-'].copied .vp-code-copy
+) {
+  background-color: var(--vp-copy-btn-bg) !important;
+  border: var(--vp-copy-btn-border) !important;
+  color: var(--vp-copy-btn-color) !important;
+  background-image: none !important;
+  border-radius: var(--vp-copy-btn-radius) !important;
+}
+
+.vp-doc :is(div[class*='language-'] > button.copy, .vp-code-copy)::before {
+  content: '';
+  display: block;
+  width: var(--vp-copy-icon-size);
+  height: var(--vp-copy-icon-size);
+  margin: auto;
+  background-color: currentColor;
+  -webkit-mask: var(--vp-copy-icon) no-repeat center / contain;
+  mask: var(--vp-copy-icon) no-repeat center / contain;
+}
+
+.vp-doc :is(div[class*='language-'] > button.copy, .vp-code-copy):hover {
+  background-color: var(--vp-copy-btn-bg-hover);
+  color: var(--vp-copy-btn-color-hover);
+}
+
+.vp-doc :is(
+  div[class*='language-'] > button.copy.copied,
+  div[class*='language-'] > button.copy:hover.copied,
+  .vp-code-copy.copied,
+  .vp-code-copy:hover.copied,
+  div[class*='language-'].copied > button.copy,
+  div[class*='language-'].copied .vp-code-copy
+)::before {
+  content: '' !important;
+  position: static !important;
+  transform: none !important;
+  display: block !important;
+  width: var(--vp-copy-icon-size) !important;
+  height: var(--vp-copy-icon-size) !important;
+  margin: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background-color: currentColor !important;
+  color: inherit !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  white-space: normal !important;
+  box-shadow: none !important;
+  -webkit-mask: var(--vp-copied-icon) no-repeat center / contain;
+  mask: var(--vp-copied-icon) no-repeat center / contain;
+}
+
+
+
+
+
+
+
+
+
+
+
+
