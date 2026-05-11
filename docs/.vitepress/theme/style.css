@@ -198,6 +198,16 @@
   font-weight: 600;
 }
 
+/* NOTE */
+.custom-block.note {
+  border-color: #0969da;
+  background-color: rgba(9, 105, 218, 0.1);
+}
+.custom-block.note .custom-block-title {
+  color: #0969da;
+  font-weight: 600;
+}
+
 /* TIP */
 .custom-block.tip {
   border-color: #1a7f37;
