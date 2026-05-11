@@ -218,6 +218,16 @@
   font-weight: 600;
 }
 
+/* SUCCESS */
+.custom-block.success {
+  border-color: #116329;
+  background-color: rgba(17, 99, 41, 0.1);
+}
+.custom-block.success .custom-block-title {
+  color: #116329;
+  font-weight: 600;
+}
+
 /* WARNING */
 .custom-block.warning {
   border-color: #9a6700;
