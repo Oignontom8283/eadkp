@@ -5,3 +5,7 @@ build/
 Cargo.lock
 package-lock.json
 package.json
+
+docs/node_modules
+docs/.vitepress/dist
+docs/.vitepress/cache
