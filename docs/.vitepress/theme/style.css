@@ -228,6 +228,15 @@
   font-weight: 600;
 }
 
+/* IMPORTANT */
+.custom-block.important {
+  border-color: #6f42c1;
+  background-color: rgba(111, 66, 193, 0.1);
+}
+.custom-block.important .custom-block-title {
+  color: #6f42c1;
+  font-weight: 600;
+}
 
 
 
