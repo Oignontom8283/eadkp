@@ -16,6 +16,8 @@ services:
       # Cargo registry and git cache
       - cargo-registry:/home/dev/.cargo/registry
       - cargo-git:/home/dev/.cargo/git
+    ports:
+      - "3000:3000" # Web docs
 
 volumes:
   cargo-registry:
