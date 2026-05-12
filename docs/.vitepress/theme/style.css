@@ -169,11 +169,20 @@
   border: 1px solid #333333;
 }
 
-/* 2. Target the <code> component that actually contains the text */
+/* Target the <code> component that actually contains the text */
 .vp-doc [class*='language-'] code {
   padding-left: 16px !important;
 }
 
+/* Add padding to the top and bottom of the code block */
+.vp-doc [class*='language-'] pre {
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+}
+.vp-doc [class*='language-'] div {
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+}
 
 
 
