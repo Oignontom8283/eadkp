@@ -49,29 +49,20 @@ pub fn next_free() -> *const u8 {
 
 **Output**
 
-::: info
-This is an info box.
-:::
+> [!INFO]
+> This is an info box.
 
-::: tip
-This is a tip.
-:::
+> [!TIP]
+> This is a tip.
 
-::: success
-This is a success message.
-:::
+> [!IMPORTANT]
+> This is an important message.
 
-::: warning
-This is a warning.
-:::
+> [!WARNING]
+> This is a warning.
 
-::: danger
-This is a dangerous warning.
-:::
-
-::: details
-This is a details block.
-:::
+> [!DANGER]
+> This is a dangerous warning.
 
 ## More
 
