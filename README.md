@@ -212,15 +212,20 @@ Ce projet est distribué sous [licence LGPL-3.0](./LICENSE) (GNU Lesser General 
 Bien que ce projet ait bénéficié d'une refonte architecturale majeure, il reconnaît l'héritage des travaux suivants :
 
 - **Sous-module de Stockage (file system):**
-La logique bas niveau du sous module `storage` a été initialement inspirée par
+La logique bas niveau du sous module `storage` est dérivée et adaptée du projet
 [NumWorks Extapp Storage](https://framagit.org/Yaya.Cout/numworks-extapp-storage/-/tree/62e3d4c44437b93a8f14ce687a1c45d6dded87d9). (Licence MIT)
 - **Handlers Rust pour l'ABI Epsilon:**
 Les premières implémentations des handlers Rust pour l'ABI d'Epsilon EADK proviennent de
 [NumCraft Rust v0.1.4](https://github.com/yannis300307/NumcraftRust/tree/b61d72214f116ce81a9a296426a27ba4a7ee1f6c). (Licence GPL-3.0)
 
-Conformément à la LGPL-3.0, les travaux originaux sont reconnus et crédités.
+Les travaux originaux sont reconnus et crédités.
 Les modifications substantielles et les nouvelles fonctionnalités introduites dans ce projet sont couvertes par la licence LGPL-3.0 actuelle,
 afin de permettre une meilleure interopérabilité de la bibliothèque avec d'autres projets.
+
+---
+
+La documentation de ce projet est distribuée sous [licence CC-BY-SA-4.0](./docs/LICENSE) (Creative Commons Attribution-ShareAlike 4.0 International License).
+Elle est fournie indépendamment du code source et n’est pas soumise à la licence LGPL-3.0 du projet.
 
 ## Remerciements
 
