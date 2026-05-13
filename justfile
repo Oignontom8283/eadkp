@@ -1,5 +1,7 @@
 out_dir := "build/"
 simulator_dir := "epsilon_simulator/"
+docs_dir := "docs/"
+
 
 # List all example files (absolute path) excluding _lib files
 list_examples:
@@ -8,6 +10,7 @@ list_examples:
 # Get the name of an example from its path
 example_name path:
     @basename -s .rs {{path}}
+
 
 send example="specs":
     just check {{example}}
@@ -63,6 +66,7 @@ sim example="specs" jobs="1":
     fi
     just run_nwb {{example}}
 
+
 list_build_dir:
     @echo "Build directory:"
     @ls -lah build/ || true
@@ -78,6 +82,7 @@ list_binaries:
     @echo "Device examples binaries:"
     @ls -lah target/thumbv7em-none-eabihf/release/examples/ || true
 
+
 [confirm("This will clean the built app AND the simulator. Do you want to continue ?")]
 clean:
     if [ -d "{{simulator_dir}}" ]; then \
@@ -88,6 +93,8 @@ clean:
     cargo clean
     rm -rf {{out_dir}} 2>/dev/null
 
+    just docs-clean
+    
 [confirm("This will clean the built app AND DELETE the simulator. Do you want to continue ?")]
 clear:
     rm -rf {{simulator_dir}} 2>/dev/null
@@ -100,3 +107,28 @@ update:
     
 target:
     rustup target add thumbv7em-none-eabihf
+
+
+docs cmd="view":
+    if [ "{{cmd}}" = "view" ]; then \
+        just docs-view; \
+    elif [ "{{cmd}}" = "clean" ]; then \
+        just docs-clean; \
+    else \
+        echo "Unknown command: {{cmd}}"; \
+        exit 1; \
+    fi
+    
+doc args="view":
+    just docs {{args}}
+
+docs-view:
+    cd {{docs_dir}} && \
+    if [ ! -d "node_modules" ]; then \
+        npm install; \
+    fi && \
+    npm run docs:dev
+
+docs-clean:
+    cd {{docs_dir}} && \
+    npm run docs:clean
