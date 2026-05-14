@@ -5,7 +5,7 @@ export default withMermaid({
   title: "Eadkp Documentation",
   description: "Official documentation for Eadkp.",
   head: [
-    ['link', { rel: 'icon', href: '/eadkp/favicon.ico' }] 
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/eadkp/favicon.svg' }] 
   ],
   base: '/eadkp/',
   
