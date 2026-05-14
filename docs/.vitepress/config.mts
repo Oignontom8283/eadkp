@@ -17,10 +17,13 @@ export default withMermaid({
 
     sidebar: [
       {
-        text: 'Examples',
+        text: 'Guide',
+        
         items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
+          { text: 'Getting Started ', link: '/guide/' },
+          { text: 'Configuration', link: '/guide/configuration' },
+          { text: 'Usage', link: '/guide/usage' },
+          { text: "Simulator", link: 'guide/simulator' }
         ]
       }
     ],
