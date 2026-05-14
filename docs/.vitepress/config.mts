@@ -26,7 +26,7 @@ export default withMermaid({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Oignontom8283/eadkp' }
+      { icon: 'github', link: 'https://github.com/Oignontom8283/eadkp/tree/dev/docs' }
     ]
   },
   markdown: {
