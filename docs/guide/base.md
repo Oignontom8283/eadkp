@@ -1,46 +1,49 @@
-
-# Base of app
+# Base of the application
 
 > [!NOTE]
-> La template fournie du code par defaut dans le fichier `src/main.rs` que vous pouvez réutiliser.
-> 
-> Ici nous détailleons le code de base pour vous aider à comprendre comment il fonctionne, et comment commencer votre projet.
+> The template provides default code in the `src/main.rs` file that you can reuse.
+> Here, we detail this base code to help you understand how it works and how to get started with your project.
 
 ## Code
 
-**Le code qui suit est OBLIGATOIRE pour que votre projet fonctionne, c'est la base de votre projet!**
+**The following code is MANDATORY for your project to work, it is the base of your application!**
 
-### Déclaration de l'environnement
+### Environment Declaration
 
-Déclaration de l'environnement a Rust :
+Let's indicate the target environment to Rust:
+
 ```rust
 #![cfg_attr(target_os = "none", no_std)]
 #![no_main]
+
 ```
-On indique a Rust que notre projet fonctionne sans OS, et que nous n'avons pas de fonction d'entrée standard `main` classique.
 
-### Configuration de l'application
+We indicate to Rust that our project runs without an operating system (OS) and that we do not have a standard `main` entry function.
 
-On importe les macros de la crate `eadkp` et on l'utilise :
+### Application Configuration
+
+We import the macros from the `eadkp` crate and use them:
+
 ```rust
 #[macro_use]
 extern crate eadkp;
 
 // Setup the NWA environment.
 eadk_setup!(name = "Your App Name")
+
 ```
-On utilise la macro `eadk_setup!` pour configurer l'environnement de notre projet, en lui donnant un nom.
 
-Cette macro fait beaucoup de choses en coulisse, notament :
-- Déclarer un `panic_handler` pour gérer les panics de notre projet et les afficher sur un Red Screnn of ERROR (RSE).
-- Déclare un allocateur global (Embedded Allocator) pour remplacer l'allocateur par défaut de Rust.
-- Configurée les proriétés obligatoires du projet : nom, level, emplacement de l'icon, etc ...
-- etc ...
+We use the `eadk_setup!` macro to configure our project's environment by assigning it a name.
 
-### Fonction d'entrée
+This macro does many things behind the scenes, notably:
 
-Bien que nous avons déclaré que nous n'avons pas de fonction d'entrée standard `main`,
-nous avont besouin d'une fonction d'entrée qui sera expossée et appellé par Epsilon :
+* Declaring a `panic_handler` to handle panics in our project and display them on a *Red Screen of ERROR* (RSE).
+* Declaring a global allocator (*Embedded Allocator*) to replace Rust's default allocator.
+* Configuring the project's mandatory properties: name, level, icon location, etc.
+
+### Entry Function
+
+Although we declared the absence of a standard `main` function, we still need an entry function that will be exposed and called by Epsilon:
 
 ```rust
 #[unsafe(no_mangle)]
@@ -52,23 +55,23 @@ pub fn main() -> isize {
     
     0
 }
+
 ```
-- `_eadk_init_heap();` est une fonction automatiquement introduite par la macro `eadk_setup!` pour initialiser l'allocateur global.
-- `#[unsafe(no_mangle)]` pour indiquer que cette fonction est expossée et ne doit pas être manglé par le compilateur.
-- `pub` pour exposer la fonction à l'extérieur du module.
-- `0`, renvoie 0 par ce que c'est comme ça que ça fonctionne, c'est l'api
 
-En gros, la fonction `main` qu'on déclare ici, n'est pas une fonction d'entrée standard, comme sur OS, mais une simple vrai fonction (compatible avec le C),
-car nottre app est en vérité une librairie compilé en format `cdylib` (comme une DLL),
-et c'est Epsilon qui va l'appeler. C'est pour cela que ça ne respecte pas les conventions des application pour OS.
+* `_eadk_init_heap();`: a function automatically introduced by the `eadk_setup!` macro to initialize the global allocator.
+* `#[unsafe(no_mangle)]`: indicates that this function is exposed and its name must not be altered (mangled) by the compiler.
+* `pub`: makes the function public to expose it outside the module.
+* `0`: we return 0 because that is the behavior expected by the API.
 
-Évidament, pour utiliser tout fonctionnalité provenante de l'allocateur normale, il va fallouare non pas les importer depuis `std`, mais depuis `core` ou `alloc` (si vous utilisez des fonctionnalités d'allocation dynamique), et les utiliser comme d'habitude.
+In summary, the `main` function declared here is not a standard entry function (like on a classic OS), but a real C-compatible function. Indeed, our application is actually a library compiled in the `cdylib` format (similar to a DLL), and Epsilon is responsible for calling it. This is why it does not follow the usual conventions of OS applications.
 
-### Base du code
+Obviously, to use features requiring allocation, you will need to import them not from `std`, but from `core` or `alloc` (if you are using dynamic allocations), and then use them as usual.
 
-Dans la fonction `main`, on peut faire ce que l'on veut, c'est le point d'entrée de notre projet, c'est ici que tout commence.
+### Code Base
 
-Mais il y a une structure minimale a respecter pour que notre application ne fasse au moins que restée ouverte, et pouvoir ce fermer proprement :
+In this `main` function, you are free to do whatever you want: it is the entry point of your project, where everything begins.
+
+However, there is a minimal structure to respect so that the application at least stays open and can close properly:
 
 ```rust
 #[unsafe(no_mangle)]
@@ -97,9 +100,9 @@ pub fn main() -> isize {
 
     return 0;
 }
+
 ```
 
-Globalement, c'est une simple boucle infinie qui vérifie les entrées de l'utilisateur,
-et si la touche "Back" est pressé, elle sort de la boucle ce qui termine l'application en renvoyant 0.
+Overall, this is a simple infinite loop that reads user inputs. If the "Back" key is pressed, the program breaks out of the loop, which terminates the application by returning 0.
 
-Voila, c'est la base de votre projet.
+There you go, this is the base of your project!
