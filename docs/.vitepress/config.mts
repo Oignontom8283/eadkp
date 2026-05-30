@@ -26,7 +26,7 @@ export default withMermaid({
           { text: 'Images', link: '/guide/images' },
           { text: 'Filesystem', link: '/guide/filesystem' },
           { text: "Simulator", link: '/guide/simulator' },
-          { text: "Export & Build", link: '/guide/export' }
+          { text: "Commands & Export", link: '/guide/commands' }
         ]
       }
     ],
