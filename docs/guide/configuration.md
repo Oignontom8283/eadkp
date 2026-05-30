@@ -1,14 +1,12 @@
+# Configuration
 
-# Configuration (FR - Not translated yet)
+Once your project is created, it will be preconfigured to work right out of the box.
 
-Une fois votre projet crée, il sera préconfiguré pour fonctionner dés le départ.
+However, there are several things you need to know in order to customize your project.
 
-Cependant, il a plusieurs choses que vous devez savoir pour pouvoir personnaliser votre projet.
+## Name
 
-
-## Nom
-
-Pour changer le nom de votre projet, c'est très simple, il vous suffit de change le champ `name` de `[package]` dans le fichier `Cargo.toml` :
+To change the name of your project, it is very simple: you just need to change the `name` field under `[package]` in the `Cargo.toml` file:
 
 ```toml {3}
 ...
@@ -17,23 +15,21 @@ name = "my_apa"
 version = "0.1.0"
 edition = "2024"
 ...
+
 ```
 
-Le reste du fichier `Cargo.toml` est préconfiguré pour fonctionner avec les utilitaires de votre projet,
-il est déconseillé de le modifier, sauf si vous savez ce que vous faites.
-
+The rest of the `Cargo.toml` file is preconfigured to work with your project's utilities. It is not recommended to modify it unless you know what you are doing.
 
 ## .eadkp/
 
-Le dossier `.eadkp/` contient principalement des fichiers de script et de configuration.
-**Il ne faut pas les modifier, supprimer ou déplacer ces fichiers**, les script son téléchargés en local pour fonctionner hors ligne.
-Il sont mise a jour par le le script d'update, et restoré en cas de suppression ou de modification.
+The `.eadkp/` folder mainly contains script and configuration files.
+**You must not modify, delete, or move these files.** The scripts are downloaded locally to work offline.
+They are updated by the update script and will be restored in case of deletion or modification.
 
-Le fichier `config.env` contient basiquement de la configuration du script de mise à jour des utilitaires de votre projet, il est déconseillé de la changer, sauf si vous savez ce que vous faites.
-
+The `config.env` file basically contains the configuration for the update script of your project's utilities. It is not recommended to change it unless you know what you are doing.
 
 ## justfile
 
-Le `justfile` (un équivalent à un Makefile) fournit ne contient que l'importation des commandes de base fournies dans `.eadkp/` : `export`, `build`, `sim`, etc ...
+The provided `justfile` (an equivalent to a Makefile) only contains the import of the basic commands provided in `.eadkp/`: `export`, `build`, `sim`, etc.
 
-C'est ici a la suite de l'importation que vous pouvez ajouter vos propres commandes personnalisées, ou même écraser les commandes de base si vous le souhaitez.
+It is here, following the import, that you can add your own custom commands, or even overwrite the basic commands if you wish.
