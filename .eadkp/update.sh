@@ -8,6 +8,17 @@ main() {
 source .eadkp/utils.sh
 load_config
 
+# ── Formatting helpers (local to update.sh) ───────────────────────────────────
+fmt_ok()      { echo -e "[${BOLD}${GREEN}OK${RESET}]"; }
+fmt_updated() { echo -e "[${BOLD}${ORANGE}UPDATED${RESET}]"; }
+fmt_new()     { echo -e "[${BOLD}${ORANGE}NEW${RESET}]"; }
+fmt_deleted() { echo -e "[${BOLD}${RED}DELETED${RESET}]"; }
+fmt_success() { echo -e "${BOLD}${GREEN}$1${RESET}"; }
+
+is_truthy() {
+    [[ "$1" == "true" || "$1" == "1" ]]
+}
+
 # Verify required dependencies before proceeding
 REQUIRED_CMDS=("curl" "git" "realpath" "cmp" "just" "tr" "head" "sed" "grep" "cut")
 MISSING_CMDS=()
@@ -121,16 +132,17 @@ for file in "${!file_hashes[@]}"; do
     remote_sha="${file_hashes[$file]}"
     local_sha="${local_file_hashes[$file]}"
 
+    printf "[Updating] %-35s" "$file"
     if [[ -z "$local_sha" ]]; then
-        echo "[Updating] Downloading new file: $file"
         curl -s -L -o "$DIR_NAME/$file.tmp" "https://raw.githubusercontent.com/$REPO/$BRANCH/$DIR_NAME/$file"
         mv "$DIR_NAME/$file.tmp" "$DIR_NAME/$file"
+        fmt_new
     elif [[ "$remote_sha" != "$local_sha" ]]; then
-        echo "[Updating] Updating modified file: $file"
         curl -s -L -o "$DIR_NAME/$file.tmp" "https://raw.githubusercontent.com/$REPO/$BRANCH/$DIR_NAME/$file"
         mv "$DIR_NAME/$file.tmp" "$DIR_NAME/$file"
+        fmt_updated
     else
-        echo "[Updating] The file $file is up to date."
+        fmt_ok
     fi
 done
 
@@ -145,24 +157,30 @@ for file in "${!local_file_hashes[@]}"; do
     fi
 
     if [[ -z "${file_hashes[$file]}" ]]; then
-        echo "[Updating] Deleting file that no longer exists on the remote: $file"
+        printf "[Updating] %-35s" "$file"
         rm -f "$DIR_NAME/$file"
+        fmt_deleted
     fi
 done
 
 
 # Update Cargo dependencies
-echo "[Dependencies] Updating Cargo dependencies..."
-
-if just --yes update; then
-    echo "[Dependencies] Cargo dependencies updated successfully."
+echo ""
+if is_truthy "$IS_NOT_UPDATE_CARGO_DEPENDENCIES"; then
+    echo "[Dependencies] Skipping Cargo dependencies update."
 else
-    echo "[Dependencies] ERROR: Failed to update Cargo dependencies."
-    exit 1
+    echo "[Dependencies] Updating Cargo dependencies..."
+    if just --yes update; then
+        echo "[Dependencies] Cargo dependencies updated successfully."
+    else
+        echo "[Dependencies] ERROR: Failed to update Cargo dependencies."
+        exit 1
+    fi
 fi
+echo ""
+
 
 # Verify and auto-restore the root launchers
-echo ""
 echo "[Launchers] Verifying root launchers..."
 
 # Fetch the root directory content 
@@ -185,26 +203,27 @@ for launcher in "${root_sh_scripts[@]}"; do
     fi
 
     curl -s -L -o "$launcher.tmp" "https://raw.githubusercontent.com/$REPO/$BRANCH/$launcher"
+    printf "[Launchers] %-34s" "$launcher"
     if [ -f "$launcher" ]; then
         if ! cmp -s "$launcher.tmp" "$launcher"; then
-            echo "[Launchers] Updating modified root launcher: $launcher"
             mv "$launcher.tmp" "$launcher"
             chmod +x "$launcher"
+            fmt_updated
         else
             rm -f "$launcher.tmp"
+            fmt_ok
         fi
     else
-        echo "[Launchers] Restoring missing root launcher: $launcher"
         mv "$launcher.tmp" "$launcher"
         chmod +x "$launcher"
+        fmt_new
     fi
 done
 
 
 # Final message
-
 echo ""
-echo "Updating process completed successfully!"
+fmt_success "Updating process completed successfully!"
 echo ""
 
 }
