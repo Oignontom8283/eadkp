@@ -1,108 +1,163 @@
 # Base of the application
 
-> [!NOTE]
-> The template provides default code in the `src/main.rs` file that you can reuse.
-> Here, we detail this base code to help you understand how it works and how to get started with your project.
+La template que nous avons utilisée inclut une structure de base pour l'application et du code d'exemple pour vous aider à démarrer. 
 
-## Code
+Vous pouvez supprimer le code suivant et ne garder que la structure de base si vous le souhaitez :
+```rust 18-31,47-57,61-99
+#![cfg_attr(target_os = "none", no_std)]
+#![no_main]
 
-**The following code is MANDATORY for your project to work, it is the base of your application!**
+// use alloc::format; // !If you have a error about missing `format!`, uncomment this line to import it from alloc.
 
-### Environment Declaration
+#[macro_use]
+extern crate eadkp;
 
-Let's indicate the target environment to Rust:
+eadk_setup!(name = "Your App");
 
+#[unsafe(no_mangle)]
+pub fn main() -> isize {
+
+    _eadk_init_heap();
+
+    eadkp::display::push_rect_uniform(eadkp::SCREEN_RECT, eadkp::COLOR_WHITE);
+
+    // ------------------------------------------------------------------------- {
+
+    eadkp::display::draw_string(
+        "Hello world!",
+        eadkp::Point { x: 10, y: 10 },
+        true,            // use large font
+        eadkp::COLOR_BLACK,
+        eadkp::COLOR_WHITE,
+    );
+
+    let mut number: i32 = 0;
+    let mut actualize = true;
+
+    // ------------------------------------------------------------------------- }
+
+    let mut prev = eadkp::input::KeyboardState::scan();
+
+    let mut running = true; // Application main loop flag. Set to false to exit.
+
+    while running {
+        let now = eadkp::input::KeyboardState::scan();
+
+        let just = now.get_just_pressed(prev);
+
+        if just.key_down(eadkp::input::Key::Back) {
+            running = false;
+        }
+
+
+        // ------------------------------------------------------------------------- {
+
+        if just.key_down(eadkp::input::Key::Plus) {
+            number += 1;
+            actualize = true;
+        } else if just.key_down(eadkp::input::Key::Minus) {
+            number -= 1;
+            actualize = true;
+        }
+
+        // ------------------------------------------------------------------------- }
+
+        eadkp::display::wait_for_vblank();
+
+        // ------------------------------------------------------------------------- {
+
+        if actualize {
+            eadkp::display::push_rect_uniform(
+                eadkp::Rect {
+                    x: 10,
+                    y: 30,
+                    width: eadkp::LARGE_FONT.width
+                        * ((eadkp::SCREEN_RECT.width - 10) / eadkp::LARGE_FONT.width),
+                    height: eadkp::LARGE_FONT.height,
+                },
+                eadkp::COLOR_WHITE,
+            );
+
+            let text_color = if number > 0 {
+                eadkp::COLOR_BLACK
+            } else {
+                eadkp::COLOR_WHITE
+            };
+            let bg_color = if number > 0 {
+                eadkp::COLOR_GREEN
+            } else if number < 0 {
+                eadkp::COLOR_RED
+            } else {
+                eadkp::COLOR_GRAY
+            };
+
+            eadkp::display::draw_string(
+                &format!("Number: {}", number),
+                eadkp::Point { x: 10, y: 30 },
+                true, // use large font
+                text_color,
+                bg_color,
+            );
+
+            actualize = false;
+        }
+
+        // ------------------------------------------------------------------------- }
+
+        prev = now;
+    }
+
+    0
+}
+```
+
+Ce qui donne approximativement ceci :
 ```rust
 #![cfg_attr(target_os = "none", no_std)]
 #![no_main]
 
-```
+// use alloc::format; // !If you have a error about missing `format!`, uncomment this line to import it from alloc.
 
-We indicate to Rust that our project runs without an operating system (OS) and that we do not have a standard `main` entry function.
-
-### Application Configuration
-
-We import the macros from the `eadkp` crate and use them:
-
-```rust
 #[macro_use]
 extern crate eadkp;
 
-// Setup the NWA environment.
-eadk_setup!(name = "Your App Name")
+eadk_setup!(name = "Your App");
 
-```
-
-We use the `eadk_setup!` macro to configure our project's environment by assigning it a name.
-
-This macro does many things behind the scenes, notably:
-
-* Declaring a `panic_handler` to handle panics in our project and display them on a *Red Screen of ERROR* (RSE).
-* Declaring a global allocator (*Embedded Allocator*) to replace Rust's default allocator.
-* Configuring the project's mandatory properties: name, level, icon location, etc.
-
-### Entry Function
-
-Although we declared the absence of a standard `main` function, we still need an entry function that will be exposed and called by Epsilon:
-
-```rust
-#[unsafe(no_mangle)]
-pub fn main() -> isize {
-    
-    _eadk_init_heap();
-
-    // ...
-    
-    0
-}
-
-```
-
-* `_eadk_init_heap();`: a function automatically introduced by the `eadk_setup!` macro to initialize the global allocator.
-* `#[unsafe(no_mangle)]`: indicates that this function is exposed and its name must not be altered (mangled) by the compiler.
-* `pub`: makes the function public to expose it outside the module.
-* `0`: we return 0 because that is the behavior expected by the API.
-
-In summary, the `main` function declared here is not a standard entry function (like on a classic OS), but a real C-compatible function. Indeed, our application is actually a library compiled in the `cdylib` format (similar to a DLL), and Epsilon is responsible for calling it. This is why it does not follow the usual conventions of OS applications.
-
-Obviously, to use features requiring allocation, you will need to import them not from `std`, but from `core` or `alloc` (if you are using dynamic allocations), and then use them as usual.
-
-### Code Base
-
-In this `main` function, you are free to do whatever you want: it is the entry point of your project, where everything begins.
-
-However, there is a minimal structure to respect so that the application at least stays open and can close properly:
-
-```rust
 #[unsafe(no_mangle)]
 pub fn main() -> isize {
 
-    // Initialize the heap allocator
-    _eadk_init_heap();
+    _eadk_init_heap(); // Initialize the allocator, required for using : vec, string, format!, etc.
 
-    let mut prev = eadkp::input::KeyboardState::scan(); // Initial keyboard state
+    eadkp::display::push_rect_uniform(eadkp::SCREEN_RECT, eadkp::COLOR_WHITE); // Clear the screen
 
-    loop {
-        let now = eadkp::input::KeyboardState::scan(); // Scan the current keyboard state
-        let just = now.get_just_pressed(prev); // Get keys that were just pressed
-        if just.key_down(eadkp::input::Key::Back) { break 0; }; // Exit if Back key is pressed
+    let mut prev = eadkp::input::KeyboardState::scan();
+    let mut running = true; // Application main loop flag. Set to false to exit.
 
-        // Clear the screen to white
-        eadkp::display::wait_for_vblank(); // Wait for VBlank before updating the display
+    while running {
+        let now = eadkp::input::KeyboardState::scan();
 
+        let just = now.get_just_pressed(prev);
 
-        // Your own logic here ...
+        if just.key_down(eadkp::input::Key::Back) {
+            running = false;
+        }
 
+        // Your code logic here . . .
 
-        // Update previous keyboard state
+        eadkp::display::wait_for_vblank();
+
+        // Your code rendering here . . .
+
         prev = now;
     }
 
-    return 0;
+    0
 }
-
 ```
 
-Overall, this is a simple infinite loop that reads user inputs. If the "Back" key is pressed, the program breaks out of the loop, which terminates the application by returning 0.
+Le code ci-dessus **ne fait rien** a part le minimum, soit : clear l'écran, exit par une touche.
 
-There you go, this is the base of your project!
+> [!NOTE]
+> Il est obligatoire d'avoir une méthode de sortie de l'application, sinon vous allez avoir des comportements indéfinis (ex: le simulateur va planter).
+> 
+> Il n'y a pas de fonction d'exit dans l'API, il faut donc faire une boucle infinie et sortir de celle-ci pour quitter l'application.
