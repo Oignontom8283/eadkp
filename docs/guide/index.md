@@ -35,19 +35,20 @@ chmod +x ./docker.sh
 > [!NOTE]
 > Docker includes many dependencies, so the first build can take a long time. Please be patient.
 
-## Accessing the application
+## Accessing the docker container
 
 Once the Docker container is running, to start developing you need to enter the container.
 
 ### VSCode
 
-On your OS (not in WSL if you are on Windows), open VSCode.
+Recommended to install the [Remote Development](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack)
+extension pack in Visual Studio Code or [this](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 
-Download the [Remote Development](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack) extension pack.
+```bash
+./docker.sh open code
+```
 
-In the new tab on the left, right-click your Docker container and click "Join in Visual Studio Code".
-
-![illustration](./assets/Quick-Start_dev-container.png)
+This will open VSCode directly in the Docker container via Remote Development.
 
 You can now work inside your Docker container as if you were working on your local machine.
 
