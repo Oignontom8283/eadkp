@@ -22,7 +22,7 @@ export default withMermaid({
         items: [
           { text: 'Getting Started ', link: '/guide/' },
           { text: 'Configuration', link: '/guide/configuration' },
-          { text: 'Base of the application', link: '/guide/base' },
+          { text: 'Application Structure', link: '/guide/structure' },
           { text: "Simulator", link: '/guide/simulator' },
           { text: "Commands & Export", link: '/guide/commands' },
           // { text: 'Images', link: '/guide/images' },
