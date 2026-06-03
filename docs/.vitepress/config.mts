@@ -23,10 +23,10 @@ export default withMermaid({
           { text: 'Getting Started ', link: '/guide/' },
           { text: 'Configuration', link: '/guide/configuration' },
           { text: 'Base of the application', link: '/guide/base' },
-          { text: 'Images', link: '/guide/images' },
-          { text: 'Filesystem', link: '/guide/filesystem' },
           { text: "Simulator", link: '/guide/simulator' },
-          { text: "Commands & Export", link: '/guide/commands' }
+          { text: "Commands & Export", link: '/guide/commands' },
+          // { text: 'Images', link: '/guide/images' },
+          // { text: 'Filesystem', link: '/guide/filesystem' },
         ]
       }
     ],
