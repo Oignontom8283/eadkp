@@ -1,104 +1,78 @@
-
 # Commands and Export
 
-It is important to clearly distinguish between building and exporting your application:
+## Building and Exporting
 
-* **Build:** Only compiles the source code to test your project on the calculator or the simulator. No distribution file is generated.
-* **Export:** Compiles the project and generates a final file in `.nwa` format. This is the file you can install on your calculator or share with other users.
+Running `just build` or `just export` both compile your project. The difference is that `just export` also packages the output as a `.nwa` file — which is simply the compiled binary renamed and placed in a dedicated folder for easy distribution. Use `just export` when you want a file to install on a calculator or share with others.
+
 
 ## Command Reference
 
-### Build, Execution and Export
+### Build, Run and Export
 
-#### Build for the calculator
-
+#### Build
 ```bash
 just build
-
 ```
 
-#### Launch the simulator
-
+#### Run the simulator
 ```bash
 just sim {number_of_cores}
-
 ```
+See the [Simulator](./simulator.md) page for details.
 
-This is the **recommended command** to test your application on a computer. Replace `{number_of_cores}` with the number of CPU cores you wish to allocate to the compilation.
-*Note: If the simulator has not yet been compiled on your machine, this command will automatically compile it before launching.*
 
-#### Export the application
-
+#### Export
 ```bash
 just export
-
 ```
-
-Generates the application file (`.nwa`) in the `build/` folder of your project.
+Generates the `.nwa` file in the `build/` folder.
 
 > [!INFO]
-> The default destination folder name might change in future updates (for example, to `dist/`, `out/`, etc.).
+> The output folder name may change in future updates.
+
 
 ### Cleanup
 
-#### Clean the project
-
+#### Clean project files
 ```bash
 just clean
-
 ```
+Deletes the compiled output of your application (`target/` and `build/` folders).
 
-Deletes the generated compilation files of your application (`target/` and `build/` folders).
 
 #### Full reset
-
 ```bash
 just clear
-
 ```
+Same as `just clean`, but also removes the compiled simulator files.
 
-Performs the same operations as `just clean`, but also deletes the files related to the simulator compilation.
 
 ### Configuration and Maintenance
 
 #### Download the compilation target
-
 ```bash
 just target
-
 ```
+Manually downloads the required compilation target. Normally done automatically on first build.
 
-Manually downloads the required compilation target for the calculator. (This operation is normally done automatically during your first build).
 
 #### Update local tools
-
 ```bash
 ./update.sh
-
 ```
+Updates project scripts and tooling (`docker.sh`, `update.sh`, `justfile`, etc.).
 
-Updates your project's configuration and environment scripts (e.g., `docker.sh`, `update.sh`, `justfile`, etc.).
 
 ### Internal and Deprecated Commands
 
-These commands are mainly used by the project's internal scripts or for very specific test cases. **It is generally not necessary to use them manually.**
+These are used by internal scripts or for specific test cases. **No need to run them manually.**
 
-#### Check the build (deprecated)
 
-```bash
-just check
+#### `just check` *(deprecated)*
 
-```
+Identical to `just build`. Use `just build` instead.
 
-This command does exactly the same thing as `just build`. It is recommended to use `just build` instead.
 
-#### Build the simulator only
+#### `just build_simulator`
 
-```bash
-just build_simulator
-
-```
-
-This command compiles the application for the simulator without launching it.
-It is considered useless for standard use and serves mainly for internal scripts to verify that the application successfully compiles in this environment.
-Favor using `just sim` instead.
+Compiles the app for the simulator without launching it. Used internally to verify simulator compatibility. Use `just sim` instead.
