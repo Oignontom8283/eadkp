@@ -5,14 +5,15 @@ layout: home
 hero:
   name: "Eadkp"
   text: "Epsilon Application Development Kit Plus"
-  tagline: Better Rust wrapper for Epsilon ABI in Numworks!
+  tagline: A Rust wrapper and abstraction layer for the Epsilon ABI on Numworks 
   actions:
     - theme: brand
       text: Quick Start
       link: /guide
     - theme: alt
       text: docs
-      link: /api-examples
+      link: /documentation
+
 
 features:
   - title: Epsilon ABI Wrapping

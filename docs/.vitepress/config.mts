@@ -12,13 +12,12 @@ export default withMermaid({
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' }
+      { text: 'Links', link: '/links' }
     ],
 
     sidebar: [
       {
         text: 'Guide',
-        
         items: [
           { text: 'Getting Started ', link: '/guide/' },
           { text: 'Configuration', link: '/guide/configuration' },
@@ -28,11 +27,19 @@ export default withMermaid({
           // { text: 'Images', link: '/guide/images' },
           // { text: 'Filesystem', link: '/guide/filesystem' },
         ]
+      },
+      {
+        text: 'Documentation',
+        items: [
+          { text: 'Doc main', link: '/documentation/' },
+          { text: 'Links', link: '/documentation/links' },
+        ]
       }
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Oignontom8283/eadkp/tree/dev/docs' }
+      { icon: 'github', link: 'https://github.com/Oignontom8283/eadkp/tree/dev/docs' },
+      { icon: 'rust', link: 'https://crates.io/crates/eadkp' }
     ]
   },
   markdown: {
