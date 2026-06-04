@@ -81,3 +81,19 @@ export_project_name() {
         exit 1
     fi
 }
+
+smart_open() {
+    local target="${1:-.}" # Default: current directory
+
+    if grep -qiE "(microsoft|wsl)" /proc/version; then
+        # Running on WSL: use Windows Explorer
+        # Use 'wslpath -w' to convert Linux path to Windows path
+        explorer.exe "$(wslpath -w "$target")" 2>/dev/null
+    elif command -v xdg-open > /dev/null; then
+        # Running on Linux Desktop (Ubuntu, Mint, etc.)
+        xdg-open "$target"
+    else
+        echo "[Error] Unable to find a file explorer (no GUI or not WSL)."
+        return 1
+    fi
+}
