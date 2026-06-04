@@ -79,7 +79,6 @@ done
 #     echo "$file: ${file_hashes[$file]}"
 # done
 
-
 # Get the list of files (name and hash) in the local '$DIR_NAME' folder
 declare -A local_file_hashes
 
