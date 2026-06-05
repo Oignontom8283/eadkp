@@ -5,7 +5,10 @@ layout: home
 hero:
   name: "Eadkp"
   text: "Epsilon Application Development Kit Plus"
-  tagline: A Rust wrapper and abstraction layer for the Epsilon ABI on Numworks 
+  tagline: A Rust wrapper and abstraction layer for the Epsilon ABI on Numworks
+  image:
+    src: /favicon.svg
+    alt: eadkp Logo
   actions:
     - theme: brand
       text: Quick Start
