@@ -12,7 +12,7 @@ export default withMermaid({
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Links', link: '/links' }
+      { text: 'Links', link: '/documentation/links' }
     ],
 
     sidebar: [
