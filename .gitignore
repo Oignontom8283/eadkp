@@ -10,3 +10,4 @@ docs/package-lock.json
 docs/node_modules
 docs/.vitepress/dist
 docs/.vitepress/cache
+*.blend1
