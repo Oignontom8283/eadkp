@@ -2,7 +2,7 @@
 import { withMermaid } from 'vitepress-plugin-mermaid'
 
 export default withMermaid({
-  title: "Eadkp Documentation",
+  title: "eadkp Documentation",
   description: "Official documentation for eadkp.",
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/eadkp/favicon.svg' }] 
