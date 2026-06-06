@@ -391,7 +391,7 @@
 /* 3D effect for the logo on the homepage */
 .VPHero .image-src {
   transform-origin: top left;
-  transform: perspective(1000px) translate(-62px, -62px) scale(1.3) rotateX(15deg) rotateY(-25deg) rotateZ(5deg);
+  transform: perspective(1000px) translate(-75px, -75px) scale(1.3) rotateX(15deg) rotateY(-25deg) rotateZ(5deg);
   filter: 
     drop-shadow(1px 1px 0px #B38024)
     drop-shadow(2px 2px 0px #FFB734)
