@@ -31,7 +31,7 @@ export default withMermaid({
       {
         text: 'Documentation',
         items: [
-          { text: 'Doc main', link: '/documentation/' },
+          { text: 'Home', link: '/documentation/' },
           { text: 'Links', link: '/documentation/links' },
         ]
       }
