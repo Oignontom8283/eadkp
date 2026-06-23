@@ -12,6 +12,8 @@ export default withMermaid({
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
+      { text: "Guide", link: '/guide/' },
+      { text: 'Documentation', link: '/documentation/' },
       { text: 'Links', link: '/documentation/links' }
     ],
 
