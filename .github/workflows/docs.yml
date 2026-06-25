@@ -1,34 +1,28 @@
 name: Deploy Doc to GitHub Pages
-
 on:
   push:
     branches:
       - dev
     paths:
       - "docs/**"
-
-  # Permet de lancer manuellement depuis l'onglet Actions
   workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     permissions:
-      contents: write # nécessaire pour push sur gh-pages
-
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # nécessaire pour que VitePress génère les dates de dernière modif
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: docs/package-lock.json
+          # Pas de cache: npm ici, on gère node_modules directement
 
       - name: Cache node_modules
         uses: actions/cache@v4
@@ -48,11 +42,10 @@ jobs:
         working-directory: docs
         run: npm run docs:build
 
-
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/.vitepress/dist # dossier de sortie de VitePress
-          publish_branch: gh-pages # branche cible pour GitHub Pages
-          force_orphan: true # garde la branche propre (pas d'historique accumulé)
+          publish_dir: docs/.vitepress/dist
+          publish_branch: gh-pages
+          force_orphan: true
