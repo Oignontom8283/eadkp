@@ -3,10 +3,7 @@ epsilon_simulator/
 build/
 
 Cargo.lock
-package-lock.json
-package.json
 
-docs/package-lock.json
 docs/node_modules
 docs/.vitepress/dist
 docs/.vitepress/cache
