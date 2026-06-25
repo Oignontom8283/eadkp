@@ -99,6 +99,7 @@ clean:
 clear:
     rm -rf {{simulator_dir}} 2>/dev/null
     cargo clean
+    just docs-clean
     rm -rf {{out_dir}} 2>/dev/null
 
 [confirm("This will update all dependencies to their latest versions. Do you want to continue ?")]
