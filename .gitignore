@@ -4,7 +4,7 @@ build/
 
 Cargo.lock
 
-docs/node_modules
+node_modules
 docs/.vitepress/dist
 docs/.vitepress/cache
 *.blend1
