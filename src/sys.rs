@@ -1,6 +1,7 @@
 use alloc::{slice, str};
 use crate::epsilon;
 
+use core::ffi::c_char;
 
 /// Obtenir la version du Sytem d'exploitation en cours d'utilisation (version du kernel).
 /// 
