@@ -42,6 +42,8 @@ pub enum SoftwareError {
     PointerOverflow,
     /// Paramètre invalide fourni à une fonction
     InvalidParameter { param_name: String, details: String },
+    /// Aucun \0 trouvé dans le buffer
+    NoNullTerminator,
 }
 
 #[derive(Debug)]
