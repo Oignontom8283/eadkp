@@ -105,3 +105,22 @@ impl Version {
         Some(Self { major, minor, patch })
     }
 }
+
+
+/// Convertit un buffer d'octets brut en chain de caractères Rust (`&str`)
+/// - S'arrête au premier octet nul (`\0`) rencontré.
+pub fn str_from_fixed_buffer(buffer: &[u8]) -> &str {
+    unsafe {
+        let ptr = buffer.as_ptr();
+        let mut len = 0;
+
+        // On cherche le \0 sans jamais dépasser la taille réelle du buffer
+        while len < buffer.len() && *ptr.add(len) != 0 {
+            len += 1;
+        }
+
+        // Création de la slice et conversion brute sans overhead
+        let slice = slice::from_raw_parts(ptr, len);
+        str::from_utf8_unchecked(slice)
+    }
+}
