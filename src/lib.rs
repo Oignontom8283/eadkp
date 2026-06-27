@@ -17,6 +17,7 @@ pub mod r#macro;
 mod color;
 mod image;
 pub mod backlight;
+pub mod common;
 pub mod utils;
 pub mod display;
 pub mod timing;
@@ -33,7 +34,7 @@ mod errors;
 pub mod builder;
 
 // Réexportations du contenu des modules
-pub use utils::*;
+pub use common::*;
 pub use color::*;
 pub use image::*;
 pub use errors::*;
