@@ -2,7 +2,7 @@ use alloc::{slice, str};
 use crate::epsilon;
 
 
-/// Obtenir la version du Sytem d'exploitation en cours d'utilisation.
+/// Obtenir la version du Sytem d'exploitation en cours d'utilisation (version du kernel).
 /// 
 /// Exemple :
 /// ```
