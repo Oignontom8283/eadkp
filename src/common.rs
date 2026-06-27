@@ -98,7 +98,7 @@ impl Version {
         let patch = parts.next()?.parse::<u8>().ok()?;
 
         // Si la chaîne ne contient pas exactement trois parties, retourner None
-        if parts.next().is_none() {
+        if parts.next().is_some() {
             return None;
         }
 
