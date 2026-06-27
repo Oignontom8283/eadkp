@@ -6,7 +6,7 @@ use crate::epsilon;
 /// 
 /// Exemple :
 /// ```
-/// let version = eadkp::os::version();
+/// let version = eadkp::sys::version();
 /// assert_eq!(version, "23.12.0"); // OK
 /// ```
 #[cfg(target_os = "none")]
@@ -39,7 +39,7 @@ pub fn version() -> &'static str {
 /// 
 /// Exemple :
 /// ```
-/// let hash = eadkp::os::hash_commit();
+/// let hash = eadkp::sys::hash_commit();
 /// assert_eq!(hash, "abcdef12"); // OK
 /// ```
 #[cfg(target_os = "none")]
