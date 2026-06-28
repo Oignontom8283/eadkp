@@ -1,5 +1,5 @@
 
-use crate::{utils, epsilon, common::Version, utils::str_from_fixed_buffer};
+use crate::{utils, epsilon, common::Version, utils::str_from_fixed_buffer, utils::ptr_range_size};
 
 /// Obtenir la version du Sytem d'exploitation en cours d'utilisation (version du kernel).
 /// ```
@@ -64,4 +64,19 @@ pub fn expected_version() -> Version {
 #[cfg(not(target_os = "none"))] // Version dummy
 pub fn expected_version() -> Version {
     Version::parse("1.2.3").unwrap()
+}
+
+
+
+/// Obtenir la taille du système de fichiers (storage).
+/// - ⚠️ Comprend **TOUT** la zone du FS, y compris les zone non utilisables pour stocker des fichiers (ex: magic number).
+/// - Taille en bytes (octets).
+#[cfg(target_os = "none")]
+pub fn filesystem_size() -> usize {
+    epsilon::userland_header().storage_size_ram as usize
+}
+
+#[cfg(not(target_os = "none"))] // Version dummy
+pub fn filesystem_size() -> usize {
+    42 * 1024 // 42 Ko (la taille du FS normalement, arbitraire)
 }
