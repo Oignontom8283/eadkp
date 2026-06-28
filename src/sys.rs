@@ -116,3 +116,36 @@ pub fn ext_app_flash_size() -> usize {
 }
 
 
+/// Obtenir le nom de l'appareil (device) en cours d'utilisation.
+/// - Renvoie "Unknown Device" si le nom n'est pas disponible ou invalide.
+/// 
+/// ## Attention
+/// Il est fortement possible que vous n'arriviez pas a obtenir le nom de l'appareil, pour des raisons qui m'échappent.
+#[cfg(target_os = "none")]
+pub fn device_name() -> &'static str {
+    
+    // Obtenir les pointeurs vers le début et la fin du nom de l'appareil
+    let name_start_ptr = epsilon::userland_header().device_name_flash_start;
+    let name_end_ptr = epsilon::userland_header().device_name_flash_end;
+
+    // Calculer la taille et on s'assure que les pointeurs sont valides
+    let len = unsafe { ptr_range_size(name_start_ptr, name_end_ptr) };
+
+    // On s'assure que la chain n'est pas vide
+    if len == 0 {
+        return "Unknown Device";
+    }
+    
+    // Convertire les pointeurs en un buffer
+    let name_buffer = unsafe {
+        core::slice::from_raw_parts(name_start_ptr, len)
+    };
+
+    // Convertire le buffer en une chaine de caractères UTF-8
+    str_from_fixed_buffer(name_buffer).unwrap_or("Unknown Device")
+}
+
+#[cfg(not(target_os = "none"))] // Version dummy
+pub fn device_name() -> &'static str {
+    "Simulated Device"
+}
