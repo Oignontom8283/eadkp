@@ -19,9 +19,6 @@ macro_rules! eadk_setup {
         // Importer alloc pour les allocations sur le tas
         extern crate alloc;
 
-        // Importations communes pour le développement embarqué
-        use alloc::format;
-
         // Importer les traits du gestionnaire de panique
         use core::panic::PanicInfo;
 
@@ -55,7 +52,7 @@ macro_rules! eadk_setup {
                 eadkp::Color { rgb565: 63488 },
             );
             
-            write_wrapped(format!("{}", panic).as_str(), 42);
+            write_wrapped(alloc::format!("{}", panic).as_str(), 42);
             
             loop {
                 eadkp::timing::msleep(50);
