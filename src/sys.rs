@@ -98,3 +98,21 @@ pub fn ext_app_ram_size() -> usize {
     100 * 1024 // 100 Ko (arbitraire)
 }
 
+
+/// Obtenir la taille de la zone de mémoire flash allouée aux stockages des binaires des applications externes.
+/// - Taille en bytes (octets).
+#[cfg(target_os = "none")]
+pub fn ext_app_flash_size() -> usize {
+    let start_ptr = epsilon::userland_header().external_apps_flash_start;
+    let end_ptr = epsilon::userland_header().external_apps_flash_end;
+
+    // Calculer la taille de la plage mémoire
+    unsafe { ptr_range_size(start_ptr, end_ptr) }
+}
+
+#[cfg(not(target_os = "none"))] // Version dummy
+pub fn ext_app_flash_size() -> usize {
+    (2.5 * 1024.0 * 1024.0) as usize // 2.5 Mo (la taille sur ma calulartrice, arbitraire)
+}
+
+
