@@ -75,6 +75,7 @@ pub struct Point {
 /// assert!(v >= v_min && v <= v_max);
 /// 
 /// ```
+#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
     pub major: u8,
@@ -84,12 +85,14 @@ pub struct Version {
 
 impl Version {
     /// Crée une nouvelle instance de Version à partir des numéros de version fournis.
+    #[allow(dead_code)]
     pub fn new(major: u8, minor: u8, patch: u8) -> Self {
         Version { major, minor, patch }
     }
     
     /// Créer une instance de Version à partir d'une chaîne de caractères au format "major.minor.patch".
     /// - Retourne None si la chaîne n'est pas au format attendu.
+    #[allow(dead_code)]
     pub fn parse(s: &str) -> Option<Self> {
         let mut parts = s.split('.');
 
