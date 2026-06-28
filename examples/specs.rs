@@ -6,6 +6,7 @@ extern crate eadkp;
 use heapless::Vec;
 use eadkp::storage;
 use alloc::string::{String, ToString};
+use alloc::format;
 mod serial_lib;
 
 eadk_setup!(name = "Specs");
