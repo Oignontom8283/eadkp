@@ -66,6 +66,10 @@ impl SlotInfo {
 /// 
 /// Contient les métadonnées essentielles du userland,
 /// notamment l'emplacement du système de fichiers.
+/// 
+/// ## src
+/// https://github.com/numworks/epsilon/blob/master/shared/ion/src/device/shared/drivers/userland_header.h
+/// https://github.com/numworks/epsilon/blob/72c8306f4fe3adf3bfc9c79802a39b80afb8e988/shared/ion/src/device/shared/drivers/userland_header.h
 #[repr(C)]
 #[derive(Debug)]
 pub struct UserlandHeader {
@@ -107,6 +111,10 @@ impl UserlandHeader {
 /// - N0110/N0115 Slot B : 0x90400008
 /// - N0120 Slot A       : 0x90000008
 /// - N0120 Slot B       : 0x90400008
+/// 
+/// ## src
+/// https://github.com/numworks/epsilon/blob/master/shared/ion/src/device/shared/drivers/kernel_header.h
+/// https://github.com/numworks/epsilon/blob/72c8306f4fe3adf3bfc9c79802a39b80afb8e988/shared/ion/src/device/shared/drivers/kernel_header.h
 #[repr(C)]
 #[derive(Debug)]
 pub struct KernelHeader {
@@ -137,6 +145,9 @@ impl KernelHeader {
 /// 
 /// - `N0110` ou `N0115` partagent la même adresse de RAM de base et les mêmes emplacements de slots.
 /// - `N0120` utilise une adresse de RAM différente et des emplacements de slots distincts.
+/// 
+/// ## src
+/// Méthode de détection du modèle provient de https://framagit.org/Yaya.Cout/numworks-extapp-storage/-/blob/master/src/storage.c
 #[allow(non_camel_case_types)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CalculatorModel {
