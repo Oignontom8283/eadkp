@@ -91,7 +91,7 @@ macro_rules! eadk_setup {
             const ICON_DATA: &[u8] = include_bytes!($icon_path);
             const ICON_SIZE: usize = ICON_DATA.len();
             
-            const _: () = assert!(ICON_SIZE > 0, "Le fichier d'icône est vide");
+            const _: () = assert!(ICON_SIZE > 0, "Icon file is empty or not found");
             
             ICON_SIZE
         }] = *include_bytes!($icon_path);
