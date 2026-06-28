@@ -80,3 +80,21 @@ pub fn filesystem_size() -> usize {
 pub fn filesystem_size() -> usize {
     42 * 1024 // 42 Ko (la taille du FS normalement, arbitraire)
 }
+
+
+/// Obtenir la taille de la zone mémoire allouée aux applications externes (RAM).
+/// - Taille en bytes (octets).
+#[cfg(target_os = "none")]
+pub fn ext_app_ram_size() -> usize {
+    let start_ptr = epsilon::userland_header().external_apps_ram_start;
+    let end_ptr = epsilon::userland_header().external_apps_ram_end;
+
+    // Calculer la taille de la plage mémoire
+    unsafe { ptr_range_size(start_ptr, end_ptr) }
+}
+
+#[cfg(not(target_os = "none"))] // Version dummy
+pub fn ext_app_ram_size() -> usize {
+    100 * 1024 // 100 Ko (arbitraire)
+}
+
