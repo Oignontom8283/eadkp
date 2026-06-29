@@ -40,8 +40,12 @@ pub fn str_from_fixed_buffer(buffer: &[u8]) -> Result<&str, GlobalError> {
 /// assert_eq!(size, 0x1000); // 4096
 /// ```
 pub unsafe fn ptr_range_size(start: *const u8, end: *const u8) -> usize {
+
+    // Vérifier que les pointeurs sont valides et dans le bon ordre
     if start.is_null() || end.is_null() || end < start {
         return 0;
     }
+    
+    // Calculer la taille de la plage en utilisant offset_from
     end.offset_from(start) as usize
 }
