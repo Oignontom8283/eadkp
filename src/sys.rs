@@ -1,5 +1,11 @@
 
-use crate::{utils, epsilon, common::Version, utils::str_from_fixed_buffer, utils::ptr_range_size};
+use crate::{
+    utils::{ptr_range_size, str_from_fixed_buffer},
+    common::{self, Version},
+    alloc::string::String,
+    epsilon,
+    svc_buf,
+};
 
 /// Obtenir la version du Sytem d'exploitation en cours d'utilisation (version du kernel).
 /// ```
@@ -37,7 +43,7 @@ pub fn hash_commit() -> &'static str {
     let hash_buffer_raw = &epsilon::kernel_header().commit_hash; // 8 bytes
 
     // Extraire la chaine de caractères
-    utils::str_from_fixed_buffer(hash_buffer_raw).unwrap()
+    str_from_fixed_buffer(hash_buffer_raw).unwrap()
 }
 
 #[cfg(not(target_os = "none"))] // Version dummy
