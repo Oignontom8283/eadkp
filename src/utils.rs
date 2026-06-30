@@ -55,7 +55,8 @@ pub unsafe fn ptr_range_size(start: *const u8, end: *const u8) -> usize {
 /// - (`u32` / `bool` / `enum` `#[repr(u32)]`)
 /// - Le type de retour doit être spécifié explicitement lors de l'appel de la macro.
 /// - Miroir de SVC_RETURNING_R0 du C++
-#[macro_export] 
+#[macro_export]
+#[cfg(target_os = "none")]
 macro_rules! svc_r0 {
     ($num:expr, $ty:ty) => {{
         let result: u32;
@@ -81,6 +82,7 @@ macro_rules! svc_r0 {
 /// - (`f32`)
 /// - Miroir de SVC_RETURNING_S0 du C++
 #[macro_export]
+#[cfg(target_os = "none")]
 macro_rules! svc_s0 {
     ($num:expr) => {{
         let bits: u32;
@@ -105,7 +107,8 @@ macro_rules! svc_s0 {
 /// Faire un appel SVC et récupérer la valeur de retour 64 bits dans `r0:r1`.
 /// - (`u64` / `enum` `#[repr(u64)]`)
 /// - Miroir de SVC_RETURNING_R0R1 du C++
-#[macro_export] 
+#[macro_export]
+#[cfg(target_os = "none")]
 macro_rules! svc_r0r1 {
     ($num:expr) => {{
         let lo: u32;
@@ -132,7 +135,8 @@ macro_rules! svc_r0r1 {
 /// Faire un appel SVC et stocker l'adresse de destination dans `r0` avant le SVC.
 /// - (`*mut T` / `*const T`)
 /// - Miroir de SVC_RETURNING_STASH_ADDRESS_IN_R0 du C++
-#[macro_export] 
+#[macro_export]
+#[cfg(target_os = "none")]
 macro_rules! svc_addr_in_r0 {
     ($num:expr, $ptr:expr) => {{
         unsafe {
@@ -166,6 +170,7 @@ macro_rules! svc_addr_in_r0 {
 /// assert!(serial.iter().all(|&b| b != 0)); 
 /// ```
 #[macro_export]
+#[cfg(target_os = "none")]
 macro_rules! svc_buf {
     ($num:expr, $len:expr) => {{
         let mut buf = [0u8; $len];
