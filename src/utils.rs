@@ -49,3 +49,30 @@ pub unsafe fn ptr_range_size(start: *const u8, end: *const u8) -> usize {
     // Calculer la taille de la plage en utilisant offset_from
     end.offset_from(start) as usize
 }
+
+
+/// Faire un appel SVC et récupérer la valeur de retour dans `r0`.
+/// - (`u32` / `bool` / `enum` `#[repr(u32)]`)
+/// - Le type de retour doit être spécifié explicitement lors de l'appel de la macro.
+/// - Miroir de SVC_RETURNING_R0 du C++
+#[macro_export] 
+macro_rules! svc_r0 {
+    ($num:expr, $ty:ty) => {{
+        let result: u32;
+        unsafe {
+            core::arch::asm!(
+                "svc {num}",
+                "mov {out}, r0",
+                num = const $num,
+                out = out(reg) result,
+                // r0-r3 sont clobberés par le SVC (convention AAPCS)
+                lateout("r0") _,
+                lateout("r1") _,
+                lateout("r2") _,
+                lateout("r3") _,
+                options(nostack),
+            );
+        }
+        result as $ty
+    }};
+}
