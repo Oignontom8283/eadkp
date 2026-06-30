@@ -101,3 +101,30 @@ macro_rules! svc_s0 {
         f32::from_bits(bits)
     }};
 }
+
+/// Faire un appel SVC et récupérer la valeur de retour 64 bits dans `r0:r1`.
+/// - (`u64` / `enum` `#[repr(u64)]`)
+/// - Miroir de SVC_RETURNING_R0R1 du C++
+#[macro_export] 
+macro_rules! svc_r0r1 {
+    ($num:expr) => {{
+        let lo: u32;
+        let hi: u32;
+        unsafe {
+            core::arch::asm!(
+                "svc {num}",
+                "mov {lo}, r0",
+                "mov {hi}, r1",
+                num = const $num,
+                lo  = out(reg) lo,
+                hi  = out(reg) hi,
+                lateout("r0") _,
+                lateout("r1") _,
+                lateout("r2") _,
+                lateout("r3") _,
+                options(nostack),
+            );
+        }
+        ((hi as u64) << 32) | (lo as u64)
+    }};
+}
