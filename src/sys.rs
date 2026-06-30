@@ -155,3 +155,34 @@ pub fn device_name() -> &'static str {
 pub fn device_name() -> &'static str {
     "Simulated Device"
 }
+
+
+
+/// Longueur du numéro de série (sans le nul terminator)
+const SERIAL_NUMBER_LENGTH: usize = 16;
+
+/// Obtenir le numéro de série de l'appareil (device) en cours d'utilisation.
+/// - Renvoie une chaine de caractères de 16 caractères en Base64.
+/// - Renvoie `None` si sur **Simulateur**, numéro indisponible/invalide, ou en cas d'erreur.
+/// 
+/// > TIP: Pour obtenir les 12 octets bruts de l'UID hardware,
+/// > décodez le résultat avec un parseur Base64 comme la crate `base64`.
+#[cfg(target_os = "none")]
+pub fn serial_number() -> Option<String> {
+
+    // Taille du buffer pour le numéro de série (16 caractères + 1 caractère nul)
+    const SERIAL_NUMBER_BUFFER_SIZE: usize = SERIAL_NUMBER_LENGTH + 1;
+
+    // Obtenir le buffer du numéro de série via SVC
+    let serial_buffer = svc_buf!(common::SVC_SERIAL_NUMBER_COPY, SERIAL_NUMBER_BUFFER_SIZE);
+
+    // Convertir le buffer en une chaine de caractères String et gérer les erreurs
+    str_from_fixed_buffer(&serial_buffer)
+        .ok()
+        .map(String::from)
+}
+
+#[cfg(not(target_os = "none"))] // Version dummy
+pub fn serial_number() -> Option<String> {
+    None
+}
