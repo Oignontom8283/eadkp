@@ -1,4 +1,7 @@
 
+use crate::{svc_r0, svc_s0, common};
+
+
 /// Représente le niveau de charge de la batterie, avec des variantes allant de "Empty" (vide) à "Full" (plein).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
@@ -37,62 +40,46 @@ impl BatteryCharge {
     }
 }
 
+
+/// Obtenir le niveau de charge de la batterie.
+/// - Renvoie un enum `BatteryCharge` représentant le niveau de charge.
 #[cfg(target_os = "none")]
 pub fn level() -> BatteryCharge {
-    let result: u8;
-    unsafe {
-        core::arch::asm!( // Obtenir le niveau de charge de la batterie via un appel système (svc)
-            "svc {svc_num}",
-            "mov {out}, r0",
-            svc_num = const 4,
-            out = out(reg) result,
-            options(nostack, nomem)
-        );
-    }
+
+    // Obtenir le niveau de charge de la batterie via le SVC
+    let result = svc_r0!(common::SVC_BATTERY_LEVEL, u8);
+
+    // Convertir le résultat en enum BatteryCharge
     BatteryCharge::from(result)
 }
 
-#[cfg(not(target_os = "none"))]
+#[cfg(not(target_os = "none"))] // Version dummy
 pub fn level() -> BatteryCharge {
     BatteryCharge::High // Valeur Dummy pour les cibles non-embarquées
 }
 
+
+/// Obtenir la tension actuelle de la batterie en volts.
 #[cfg(target_os = "none")]
 pub fn voltage() -> f32 {
-    let result: f32;
-    unsafe {
-        core::arch::asm!(
-            "svc {svc_num}",
-            "vmov {out}, s0",
-            svc_num = const 5,
-            out = out(reg) result,
-            options(nostack, nomem)
-        );
-    }
-    result
+    // Obtenir la tension de la batterie via le SVC
+    svc_s0!(common::SVC_BATTERY_VOLTAGE)
 }
 
-#[cfg(not(target_os = "none"))]
+#[cfg(not(target_os = "none"))] // Version dummy
 pub fn voltage() -> f32 {
     4.2 // Valeur Dummy pour les cibles non-embarquées
 }
 
+
+/// Savoir si la batterie est en cours de charge.
 #[cfg(target_os = "none")]
 pub fn is_charging() -> bool {
-    let result: u8;
-    unsafe {
-        core::arch::asm!(
-            "svc {svc_num}",
-            "mov {out}, r0",
-            svc_num = const 3,
-            out = out(reg) result,
-            options(nostack, nomem)
-        );
-    }
-    result != 0
+    // Obtenir l'état de charge de la batterie via le SVC
+    svc_r0!(common::SVC_BATTERY_IS_CHARGING, u8) != 0
 }
 
-#[cfg(not(target_os = "none"))]
+#[cfg(not(target_os = "none"))] // Version dummy
 pub fn is_charging() -> bool {
-    false // Valeur Dummy pour les cibles non-embarquées
+    false
 }
