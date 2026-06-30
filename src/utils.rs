@@ -76,3 +76,28 @@ macro_rules! svc_r0 {
         result as $ty
     }};
 }
+
+/// Faire un appel SVC et récupérer la valeur de retour dans `s0`.
+/// - (`f32`)
+/// - Miroir de SVC_RETURNING_S0 du C++
+#[macro_export]
+macro_rules! svc_s0 {
+    ($num:expr) => {{
+        let bits: u32;
+        unsafe {
+            core::arch::asm!(
+                "svc {num}",
+                // move s0 into a general-purpose register as u32 bits
+                "vmov {bits}, s0",
+                num  = const $num,
+                bits = out(reg) bits,
+                lateout("r0") _,
+                lateout("r1") _,
+                lateout("r2") _,
+                lateout("r3") _,
+                options(nostack),
+            );
+        }
+        f32::from_bits(bits)
+    }};
+}
