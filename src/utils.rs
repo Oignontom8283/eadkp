@@ -151,3 +151,37 @@ macro_rules! svc_addr_in_r0 {
     }};
 }
 
+/// Faire un appel SVC avec un buffer alloué par l'appelant (caller-allocated buffer).
+/// - Le kernel reçoit une adresse dans `r0` et y écrit les données de retour (Notre buffer).
+/// - Miroir de SVC_RETURNING_STASH_ADDRESS_IN_R0 du C++ **mais avec gestion du buffer intégrée.**
+/// - Retourne `[u8; $len]` rempli par le kernel.
+/// - Il s'agit d'une version automatisée de `svc_addr_in_r0!` qui gére le buffer pour vous.
+/// 
+/// ## Exemple
+/// ```rust
+/// // Appel SVC pour récupérer le numéro de série
+/// let serial = svc_buf!(SVC_SERIAL_NUMBER_COPY, 16); // 16 octets — taille du buffer voulu
+/// 
+/// // Le buffer est rempli par le kernel
+/// assert!(serial.iter().all(|&b| b != 0)); 
+/// ```
+#[macro_export]
+macro_rules! svc_buf {
+    ($num:expr, $len:expr) => {{
+        let mut buf = [0u8; $len];
+        unsafe {
+            core::arch::asm!(
+                "mov r0, {ptr}",
+                "svc {num}",
+                ptr = in(reg) buf.as_mut_ptr(),
+                num = const $num,
+                lateout("r0") _,
+                lateout("r1") _,
+                lateout("r2") _,
+                lateout("r3") _,
+                options(nostack),
+            );
+        }
+        buf
+    }};
+}
