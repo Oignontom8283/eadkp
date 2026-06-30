@@ -128,3 +128,26 @@ macro_rules! svc_r0r1 {
         ((hi as u64) << 32) | (lo as u64)
     }};
 }
+
+/// Faire un appel SVC et stocker l'adresse de destination dans `r0` avant le SVC.
+/// - (`*mut T` / `*const T`)
+/// - Miroir de SVC_RETURNING_STASH_ADDRESS_IN_R0 du C++
+#[macro_export] 
+macro_rules! svc_addr_in_r0 {
+    ($num:expr, $ptr:expr) => {{
+        unsafe {
+            core::arch::asm!(
+                "mov r0, {ptr}",
+                "svc {num}",
+                ptr = in(reg) $ptr,
+                num = const $num,
+                lateout("r0") _,
+                lateout("r1") _,
+                lateout("r2") _,
+                lateout("r3") _,
+                options(nostack),
+            );
+        }
+    }};
+}
+
