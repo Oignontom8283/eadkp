@@ -5,6 +5,7 @@
 main() {
 
 # Load external configuration if present
+chmod +x .eadkp/utils.sh
 source .eadkp/utils.sh
 load_config
 
@@ -206,7 +207,6 @@ for launcher in "${root_sh_scripts[@]}"; do
     if [ -f "$launcher" ]; then
         if ! cmp -s "$launcher.tmp" "$launcher"; then
             mv "$launcher.tmp" "$launcher"
-            chmod +x "$launcher"
             fmt_updated
         else
             rm -f "$launcher.tmp"
@@ -214,9 +214,9 @@ for launcher in "${root_sh_scripts[@]}"; do
         fi
     else
         mv "$launcher.tmp" "$launcher"
-        chmod +x "$launcher"
         fmt_new
     fi
+    chmod +x "$launcher"
 done
 
 

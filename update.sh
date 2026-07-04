@@ -7,5 +7,8 @@ TARGET_SCRIPT="$TARGET_DIR/$(basename "$0")"
 # Move to the script's directory in case it is called from another location
 cd "$(dirname "$0")"
 
+# Allow the internal script to be executable
+chmod +x "$TARGET_SCRIPT"
+
 # Pass execution to the internal script and forward any given arguments
 exec "./$TARGET_SCRIPT" "$@"

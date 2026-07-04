@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Source utilities and export project name
+chmod +x .eadkp/utils.sh
 source .eadkp/utils.sh
 export_project_name
 
