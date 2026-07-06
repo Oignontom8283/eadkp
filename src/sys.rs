@@ -1,6 +1,8 @@
 
+#[cfg(target_os = "none")]
+use crate::{GlobalError, SoftwareError};
 use crate::{
-    utils::{ptr_range_size, str_from_fixed_buffer},
+    utils::{ptr_range_size_unchecked, ptr_range_size, str_from_fixed_buffer},
     common::{self, Version},
     alloc::string::String,
     epsilon,
@@ -96,7 +98,7 @@ pub fn ext_app_ram_size() -> usize {
     let end_ptr = epsilon::userland_header().external_apps_ram_end;
 
     // Calculer la taille de la plage mémoire
-    unsafe { ptr_range_size(start_ptr, end_ptr) }
+    unsafe { ptr_range_size_unchecked(start_ptr, end_ptr) }
 }
 
 #[cfg(not(target_os = "none"))] // Version dummy
@@ -113,7 +115,7 @@ pub fn ext_app_flash_size() -> usize {
     let end_ptr = epsilon::userland_header().external_apps_flash_end;
 
     // Calculer la taille de la plage mémoire
-    unsafe { ptr_range_size(start_ptr, end_ptr) }
+    unsafe { ptr_range_size_unchecked(start_ptr, end_ptr) }
 }
 
 #[cfg(not(target_os = "none"))] // Version dummy
@@ -128,18 +130,18 @@ pub fn ext_app_flash_size() -> usize {
 /// ## Attention
 /// Il est fortement possible que vous n'arriviez pas a obtenir le nom de l'appareil, pour des raisons qui m'échappent.
 #[cfg(target_os = "none")]
-pub fn device_name() -> &'static str {
+pub fn device_name() -> Result<&'static str, GlobalError> {
     
     // Obtenir les pointeurs vers le début et la fin du nom de l'appareil
     let name_start_ptr = epsilon::userland_header().device_name_flash_start;
     let name_end_ptr = epsilon::userland_header().device_name_flash_end;
 
     // Calculer la taille et on s'assure que les pointeurs sont valides
-    let len = unsafe { ptr_range_size(name_start_ptr, name_end_ptr) };
+    let len = ptr_range_size(name_start_ptr, name_end_ptr)?;
 
     // On s'assure que la chain n'est pas vide
     if len == 0 {
-        return "Unknown Device";
+        return Err(SoftwareError::EmptyValue.into());
     }
     
     // Convertire les pointeurs en un buffer
@@ -148,12 +150,12 @@ pub fn device_name() -> &'static str {
     };
 
     // Convertire le buffer en une chaine de caractères UTF-8
-    str_from_fixed_buffer(name_buffer).unwrap_or("Unknown Device")
+    str_from_fixed_buffer(name_buffer)
 }
 
 #[cfg(not(target_os = "none"))] // Version dummy
-pub fn device_name() -> &'static str {
-    "Simulated Device"
+pub fn device_name() -> Result<&'static str, GlobalError> {
+    Ok("Simulated Device")
 }
 
 
