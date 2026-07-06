@@ -48,6 +48,8 @@ pub enum SoftwareError {
     NullPointer,
     /// Plage de pointeurs invalide (start > end)
     InvalidPointerRange { start: *const u8, end: *const u8 },
+    /// Valeur vide rencontrée là où une valeur était attendue
+    EmptyValue,
 }
 
 #[derive(Debug)]
