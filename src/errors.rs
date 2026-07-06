@@ -36,6 +36,8 @@ pub enum SoftwareError {
     InvalidStorage,
     /// Magic number incorrect dans une structure (ex: UserlandHeader, SlotInfo)
     InvalidMagicNumber { expected: u32, found: u32 },
+    /// Format invalide pour une structure ou un fichier
+    InvalidFormat { details: &'static str },
     /// Zones de mémoire ce chevauchantes
     OverlappingRegions { src_start: *const u8, src_end: *const u8, dest_start: *const u8, dest_end: *const u8 },
     /// Overflow lors du calcul de pointeur
