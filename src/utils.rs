@@ -28,28 +28,43 @@ pub fn str_from_fixed_buffer(buffer: &[u8]) -> Result<&str, GlobalError> {
 
 
 /// Calculer la taille d'une plage de mémoire définie par deux pointeurs.
-/// - Renvoie 0 si les pointeurs sont invalides ou dans le mauvais ordre.
 /// 
 /// ## Exemple
 /// ```
 /// let start_ptr = 0x1000 as *const u8; // 4096
 /// let end_ptr = 0x2000 as *const u8; // 8192
 /// 
-/// let size = ptr_range_size(start_ptr, end_ptr);
+/// let size = ptr_range_size(start_ptr, end_ptr).unwrap();
 /// 
 /// assert_eq!(size, 0x1000); // 4096
 /// ```
-pub unsafe fn ptr_range_size(start: *const u8, end: *const u8) -> usize {
+pub fn ptr_range_size(start: *const u8, end: *const u8) -> Result<usize, GlobalError> {
 
     // Vérifier que les pointeurs sont valides et dans le bon ordre
-    if start.is_null() || end.is_null() || end < start {
-        return 0;
+    if start.is_null() || end.is_null() {
+        return Err(SoftwareError::NullPointer.into());
+    }
+
+    // Vérifier que les pointeurs sont dans le bon ordre (start <= end)
+    if end < start {
+        return Err(SoftwareError::InvalidPointerRange { start, end }.into());
     }
     
     // Calculer la taille de la plage en utilisant offset_from
-    end.offset_from(start) as usize
+    unsafe { Ok(ptr_range_size_unchecked(start, end)) }
 }
 
+/// Calculer la taille d'une plage de mémoire définie par deux pointeurs sans vérifier leur validité.
+///     
+/// Référez-vous à la documentation de [`ptr_range_size`] pour plus d'informations sur l'utilisation de cette fonction.
+/// 
+/// ## Safety
+/// - Les pointeurs doivent être valides
+/// - Les pointeurs doivent être dans le bon ordre (start <= end)
+pub unsafe fn ptr_range_size_unchecked(start: *const u8, end: *const u8) -> usize {
+    // Calculer la taille de la plage en utilisant offset_from
+    end.offset_from(start) as usize
+}
 
 /// Faire un appel SVC et récupérer la valeur de retour dans `r0`.
 /// - (`u32` / `bool` / `enum` `#[repr(u32)]`)
