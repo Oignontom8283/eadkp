@@ -44,6 +44,10 @@ pub enum SoftwareError {
     InvalidParameter { param_name: String, details: String },
     /// Aucun \0 trouvé dans le buffer
     NoNullTerminator,
+    // Pointeur null rencontré là où un pointeur valide était attendu
+    NullPointer,
+    /// Plage de pointeurs invalide (start > end)
+    InvalidPointerRange { start: *const u8, end: *const u8 },
 }
 
 #[derive(Debug)]
