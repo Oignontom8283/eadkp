@@ -217,3 +217,43 @@ pub fn compilation_flags() -> Result<CompilationFlags, GlobalError> {
 pub fn compilation_flags() -> Result<CompilationFlags, GlobalError> {
     Err(SoftwareError::SimulatorNotSupported.into())
 }
+
+
+/// Obtenir le FCC ID de l'appareil en cours d'utilisation.
+/// - Renvoie [`SoftwareError::SimulatorNotSupported`] si sur simulateur ou si le FCC ID n'est pas disponible (Ne devrait pas arriver).
+/// 
+/// ## source
+/// - `FCC ID max length: grantee (max 5) + product code (max 14) = 19 chars + \0` -- Ref: [47 CFR § 2.926](https://www.law.cornell.edu/cfr/text/47/2.926)
+/// - https://github.com/numworks/epsilon/blob/master/shared/ion/src/device/userland/drivers/fcc_id.cpp
+#[cfg(target_os = "none")]
+pub fn fcc_id() -> Result<&'static str, GlobalError> {
+    
+    // Obtenir le pointeur vers le FCC ID via SVC
+    let ptr = svc_r0!(common::SVC_FCC_ID, u32) as *const u8;
+
+    // Vérifier que le pointeur n'est pas null
+    if ptr.is_null() {
+        return Err(SoftwareError::NullPointer.into());
+    }
+
+    // FCC ID max = 19 chars + \0 = 20 bytes
+    const FCC_ID_MAX_BUFFER: usize = 20;
+    let buffer: &'static [u8] = unsafe {
+        core::slice::from_raw_parts(ptr, FCC_ID_MAX_BUFFER)
+    };
+
+    // Convertire le buffer en une chaine de caractères
+    let fcc_str = str_from_fixed_buffer(buffer)?;
+
+    // "NA" = pas de certification FCC sur cet appareil
+    if fcc_str == "NA" {
+        return Err(SoftwareError::SimulatorNotSupported.into());
+    }
+
+    Ok(fcc_str)
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn fcc_id() -> Result<&'static str, GlobalError> {
+    Err(SoftwareError::SimulatorNotSupported.into())
+}
