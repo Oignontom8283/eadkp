@@ -1,4 +1,4 @@
-use crate::{SoftwareError, GlobalError};
+use crate::{SoftwareError, GlobalError, common};
 
 
 /// Convertit un buffer d'octets brut en chain de caractères Rust (`&str`)
@@ -204,4 +204,118 @@ macro_rules! svc_buf {
         }
         buf
     }};
+}
+
+
+/// Représentation des drapeaux de compilation du kernel et du userland.
+/// 
+/// - Stocker sous leur forme d'origine (un entier 32 bits).
+/// 
+/// ---
+///
+/// **Bits userland (bas 16 bits) :**
+/// - \[**`0`**] `debug userland`
+/// - \[**`1`**] `assertions userland`
+/// - \[**`2`**] `third-party autorisé`
+/// - \[**`3`**] `slot A actif`
+/// - \[**`4-7`**] `external apps API level`
+/// - \[**`8-11`**] `security level`
+/// 
+/// **Bits kernel (haut 16 bits) :**
+/// - \[**`16`**] `debug kernel`
+/// - \[**`17`**] `assertions kernel`
+/// - \[**`18`**] `in_factory`
+/// - \[**`19`**] `embed_extra_data`
+/// 
+/// ```
+/// CompilationFlasg : 32 bits (total)
+///       - UserLand : 16 bits (bas)
+///       - Kernel   : 16 bits (haut)
+/// 
+/// ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+/// │                                                     UserLand (0-15)                                                   │
+/// ├────────────────┬─────────────────────┬──────────────────────┬──────────────┬─────────────────────────┬────────────────┤ ➔ ...
+/// │     bits 0     │       bites 1       │        bites 2       │    bites 3   │        bites 4-7        │    bites 8-11  │
+/// ├────────────────┼─────────────────────┼──────────────────────┼──────────────┼─────────────────────────┼────────────────┤
+/// │ debug userland │ assertions userland │ third-party autorisé │ slot A actif │ external apps API level │ security level │
+/// └────────────────┴─────────────────────┴──────────────────────┴──────────────┴─────────────────────────┴────────────────┘
+/// ┌──────────────────────────────────────────────────────────────────┐
+/// │                          Kernel (16-31)                          │
+/// ├──────────────┬───────────────────┬────────────┬──────────────────┤
+/// │    bits 16   │      bites 17     │  bites 18  │      bites 19    │
+/// ├──────────────┼───────────────────┼────────────┼──────────────────┤
+/// │ debug kernel │ assertions kernel │ in_factory │ embed_extra_data │
+/// └──────────────┴───────────────────┴────────────┴──────────────────┘
+/// ```
+/// 
+/// ## source
+/// - https://github.com/numworks/epsilon/blob/master/shared/ion/src/device/userland/drivers/compilation_flags.cpp#L18-L29
+/// - https://github.com/numworks/epsilon/blob/72c8306f4fe3adf3bfc9c79802a39b80afb8e988/shared/ion/src/device/userland/drivers/compilation_flags.cpp#L18-L29
+#[derive(Debug, Clone, Copy)]
+pub struct CompilationFlags(pub u32);
+
+impl CompilationFlags {
+
+    /// Parse un pointeur vers une string hex en [`CompilationFlags`].
+    ///
+    /// - Renvoie une erreur si le pointeur est null, si la string n'est pas au format hex, ou si aucun caractère nul n'est trouvé.
+    /// - Parse la string hex en un entier 32 bits (format d'origine utiliser par Epsilon).
+    /// 
+    /// # Safety
+    /// - `ptr` doit être non-null
+    /// - `ptr` doit pointer vers une string ASCII hex valide, null-terminée
+    /// - En pratique : toujours le buffer RAM statique retourné par le SVC 56
+    pub unsafe fn from_hex_ptr(ptr: *const u8) -> Result<Self, GlobalError> {
+        let mut val: u32 = 0;
+        let mut null_found = false;
+
+        // Parcourir les 8 caractères hex de la string
+        for i in 0..8usize {
+            let b = *ptr.add(i);
+
+            if b == 0 {
+                null_found = true;
+                break;
+            }
+
+            let nibble = match b {
+                b'0'..=b'9' => b - b'0',
+                b'a'..=b'f' => b - b'a' + 10,
+                b'A'..=b'F' => b - b'A' + 10,
+                // Si le caractère n'est pas un hex valide, retourner une erreur
+                _ => return Err(SoftwareError::InvalidFormat { details: "expected hex string" }.into()),
+            };
+
+            // Décaler la valeur précédente de 4 bits et ajouter le nibble actuel
+            val = (val << 4) | nibble as u32;
+        }
+
+        // Vérifier si un caractère nul a été trouvé dans la string
+        if !null_found {
+            return Err(SoftwareError::NoNullTerminator.into());
+        }
+
+        Ok(Self(val))
+    }
+
+    /// Vérifie si le flag de compilation `userland_debug` est activé.
+    pub fn userland_debug(&self)      -> bool { self.0 & (1 << 0)  != 0 }
+    /// Vérifie si le flag de compilation `userland_assertions` est activé.
+    pub fn userland_assertions(&self) -> bool { self.0 & (1 << 1)  != 0 }
+    /// Vérifie si le flag de compilation `third_party_allowed` est activé.
+    pub fn third_party_allowed(&self) -> bool { self.0 & (1 << 2)  != 0 }
+    /// Vérifie si le flag de compilation `slot_a_active` est activé.
+    pub fn is_slot_a(&self)           -> bool { self.0 & (1 << 3)  != 0 }
+    /// Récupère le niveau d'API
+    pub fn api_level(&self)           -> u32  { (self.0 >> 4) & 0xF     }
+    /// Récupère le niveau de sécurité
+    pub fn security_level(&self)      -> u32  { (self.0 >> 8) & 0xF     }
+    /// Vérifie si le flag de compilation `kernel_debug` est activé.
+    pub fn kernel_debug(&self)        -> bool { self.0 & (1 << 16) != 0 }
+    /// Vérifie si le flag de compilation `kernel_assertions` est activé.
+    pub fn kernel_assertions(&self)   -> bool { self.0 & (1 << 17) != 0 }
+    /// Vérifie si le flag de compilation `in_factory` est activé.
+    pub fn in_factory(&self)          -> bool { self.0 & (1 << 18) != 0 }
+    /// Vérifie si le flag de compilation `embed_extra_data` est activé.
+    pub fn embed_extra_data(&self)    -> bool { self.0 & (1 << 19) != 0 }
 }
