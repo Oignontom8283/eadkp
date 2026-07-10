@@ -190,7 +190,7 @@ pub fn serial_number() -> Result<String, GlobalError> {
     const SERIAL_NUMBER_BUFFER_SIZE: usize = SERIAL_NUMBER_LENGTH + 1;
 
     // Obtenir le buffer du numéro de série via SVC
-    let serial_buffer = svc_buf!(common::SVC_SERIAL_NUMBER_COPY, SERIAL_NUMBER_BUFFER_SIZE);
+    let serial_buffer = svc_buf!(constant::SVC_SERIAL_NUMBER_COPY, SERIAL_NUMBER_BUFFER_SIZE);
 
     // Convertir le buffer en une chaine de caractères String et gérer les erreurs
     str_from_fixed_buffer(&serial_buffer).map(String::from)
@@ -210,7 +210,7 @@ pub fn serial_number() -> Result<String, GlobalError> {
 pub fn compilation_flags() -> Result<CompilationFlags, GlobalError> {
 
     // Obtenir le pointeur vers la string hex des drapeaux de compilation via SVC
-    let ptr = svc_r0!(common::SVC_COMPILATION_FLAGS, u32) as *const u8;
+    let ptr = svc_r0!(constant::SVC_COMPILATION_FLAGS, u32) as *const u8;
 
     // Vérifier que le pointeur n'est pas null
     if ptr.is_null() {
@@ -239,7 +239,7 @@ pub fn compilation_flags() -> Result<CompilationFlags, GlobalError> {
 pub fn fcc_id() -> Result<&'static str, GlobalError> {
     
     // Obtenir le pointeur vers le FCC ID via SVC
-    let ptr = svc_r0!(common::SVC_FCC_ID, u32) as *const u8;
+    let ptr = svc_r0!(constant::SVC_FCC_ID, u32) as *const u8;
 
     // Vérifier que le pointeur n'est pas null
     if ptr.is_null() {
@@ -273,7 +273,7 @@ pub fn fcc_id() -> Result<&'static str, GlobalError> {
 #[cfg(target_os = "none")]
 pub fn pcb_version() -> Result<u32, GlobalError> {
     // Appel SVC 58 pour obtenir la version du PCB
-    Ok(svc_r0!(common::SVC_PCB_VERSION, u32))
+    Ok(svc_r0!(constant::SVC_PCB_VERSION, u32))
 }
 
 #[cfg(not(target_os = "none"))]
@@ -289,7 +289,7 @@ pub fn pcb_version() -> Result<u32, GlobalError> {
 #[cfg(target_os = "none")]
 pub fn last_reset_type() -> Result<ResetType, GlobalError> {
     // Appel SVC 59 pour obtenir le type du dernier reset
-    match svc_r0!(common::SVC_RESET_LAST_RESET_TYPE, u32) {
+    match svc_r0!(constant::SVC_RESET_LAST_RESET_TYPE, u32) {
         0 => Ok(ResetType::Hardware),
         1 => Ok(ResetType::Software),
         _ => Err(SoftwareError::InvalidFormat { details: "unexpected ResetType value" }.into()),
@@ -309,7 +309,7 @@ pub fn last_reset_type() -> Result<ResetType, GlobalError> {
 #[cfg(target_os = "none")]
 pub fn clearance_level() -> Result<ClearanceLevel, GlobalError> {
     // Appel SVC 60 pour obtenir le niveau d'autorisation du firmware
-    match svc_r0!(common::SVC_AUTHENTICATION_CLEARANCE_LEVEL, u32) {
+    match svc_r0!(constant::SVC_AUTHENTICATION_CLEARANCE_LEVEL, u32) {
         0 => Ok(ClearanceLevel::NumWorks),
         1 => Ok(ClearanceLevel::NumWorksAndThirdPartyApps),
         2 => Ok(ClearanceLevel::ThirdParty),

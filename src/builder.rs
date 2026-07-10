@@ -5,7 +5,7 @@ use std::{fs, process::Command};
 use cc;
 
 mod utils {
-    include!("common.rs");
+    include!("shared.rs");
 }
 
 const ASSETS_DIR: &str = "assets/";

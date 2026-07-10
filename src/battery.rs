@@ -47,7 +47,7 @@ impl BatteryCharge {
 pub fn level() -> BatteryCharge {
 
     // Obtenir le niveau de charge de la batterie via le SVC
-    let result = svc_r0!(common::SVC_BATTERY_LEVEL, u8);
+    let result = svc_r0!(constant::SVC_BATTERY_LEVEL, u8);
 
     // Convertir le résultat en enum BatteryCharge
     BatteryCharge::from(result)
@@ -63,7 +63,7 @@ pub fn level() -> BatteryCharge {
 #[cfg(target_os = "none")]
 pub fn voltage() -> f32 {
     // Obtenir la tension de la batterie via le SVC
-    svc_s0!(common::SVC_BATTERY_VOLTAGE)
+    svc_s0!(constant::SVC_BATTERY_VOLTAGE)
 }
 
 #[cfg(not(target_os = "none"))] // Version dummy
@@ -76,7 +76,7 @@ pub fn voltage() -> f32 {
 #[cfg(target_os = "none")]
 pub fn is_charging() -> bool {
     // Obtenir l'état de charge de la batterie via le SVC
-    svc_r0!(common::SVC_BATTERY_IS_CHARGING, u8) != 0
+    svc_r0!(constant::SVC_BATTERY_IS_CHARGING, u8) != 0
 }
 
 #[cfg(not(target_os = "none"))] // Version dummy
