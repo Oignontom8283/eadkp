@@ -26,6 +26,7 @@ pub mod battery;
 pub mod input;
 pub mod storage;
 pub mod epsilon;
+pub mod constant;
 pub mod sys;
 mod errors;
 
@@ -35,8 +36,7 @@ pub mod builder;
 
 // Réexportations du contenu des modules
 pub use common::*;
-pub use color::*;
-pub use image::*;
+pub use constant::*;
 pub use errors::*;
 // Note: Le panic handler et l'allocateur global sont définis par la macro eadkp_setup!
 // L'application n'a pas besoin de les définir manuellement
