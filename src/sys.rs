@@ -1,8 +1,8 @@
 
 use crate::{
-    utils::{ptr_range_size_unchecked, ptr_range_size, str_from_fixed_buffer, CompilationFlags},
+    utils::{ptr_range_size_unchecked, ptr_range_size, str_from_fixed_buffer, CompilationFlags, Ruleset, ExamMode},
     GlobalError, SoftwareError,
-    common::{self, Version},
+    common::{self, Version, ResetType, ClearanceLevel},
     alloc::string::String,
     epsilon,
     svc_buf, svc_r0
@@ -257,3 +257,17 @@ pub fn fcc_id() -> Result<&'static str, GlobalError> {
 pub fn fcc_id() -> Result<&'static str, GlobalError> {
     Err(SoftwareError::SimulatorNotSupported.into())
 }
+
+
+/// Obtenir la version du PCB de l'appareil.
+#[cfg(target_os = "none")]
+pub fn pcb_version() -> Result<u32, GlobalError> {
+    // Appel SVC 58 pour obtenir la version du PCB
+    Ok(svc_r0!(common::SVC_PCB_VERSION, u32))
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn pcb_version() -> Result<u32, GlobalError> {
+    Err(SoftwareError::SimulatorNotSupported.into())
+}
+
