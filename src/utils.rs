@@ -401,3 +401,49 @@ impl CompilationFlags {
 }
 
 
+/// Ruleset du mode examen.
+/// 
+/// ## source
+/// - https://github.com/numworks/epsilon/blob/master/shared/ion/include/ion/exam_mode.h
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[repr(u16)]
+pub enum Ruleset {
+    Off           = 0,
+    Standard      = 1,
+    Dutch         = 2,
+    IBTest        = 3,
+    PressToTest   = 4,
+    Portuguese    = 5,
+    English       = 6,
+    STAAR         = 7,
+    Pennsylvania  = 8,
+    SouthCarolina = 9,
+    NorthCarolina = 10,
+    SAT           = 11,
+    Uninitialized = 12,
+}
+
+impl TryFrom<u16> for Ruleset {
+    type Error = GlobalError;
+
+    fn try_from(data: u16) -> Result<Self, Self::Error> {
+        match data {
+            0  => Ok(Self::Off),
+            1  => Ok(Self::Standard),
+            2  => Ok(Self::Dutch),
+            3  => Ok(Self::IBTest),
+            4  => Ok(Self::PressToTest),
+            5  => Ok(Self::Portuguese),
+            6  => Ok(Self::English),
+            7  => Ok(Self::STAAR),
+            8  => Ok(Self::Pennsylvania),
+            9  => Ok(Self::SouthCarolina),
+            10 => Ok(Self::NorthCarolina),
+            11 => Ok(Self::SAT),
+            12 => Ok(Self::Uninitialized),
+            _  => Err(SoftwareError::InvalidFormat { details: "unknown Ruleset value" }.into()),
+        }
+    }
+}
+
+
