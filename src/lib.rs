@@ -14,8 +14,6 @@ extern crate alloc;
 #[macro_use]
 pub mod r#macro;
 
-mod color;
-mod image;
 pub mod backlight;
 pub mod common;
 pub mod utils;
