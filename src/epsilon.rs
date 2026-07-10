@@ -1,5 +1,5 @@
 /*!
-Ce module fournit des structures de données et fonctions utilitaires pour interagir
+Ce sous module fournit des structures de données et fonctions utilitaires pour interagir
 avec les composants essentiels d'Epsilon en mêmoire.
 */
 

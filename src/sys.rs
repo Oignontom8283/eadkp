@@ -1,12 +1,22 @@
 
+/*!
+Ce sous-module fournit des fonctions pour interagir directement avec le système d'exploitation (OS) de l'appareil :
+version, numéro de série, drapeaux de compilation, type de reset, niveau d'autorisation, etc.
+
+## Warning
+- Tout les éléments fournis ici n'ont pas tous but à être utiles, ils existent au cas ou ils seraient utiles par qui que ce soit.
+- Tenez compte que la casi totalité des fonctions de ce sous module n'ont pas de version Dummy, et renvoient donc une erreur [`SoftwareError::SimulatorNotSupported`] si vous les appelez depuis un simulateur (OS hôte).
+*/
+
 use crate::{
-    utils::{ptr_range_size_unchecked, ptr_range_size, str_from_fixed_buffer, CompilationFlags, Ruleset, ExamMode},
+    utils::{ptr_range_size_unchecked, ptr_range_size, str_from_fixed_buffer, CompilationFlags, ExamMode},
     GlobalError, SoftwareError,
     common::{self, Version, ResetType, ClearanceLevel},
     alloc::string::String,
     epsilon,
     svc_buf, svc_r0
 };
+
 
 /// Obtenir la version du Sytem d'exploitation en cours d'utilisation (version du kernel).
 /// 
