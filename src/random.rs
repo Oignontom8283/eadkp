@@ -5,6 +5,7 @@ Sous-module fournissant divers fonctions de génération de nombres pseudo-aléa
 
 use core::sync::atomic::{AtomicU32, AtomicU8, Ordering};
 
+
 unsafe extern "C" {
     fn eadk_random() -> u32;
 }

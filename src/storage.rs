@@ -18,24 +18,18 @@ Un merci tout particulier à Yaya Cout pour son travail d'ingénierie remarquabl
 manipulation du stockage, sans lequel ce module n'aurait probablement jamais vu le jour.
 */
 
-use super::*;
+use crate::{
+    epsilon,
+    SoftwareError, GlobalError, StorageError
+};
+use core::{ ffi::{c_char}, ptr, slice, str };
+use alloc::{
+    vec::Vec,
+    string::{String, ToString},
+    ffi::{CString},
+    format,
+};
 
-// Core
-#[allow(unused_imports)]
-use core::ffi::{c_char};
-use core::ptr;
-use core::slice;
-use core::str;
-
-// Alloc
-extern crate alloc; 
-use alloc::vec::Vec;
-#[allow(unused_imports)]
-use alloc::string::{String, ToString};
-#[allow(unused_imports)]
-use alloc::ffi::CString;
-#[allow(unused_imports)]
-use alloc::format;
 
 // ============================================================================
 // STORAGE OPERATIONS  

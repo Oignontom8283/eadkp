@@ -9,13 +9,13 @@ version, numéro de série, drapeaux de compilation, type de reset, niveau d'aut
 */
 
 use crate::{
-    utils::{ptr_range_size_unchecked, ptr_range_size, str_from_fixed_buffer, CompilationFlags, ExamMode},
+    utils::{ptr_range_size_unchecked, ptr_range_size, str_from_fixed_buffer},
+    common::{Version, ResetType, ClearanceLevel, CompilationFlags, ExamMode},
     GlobalError, SoftwareError,
-    common::{self, Version, ResetType, ClearanceLevel},
-    alloc::string::String,
-    epsilon,
+    epsilon, constant,
     svc_buf, svc_r0
 };
+use alloc::{ string::{String} };
 
 
 /// Obtenir la version du Sytem d'exploitation en cours d'utilisation (version du kernel).
