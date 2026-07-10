@@ -1,7 +1,12 @@
 
-use super::*;
+use crate::{
+    common::{Rect, Point, Color},
+    constant, display,
+    ImageError,
+};
 use alloc::{boxed::Box, slice, string::ToString};
-use core::ptr;
+use core::{ptr};
+
 
 /// Source de données pour les pixels d'une image. Peut être en flash ou en RAM.
 pub trait PixelsSource {

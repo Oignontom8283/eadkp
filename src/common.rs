@@ -1,19 +1,13 @@
 
-/// Magic number for EIF1 format. Magic number in hex `0x31464945`
-pub const EIF1_MAGIC_NUMBER: u32 = u32::from_le_bytes(*b"EIF1"); 
+use crate::{SoftwareError, GlobalError};
 
-// SVC number 
-pub const SVC_AUTHENTICATION_CLEARANCE_LEVEL: u32 = 0;
-pub const SVC_BACKLIGHT_BRIGHTNESS: u32           = 1;
-pub const SVC_BATTERY_IS_CHARGING: u32            = 3;
-pub const SVC_BATTERY_LEVEL: u32                  = 4;
-pub const SVC_BATTERY_VOLTAGE: u32                = 5;
-pub const SVC_FCC_ID: u32                         = 29;
-pub const SVC_PCB_VERSION: u32                    = 39;
-pub const SVC_RESET_LAST_RESET_TYPE: u32          = 59;
-pub const SVC_SERIAL_NUMBER_COPY: u32             = 47;
-pub const SVC_TIMING_MILLIS: u32                  = 48;
-pub const SVC_COMPILATION_FLAGS: u32              = 56;
+#[path = "color.rs"]
+mod color;
+pub use color::*;
+
+#[path = "image.rs"]
+mod image;
+pub use image::*;
 
 
 /// Objet rectangulaire représentant une zone de l'écran, défini par sa position (x, y) et sa taille (width, height).

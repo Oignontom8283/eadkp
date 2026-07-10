@@ -1,4 +1,5 @@
-use crate::{SoftwareError, GlobalError, common};
+
+use crate::{SoftwareError, GlobalError};
 
 
 /// Convertit un buffer d'octets brut en chain de caractères Rust (`&str`)
