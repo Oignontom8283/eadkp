@@ -271,3 +271,23 @@ pub fn pcb_version() -> Result<u32, GlobalError> {
     Err(SoftwareError::SimulatorNotSupported.into())
 }
 
+
+/// Obtenir le type du dernier reset de l'appareil.
+/// 
+/// ## source
+/// - https://github.com/numworks/epsilon/blob/master/shared/ion/include/ion/reset.h
+#[cfg(target_os = "none")]
+pub fn last_reset_type() -> Result<ResetType, GlobalError> {
+    // Appel SVC 59 pour obtenir le type du dernier reset
+    match svc_r0!(common::SVC_RESET_LAST_RESET_TYPE, u32) {
+        0 => Ok(ResetType::Hardware),
+        1 => Ok(ResetType::Software),
+        _ => Err(SoftwareError::InvalidFormat { details: "unexpected ResetType value" }.into()),
+    }
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn last_reset_type() -> Result<ResetType, GlobalError> {
+    Err(SoftwareError::SimulatorNotSupported.into())
+}
+
