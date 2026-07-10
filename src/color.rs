@@ -15,16 +15,6 @@ pub struct Color {
     pub rgb565: u16,
 }
 
-pub const COLOR_BLACK: Color = Color::from_888(0, 0, 0);
-pub const COLOR_WHITE: Color = Color::from_888(255, 255, 255);
-pub const COLOR_RED: Color = Color::from_888(255, 0, 0);
-pub const COLOR_GREEN: Color = Color::from_888(0, 255, 0);
-pub const COLOR_BLUE: Color = Color::from_888(0, 0, 255);
-pub const COLOR_YELLOW: Color = Color::from_888(255, 255, 0);
-pub const COLOR_CYAN: Color = Color::from_888(0, 255, 255);
-pub const COLOR_MAGENTA: Color = Color::from_888(255, 0, 255);
-pub const COLOR_GRAY: Color = Color::from_888(128, 128, 128);
-
 impl Color {
     #[inline]
     /// Créer un objet Color depuis un RGB565 **(5-bit red, 6-bit green, and 5-bit blue)**.
