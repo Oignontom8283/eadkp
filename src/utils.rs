@@ -447,3 +447,34 @@ impl TryFrom<u16> for Ruleset {
 }
 
 
+/// Configuration du mode examen décodée depuis le secteur ExamBytes en flash.
+#[derive(Debug, Clone, Copy)]
+pub struct ExamMode {
+    pub ruleset: Ruleset,
+    /// `true` = PressToTest avec flags custom, `false` = Ruleset prédéfini
+    pub configurable: bool,
+    pub active: bool,
+}
+
+impl TryFrom<u16> for ExamMode {
+
+    /// Parse un raw u16 depuis le secteur ExamBytes en flash.
+    /// 
+    /// ## Encodage
+    /// - bit 0 = configurable, bits 1-14 = data (Ruleset ou flags PressToTest)
+    /// 
+    /// ## source
+    /// - https://github.com/numworks/epsilon/blob/master/shared/ion/include/ion/exam_mode.h
+    fn try_from(raw: u16) -> Result<Self, GlobalError> {
+        let configurable = raw & 1 != 0;
+        let data = (raw >> 1) & 0x3FFF;
+        let ruleset = Ruleset::try_from(data)?;
+        Ok(Self {
+            ruleset,
+            configurable,
+            active: !matches!(ruleset, Ruleset::Off | Ruleset::Uninitialized),
+        })
+    }
+    
+    type Error = GlobalError;
+}
