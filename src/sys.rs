@@ -311,3 +311,13 @@ pub fn clearance_level() -> Result<ClearanceLevel, GlobalError> {
 pub fn clearance_level() -> Result<ClearanceLevel, GlobalError> {
     Err(SoftwareError::SimulatorNotSupported.into())
 }
+
+
+/// Vérifie si le slot A est actif.
+/// - Extrait du bit 3 des compilation flags.
+/// 
+/// ## source
+/// - https://github.com/numworks/epsilon/blob/master/shared/ion/src/device/userland/drivers/compilation_flags.cpp#L18-L29
+pub fn is_slot_a() -> Result<bool, GlobalError> {
+    Ok(compilation_flags()?.is_slot_a())
+}
