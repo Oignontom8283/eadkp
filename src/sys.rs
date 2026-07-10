@@ -321,3 +321,57 @@ pub fn clearance_level() -> Result<ClearanceLevel, GlobalError> {
 pub fn is_slot_a() -> Result<bool, GlobalError> {
     Ok(compilation_flags()?.is_slot_a())
 }
+
+
+/// Obtenir la configuration du mode examen actif.
+///
+/// ExamBytes n'a pas de SVC, lecture directe du secteur flash via le UserlandHeader.
+/// ```
+/// ┌───────────────────────────────────────┐
+/// │ Layout PersistingBytes (64 kB total)  │
+/// ├───────────────────╥───────────────────┤
+/// │ DeviceName (1 kB) ║ ExamBytes (63 kB) │
+/// └───────────────────╨───────────────────┘
+/// ```
+/// Le secteur ExamBytes est en append-only (on scanne de la fin vers le début)
+/// pour trouver la dernière valeur écrite (non 0xFFFF).
+///
+/// Encodage 16 bits (exam_mode.h) :
+/// ```d
+///   bit 0      : configurable (PressToTest avec flags custom)
+///   bits 1-14  : data (index Ruleset OU flags PressToTest)
+///   bit 15     : cleared (toujours 0 pour une config valide)
+/// ```
+/// ## source
+/// - layout: https://github.com/numworks/epsilon/blob/master/shared/ion/src/device/userland/drivers/persisting_bytes.h
+/// - encodage: https://github.com/numworks/epsilon/blob/master/shared/ion/include/ion/exam_mode.h
+#[cfg(target_os = "none")]
+pub fn exam_mode() -> Result<ExamMode, GlobalError> {
+    let sector_start = epsilon::userland_header().device_name_flash_end;
+
+    if sector_start.is_null() {
+        return Err(SoftwareError::NullPointer.into());
+    }
+
+    // Secteur ExamBytes = 63 kB (persisting_bytes.h)
+    const EXAM_BYTES_SECTOR_LEN: usize = (63 * 1024) / 2; // en u16
+
+    // &[u16] → le compilateur peut vectoriser le find()
+    let sector: &[u16] = unsafe {
+        core::slice::from_raw_parts(sector_start as *const u16, EXAM_BYTES_SECTOR_LEN)
+    };
+
+    // Secteur append-only : la valeur courante est la dernière non-0xFFFF
+    let raw = sector.iter()
+        .rev()
+        .copied()
+        .find(|&v| v != 0xFFFF)
+        .unwrap_or(0); // secteur vierge → k_defaultValue = 0 = Ruleset::Off
+
+    ExamMode::try_from(raw)
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn exam_mode() -> Result<ExamMode, GlobalError> {
+    Err(SoftwareError::SimulatorNotSupported.into())
+}
