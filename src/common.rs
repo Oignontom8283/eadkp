@@ -122,3 +122,22 @@ impl Version {
         Some(Self { major, minor, patch })
     }
 }
+
+
+/// Type de reset de l'appareil.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum ResetType {
+    /// POWER on / NRST pin
+    Hardware,
+    /// crash ou Reset::core()
+    Software,
+}
+
+
+/// Niveau d'autorisation du firmware en cours d'exécution.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum ClearanceLevel {
+    NumWorks                  = 0,
+    NumWorksAndThirdPartyApps = 1,
+    ThirdParty                = 2,
+}
