@@ -100,7 +100,7 @@ impl ImageLoader {
 
             // Identifier le format d'image à partir du magic number et créer l'instance correspondante
             match magic {
-                EIF1_MAGIC_NUMBER => Ok( Image::Eif1Flash(Eif1::new(FlashSource(data))) ),
+                constant::EIF1_MAGIC_NUMBER => Ok( Image::Eif1Flash(Eif1::new(FlashSource(data))) ),
                 // Futurs formats
 
                 _ => Err(ImageError::UnsupportedFormat { magic_number: magic }),
@@ -127,7 +127,7 @@ impl ImageLoader {
             let magic = ptr::read_unaligned(buffer.as_ptr() as *const u32);
 
             match magic {
-                EIF1_MAGIC_NUMBER => Ok( Image::Eif1Ram(Eif1::new(RamSource(buffer))) ),
+                constant::EIF1_MAGIC_NUMBER => Ok( Image::Eif1Ram(Eif1::new(RamSource(buffer))) ),
                 // Futurs formats
 
                 _ => Err(ImageError::UnsupportedFormat { magic_number: magic }),
