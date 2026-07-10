@@ -291,3 +291,23 @@ pub fn last_reset_type() -> Result<ResetType, GlobalError> {
     Err(SoftwareError::SimulatorNotSupported.into())
 }
 
+
+/// Obtenir le niveau d'autorisation du firmware en cours d'exécution.
+///
+/// ## source
+/// - https://github.com/numworks/epsilon/blob/master/shared/ion/include/ion/authentication.h
+#[cfg(target_os = "none")]
+pub fn clearance_level() -> Result<ClearanceLevel, GlobalError> {
+    // Appel SVC 60 pour obtenir le niveau d'autorisation du firmware
+    match svc_r0!(common::SVC_AUTHENTICATION_CLEARANCE_LEVEL, u32) {
+        0 => Ok(ClearanceLevel::NumWorks),
+        1 => Ok(ClearanceLevel::NumWorksAndThirdPartyApps),
+        2 => Ok(ClearanceLevel::ThirdParty),
+        _ => Err(SoftwareError::InvalidFormat { details: "unexpected ClearanceLevel value" }.into()),
+    }
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn clearance_level() -> Result<ClearanceLevel, GlobalError> {
+    Err(SoftwareError::SimulatorNotSupported.into())
+}
