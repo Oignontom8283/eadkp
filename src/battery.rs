@@ -1,5 +1,5 @@
 
-use crate::{svc_r0, svc_s0, common};
+use crate::{ constant, svc_r0, svc_s0 };
 
 
 /// Représente le niveau de charge de la batterie, avec des variantes allant de "Empty" (vide) à "Full" (plein).

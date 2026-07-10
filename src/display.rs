@@ -3,9 +3,6 @@ use crate::{ common::{Rect, Point, Color, Image, ImageFormat} };
 use alloc::{ vec::Vec, ffi::{CString} };
 use core::ffi::{c_char};
 
-use alloc::vec::Vec;
-use alloc::ffi::CString;
-use core::ffi::c_char;
 
 /// Pousser un rectangle de pixels (buffer) à l'écran.
 pub fn push_rect(rect: Rect, pixels: &[Color]) {
