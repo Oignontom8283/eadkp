@@ -11,8 +11,9 @@ version, numéro de série, drapeaux de compilation, type de reset, niveau d'aut
 use crate::{
     utils::{ptr_range_size_unchecked, ptr_range_size, str_from_fixed_buffer},
     common::{Version, ResetType, ClearanceLevel, CompilationFlags, ExamMode},
+    epsilon::{kernel_header, userland_header},
     GlobalError, SoftwareError,
-    epsilon, constant,
+    constant,
     svc_buf, svc_r0
 };
 use alloc::{ string::{String} };
@@ -29,7 +30,7 @@ use alloc::{ string::{String} };
 pub fn version() -> Result<Version, GlobalError> {
     
     // Obtenir le buffer de version du kernel
-    let version_buffer_raw = &epsilon::kernel_header().epsilon_version; // 8 bytes
+    let version_buffer_raw = &kernel_header().epsilon_version; // 8 bytes
 
     // Extraire la chaine de caractères
     let version_str = str_from_fixed_buffer(version_buffer_raw)?;
@@ -55,7 +56,7 @@ pub fn version() -> Result<Version, GlobalError> {
 pub fn hash_commit() -> Result<&'static str, GlobalError> {
 
     // Obternir le buffer du hash du commit du kernel
-    let hash_buffer_raw = &epsilon::kernel_header().commit_hash; // 8 bytes
+    let hash_buffer_raw = &kernel_header().commit_hash; // 8 bytes
 
     // Extraire la chaine de caractères
     str_from_fixed_buffer(hash_buffer_raw)
@@ -73,7 +74,7 @@ pub fn hash_commit() -> Result<&'static str, GlobalError> {
 pub fn expected_version() -> Result<Version, GlobalError> {
 
     // Obtenir le buffer de la version attendue du kernel
-    let expected_version_buffer_raw = &epsilon::userland_header().expected_epsilon_version; // 8 bytes
+    let expected_version_buffer_raw = &userland_header().expected_epsilon_version; // 8 bytes
 
     // Extraire la chaine de caractères
     let expected_version_str = str_from_fixed_buffer(expected_version_buffer_raw)?;
@@ -95,7 +96,7 @@ pub fn expected_version() -> Result<Version, GlobalError> {
 /// - ⚠️ Comprend **TOUT** la zone du FS, y compris les zone non utilisables pour stocker des fichiers (ex: magic number).
 #[cfg(target_os = "none")]
 pub fn filesystem_size() -> Result<usize, GlobalError> {
-    Ok(epsilon::userland_header().storage_size_ram as usize)
+    Ok(userland_header().storage_size_ram as usize)
 }
 
 #[cfg(not(target_os = "none"))] // Version dummy
@@ -108,8 +109,8 @@ pub fn filesystem_size() -> Result<usize, GlobalError> {
 /// - Taille en bytes (octets).
 #[cfg(target_os = "none")]
 pub fn ext_app_ram_size() -> Result<usize, GlobalError> {
-    let start_ptr = epsilon::userland_header().external_apps_ram_start;
-    let end_ptr = epsilon::userland_header().external_apps_ram_end;
+    let start_ptr = userland_header().external_apps_ram_start;
+    let end_ptr = userland_header().external_apps_ram_end;
 
     // Calculer la taille de la plage mémoire
     Ok(unsafe { ptr_range_size_unchecked(start_ptr, end_ptr) })
@@ -125,8 +126,8 @@ pub fn ext_app_ram_size() -> Result<usize, GlobalError> {
 /// - Taille en bytes (octets).
 #[cfg(target_os = "none")]
 pub fn ext_app_flash_size() -> Result<usize, GlobalError> {
-    let start_ptr = epsilon::userland_header().external_apps_flash_start;
-    let end_ptr = epsilon::userland_header().external_apps_flash_end;
+    let start_ptr = userland_header().external_apps_flash_start;
+    let end_ptr = userland_header().external_apps_flash_end;
 
     // Calculer la taille de la plage mémoire
     Ok(unsafe { ptr_range_size_unchecked(start_ptr, end_ptr) })
@@ -147,8 +148,8 @@ pub fn ext_app_flash_size() -> Result<usize, GlobalError> {
 pub fn device_name() -> Result<&'static str, GlobalError> {
     
     // Obtenir les pointeurs vers le début et la fin du nom de l'appareil
-    let name_start_ptr = epsilon::userland_header().device_name_flash_start;
-    let name_end_ptr = epsilon::userland_header().device_name_flash_end;
+    let name_start_ptr = userland_header().device_name_flash_start;
+    let name_end_ptr = userland_header().device_name_flash_end;
 
     // Calculer la taille et on s'assure que les pointeurs sont valides
     let len = ptr_range_size(name_start_ptr, name_end_ptr)?;
@@ -357,7 +358,7 @@ pub fn is_slot_a() -> Result<bool, GlobalError> {
 /// - encodage: https://github.com/numworks/epsilon/blob/master/shared/ion/include/ion/exam_mode.h
 #[cfg(target_os = "none")]
 pub fn exam_mode() -> Result<ExamMode, GlobalError> {
-    let sector_start = epsilon::userland_header().device_name_flash_end;
+    let sector_start = userland_header().device_name_flash_end;
 
     if sector_start.is_null() {
         return Err(SoftwareError::NullPointer.into());

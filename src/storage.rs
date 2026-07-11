@@ -19,16 +19,12 @@ manipulation du stockage, sans lequel ce module n'aurait probablement jamais vu 
 */
 
 use crate::{
-    epsilon,
-    SoftwareError, GlobalError, StorageError
+    SoftwareError, GlobalError, StorageError,
+    epsilon::{storage},
+    constant
 };
-use core::{ ffi::{c_char}, ptr, slice, str };
-use alloc::{
-    vec::Vec,
-    string::{String, ToString},
-    ffi::{CString},
-    format,
-};
+use core::{ ptr, slice, str };
+use alloc::{ vec::Vec, string::{ToString} };
 
 
 // ============================================================================
@@ -39,7 +35,7 @@ use alloc::{
 /// Vérifie que le stockage semble valide. **Ne vérifie pas l'integrité des fichiers !**
 #[cfg(target_os = "none")]
 pub fn is_valid_storage() -> Result<(), GlobalError> {
-    let storage = epsilon::storage();
+    let storage = storage();
     storage.is_valid().map_err(|_| SoftwareError::InvalidStorage.into())
 }
 
@@ -54,7 +50,7 @@ pub(crate) fn strnend(start:*const u8, max:*const u8) -> Result<*const u8, Stora
     //TODO: Separer la fonction en deux, une général pour trouver le nt et celle ici avec limite STORAGE_FILE_MAX_NAME_LEN
     unsafe  {
         // limite d'Epsilon et l'imite donnée
-        let len = (max.offset_from(start) as usize).min(epsilon::STORAGE_FILE_MAX_NAME_LEN);
+        let len = (max.offset_from(start) as usize).min(constant::STORAGE_FILE_MAX_NAME_LEN);
         
         for offset in 0..len {
             if *start.add(offset) == 0 {
@@ -75,7 +71,7 @@ pub(crate) fn strnend(start:*const u8, max:*const u8) -> Result<*const u8, Stora
 #[doc(hidden)]
 pub fn next_free() -> *const u8 {
 
-    let storage = epsilon::storage();
+    let storage = storage();
     let usable_end_addr = storage.usable_end_addr;
     let mut offset = storage.usable_start_addr;
 
@@ -109,7 +105,7 @@ pub fn _find_file(filename: &str) -> Result<FileEntry, StorageError> {
     let filename_slice = filename.as_bytes();
     let filename_len = filename_slice.len();
 
-    let storage = epsilon::storage();
+    let storage = storage();
     let storage_start = storage.usable_start_addr;
     let storage_end = storage.usable_end_addr;
 
@@ -160,7 +156,7 @@ pub fn find_files_with_suffix(suffix: &str) -> Result<Vec<&str>, GlobalError> {
     let suffix_slice = suffix.as_bytes();
     let suffix_len = suffix_slice.len();
 
-    let storage = epsilon::storage();
+    let storage = storage();
     let storage_start = storage.usable_start_addr;
     let storage_end = storage.usable_end_addr;
 
@@ -219,7 +215,7 @@ pub fn find_files_with_suffix(_suffix: &str) -> Result<Vec<&str>, GlobalError> {
 pub fn available_space() -> usize {
 
     let free_addr = next_free() as usize; // Adresse de la prochaine position libre
-    let usable_end = epsilon::storage().usable_end_addr as usize; // Adresse fin stockage utilisable (adresse du footer)
+    let usable_end = storage().usable_end_addr as usize; // Adresse fin stockage utilisable (adresse du footer)
 
     // Retourner l'espace libre restant, en soustrayant l'adresse de la prochaine position libre de l'adresse de fin du stockage utilisable
     usable_end - free_addr
