@@ -280,21 +280,39 @@ impl Filesystem {
 
 /// Retourne le modèle de la calculatrice
 #[cfg(target_os = "none")]
-pub fn model() -> CalculatorModel {
-    CalculatorModel::detect()
+pub fn model() -> Result<CalculatorModel, SoftwareError> {
+    Ok(CalculatorModel::detect())
 }
+
+#[cfg(not(target_os = "none"))]
+pub fn model() -> Result<CalculatorModel, SoftwareError> {
+    Err(SoftwareError::SimulatorNotSupported)
+}
+
 
 /// Retourne l'adresse de début de la RAM
 #[cfg(target_os = "none")]
-pub fn address() -> *const u8 {
-    CalculatorModel::detect().ram_base()
+pub fn address() -> Result<*const u8, SoftwareError> {
+    Ok(CalculatorModel::detect().ram_base())
 }
+
+#[cfg(not(target_os = "none"))]
+pub fn address() -> Result<*const u8, SoftwareError> {
+    Err(SoftwareError::SimulatorNotSupported)
+}
+
 
 /// Retourne l'adresse du Kernel Header
 #[cfg(target_os = "none")]
-pub fn kernel_header() -> &'static KernelHeader {
-    CalculatorModel::detect().slotinfo_address().kernel_header_address
+pub fn kernel_header() -> Result<&'static KernelHeader, SoftwareError> {
+    Ok(CalculatorModel::detect().slotinfo_address().kernel_header_address)
 }
+
+#[cfg(not(target_os = "none"))]
+pub fn kernel_header() -> Result<&'static KernelHeader, SoftwareError> {
+    Err(SoftwareError::SimulatorNotSupported)
+}
+
 
 /// Retourne l'adresse du Userland Header
 #[cfg(target_os = "none")]
@@ -302,8 +320,19 @@ pub fn userland_header() -> &'static UserlandHeader {
     CalculatorModel::detect().slotinfo_address().userland_header_address
 }
 
+#[cfg(not(target_os = "none"))]
+pub fn userland_header() -> Result<&'static UserlandHeader, SoftwareError> {
+    Err(SoftwareError::SimulatorNotSupported)
+}
+
+
 /// Retourne l'utilitaire d'adresse du filesystem
 #[cfg(target_os = "none")]
-pub fn storage() -> Filesystem {
-    Filesystem::new()
+pub fn storage() -> Result<Filesystem, SoftwareError> {
+    Ok(Filesystem::new())
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn storage() -> Result<Filesystem, SoftwareError> {
+    Err(SoftwareError::SimulatorNotSupported)
 }
