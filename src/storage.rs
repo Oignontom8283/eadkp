@@ -10,7 +10,7 @@ La forme et la logique actuelle diffèrent donc significativement de l'origial.
 
 ## Crédits
 
-Auteur original : **[Yaya Cout](https://framagit.org/Yaya.Cout)**
+Auteur original : **[Yaya Cout](https://github.com/Yaya-Cout)**
 
 Fichier source original : [numworks-extapp-storage/src/storage.c](https://framagit.org/Yaya.Cout/numworks-extapp-storage/-/blob/master/src/storage.c)
 
