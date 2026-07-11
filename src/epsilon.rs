@@ -3,11 +3,15 @@ Ce sous module fournit des structures de données et fonctions utilitaires pour 
 avec les composants essentiels d'Epsilon en mêmoire.
 */
 
+use crate::{
+    constant::{
+        SLOTINFO_MAGIC, USERLAND_HEADER_MAGIC, KERNEL_HEADER_MAGIC,EXTERNAL_APPS_MAGIC, FILESYSTEM_MAGIC,
+        RAM_BASE_N0110_OR_N0115, RAM_BASE_N0120,
+        SLOTS_N0110_OR_N0115, SLOTS_N0120
+    },
+    SoftwareError
+};
 use core::{ptr};
-use crate::{SoftwareError};
-
-
-
 
 
 /// SlotInfo - 16 bytes au dèbut de la RAM
