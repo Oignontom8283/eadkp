@@ -106,7 +106,7 @@ fn main() -> isize {
 	#[cfg(target_os = "none")]
 	let footer_value = {
 		log("Reading footer value...".to_string());
-		unsafe { core::ptr::read_unaligned(eadkp::epsilon::storage().footer_addr) }
+		unsafe { core::ptr::read_unaligned(eadkp::epsilon::storage().unwrap().footer_addr) }
 	};
 
 	#[cfg(not(target_os = "none"))]
