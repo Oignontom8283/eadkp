@@ -41,6 +41,9 @@ pub trait ImageFormat {
 
 /// Représentation d'une image.
 /// - Abstraction de formats et sources de pixels.
+/// 
+/// ## Dependances
+/// - [`ImageFormat`] doit être importé avec [`Image`] pour qu'il fonctionne correctement.
 pub enum Image {
     Eif1Flash(Eif1<FlashSource>),
     Eif1Ram(Eif1<RamSource>),
