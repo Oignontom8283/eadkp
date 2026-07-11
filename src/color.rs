@@ -1,4 +1,9 @@
 
+/*!
+Ce fichier contient la structure `Color` relatif a la manipulation des couleurs.
+- Ce fichier est reexporté par le module `common` de la lib.
+*/
+
 /// Représente une couleur au format RGB565.
 /// 
 /// Le champ `rgb565` stocke la couleur sous forme d'un entier non signé de 16 bits,

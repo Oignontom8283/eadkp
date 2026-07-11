@@ -1,4 +1,9 @@
 
+/*!
+Ce fichier contient les struc/type/chargeur relatifs aux images.
+- Ce fichier est reexporté par le module `common` de la lib.
+*/
+
 use crate::{
     common::{Rect, Point, Color},
     constant, display,
