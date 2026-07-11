@@ -20,6 +20,25 @@ pub const SVC_TIMING_MILLIS: u32                  = 48;
 pub const SVC_COMPILATION_FLAGS: u32              = 56;
 
 
+// Magic numbers for various data structures in the firmware
+pub const SLOTINFO_MAGIC: u32 = 0xEFEEDBBA;
+pub const USERLAND_HEADER_MAGIC: u32 = 0xDEC0EDFE;
+pub const KERNEL_HEADER_MAGIC: u32 = 0xDEC00DF0;
+pub const FILESYSTEM_MAGIC: u32 = 0xBADD0BEEu32.swap_bytes();
+pub const EXTERNAL_APPS_MAGIC: u32 = 0xDEC0EDFE;
+
+// Memory layout constants for different hardware versions
+pub const RAM_BASE_N0110_OR_N0115: u32 = 0x20000000;
+pub const RAM_BASE_N0120: u32 = 0x24000000;
+
+// Memory slot addresses for different hardware versions
+pub const SLOTS_N0110_OR_N0115: [*const u32; 2] = [0x90010000 as *const u32, 0x90410000 as *const u32];
+pub const SLOTS_N0120: [*const u32; 2] = [0x90020000 as *const u32, 0x90420000 as *const u32];
+
+// Maximum length
+pub const STORAGE_FILE_MAX_NAME_LEN: usize = u16::MAX as usize;
+
+
 /// Représente le rectangle de l'écran entier. (preset pour éviter de devoir le recréer à chaque fois)
 #[allow(dead_code)]
 pub const SCREEN_RECT: Rect = Rect {
