@@ -60,7 +60,7 @@ sim example="specs" jobs="1":
     cargo build --release --example {{example}}-simulator
     if [ -d "{{simulator_dir}}" ]; then \
         cd {{simulator_dir}}; \
-        rm -r .git 2>/dev/null;\
+        rm -rf .git 2>/dev/null;\
         make PLATFORM=simulator -j {{jobs}}; \
         cd ..; \
     fi
