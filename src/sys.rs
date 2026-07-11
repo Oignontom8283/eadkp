@@ -30,7 +30,7 @@ use alloc::{ string::{String} };
 pub fn version() -> Result<Version, GlobalError> {
     
     // Obtenir le buffer de version du kernel
-    let version_buffer_raw = &kernel_header().epsilon_version; // 8 bytes
+    let version_buffer_raw = &kernel_header().unwrap().epsilon_version; // 8 bytes
 
     // Extraire la chaine de caractères
     let version_str = str_from_fixed_buffer(version_buffer_raw)?;
@@ -56,7 +56,7 @@ pub fn version() -> Result<Version, GlobalError> {
 pub fn hash_commit() -> Result<&'static str, GlobalError> {
 
     // Obternir le buffer du hash du commit du kernel
-    let hash_buffer_raw = &kernel_header().commit_hash; // 8 bytes
+    let hash_buffer_raw = &kernel_header().unwrap().commit_hash; // 8 bytes
 
     // Extraire la chaine de caractères
     str_from_fixed_buffer(hash_buffer_raw)

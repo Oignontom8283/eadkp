@@ -35,7 +35,7 @@ use alloc::{ vec::Vec, string::{ToString} };
 /// Vérifie que le stockage semble valide. **Ne vérifie pas l'integrité des fichiers !**
 #[cfg(target_os = "none")]
 pub fn is_valid_storage() -> Result<(), GlobalError> {
-    let storage = storage();
+    let storage = storage().unwrap();
     storage.is_valid().map_err(|_| SoftwareError::InvalidStorage.into())
 }
 
@@ -71,7 +71,7 @@ pub(crate) fn strnend(start:*const u8, max:*const u8) -> Result<*const u8, Stora
 #[doc(hidden)]
 pub fn next_free() -> *const u8 {
 
-    let storage = storage();
+    let storage = storage().unwrap();
     let usable_end_addr = storage.usable_end_addr;
     let mut offset = storage.usable_start_addr;
 
@@ -105,7 +105,7 @@ pub fn _find_file(filename: &str) -> Result<FileEntry, StorageError> {
     let filename_slice = filename.as_bytes();
     let filename_len = filename_slice.len();
 
-    let storage = storage();
+    let storage = storage().unwrap();
     let storage_start = storage.usable_start_addr;
     let storage_end = storage.usable_end_addr;
 
@@ -156,7 +156,7 @@ pub fn find_files_with_suffix(suffix: &str) -> Result<Vec<&str>, GlobalError> {
     let suffix_slice = suffix.as_bytes();
     let suffix_len = suffix_slice.len();
 
-    let storage = storage();
+    let storage = storage().unwrap();
     let storage_start = storage.usable_start_addr;
     let storage_end = storage.usable_end_addr;
 
@@ -215,7 +215,7 @@ pub fn find_files_with_suffix(_suffix: &str) -> Result<Vec<&str>, GlobalError> {
 pub fn available_space() -> usize {
 
     let free_addr = next_free() as usize; // Adresse de la prochaine position libre
-    let usable_end = storage().usable_end_addr as usize; // Adresse fin stockage utilisable (adresse du footer)
+    let usable_end = storage().unwrap().usable_end_addr as usize; // Adresse fin stockage utilisable (adresse du footer)
 
     // Retourner l'espace libre restant, en soustrayant l'adresse de la prochaine position libre de l'adresse de fin du stockage utilisable
     usable_end - free_addr
