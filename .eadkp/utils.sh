@@ -5,6 +5,9 @@ RESET="\033[0m"
 GREEN="\033[32m"
 ORANGE="\033[33m"
 RED="\033[31m"
+YELLOW="\033[33m"
+BLUE="\033[34m"
+CYAN="\033[36m"
 
 # Default configuration path
 CONFIG_FILE=".eadkp/config.env"
@@ -12,8 +15,8 @@ CONFIG_FILE=".eadkp/config.env"
 # Function to load and validate the configuration file
 load_config() {
     if [ ! -f "$CONFIG_FILE" ]; then
-        echo "[Error] Configuration file $CONFIG_FILE not found."
-        echo "Please refer to the documentation to configure your repository."
+        echo -e "${RED}[Error] Configuration file $CONFIG_FILE not found.${RESET}"
+        echo -e "Please refer to the documentation to configure your repository."
         exit 1
     fi
 

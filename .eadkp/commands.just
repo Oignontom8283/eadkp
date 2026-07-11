@@ -12,10 +12,12 @@ build_simulator:
     cargo build --release --example simulator
 
 send:
-    cargo run --release --example device --target=thumbv7em-none-eabihf
+    @echo "[ ... ] This command is not implemented yet. Please use the official NumWorks website to send the .nwa file to your calculator."
 
 check:
-    cargo build --release --example device --target=thumbv7em-none-eabihf
+    just target
+    cargo check --release --example device --target=thumbv7em-none-eabihf
+    cargo check --release --example simulator --target=thumbv7em-none-eabihf
 
 export:
     just build

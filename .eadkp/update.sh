@@ -21,7 +21,7 @@ is_truthy() {
 }
 
 # Verify required dependencies before proceeding
-REQUIRED_CMDS=("curl" "git" "realpath" "cmp" "just" "tr" "head" "sed" "grep" "cut")
+REQUIRED_CMDS=("curl" "git" "realpath" "cmp" "just" "tr" "head" "sed" "grep" "cut" "jq")
 MISSING_CMDS=()
 for cmd in "${REQUIRED_CMDS[@]}"; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
@@ -30,15 +30,33 @@ for cmd in "${REQUIRED_CMDS[@]}"; do
 done
 
 if [ ${#MISSING_CMDS[@]} -ne 0 ]; then
-    echo "[Dependencies] ERROR: The following required commands are missing: ${MISSING_CMDS[*]}"
-    echo "Note: 'realpath' is not installed by default on macOS (can be installed via 'brew install coreutils')."
-    echo "Note: 'just' must be installed manually (https://github.com/casey/just)."
+    echo -e ""
+    echo -e "${RED}[Dependencies] ERROR: The following required commands are missing: ${MISSING_CMDS[*]} ${RESET}"
+    echo -e " "
+    echo -e "Note: "
+    echo -e " - '${YELLOW}realpath${RESET}' is not installed by default on macOS (can be installed via 'brew install coreutils')."
+    echo -e " - '${YELLOW}jq${RESET}' is not installed by default, you can install it via your package manager (e.g., 'apt install jq' on Debian/Ubuntu, 'brew install jq' on macOS)."
+    echo -e " "
+    exit 1
+fi
+
+# Verify Rust/Cargo is installed (required to build/update the project)
+if ! command -v cargo >/dev/null 2>&1; then
+    echo -e ""
+    echo -e "${RED}[Dependencies] ERROR: Rust (cargo) is not installed. ${RESET}"
+    echo -e " "
+    echo -e "Note: "
+    echo -e " - Rust and Cargo are required to build and update this project."
+    echo -e " - Install it from the official website: ${CYAN}https://www.rust-lang.org/tools/install${RESET}"
+    echo -e " "
     exit 1
 fi
 
 # Safety check to prevent running the script directly from within its folder
 if [[ "$(basename "$PWD")" == "$DIR_NAME" ]]; then
-    echo "[Safety] Please run the update script from the root directory of the project."
+    echo -e " "
+    echo -e "${GREEN}[Safety] Please run the update script from the root directory of the project.${RESET}"
+    echo -e " "
     exit 1
 fi
 
