@@ -1,5 +1,6 @@
 
 use crate::{SoftwareError, GlobalError};
+use core::fmt;
 
 #[path = "color.rs"]
 mod color;
@@ -91,6 +92,12 @@ impl Version {
         }
 
         Some(Self { major, minor, patch })
+    }
+}
+
+impl fmt::Display for Version {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
