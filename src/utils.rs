@@ -271,3 +271,57 @@ pub fn format_size(bytes: usize, is_ko: bool, decimals: usize) -> String {
 
     result
 }
+
+
+
+/// Formate un nombre flottant avec un séparateur de milliers et un nombre fixe de décimales.
+/// - `separator`: caractère à utiliser comme séparateur de milliers (ex: `' '` ou `','`).
+/// - `decimals`: nombre de décimales à afficher après la virgule.
+/// 
+/// ## Exemple
+/// ```rust
+/// let formatted = format_number(1234567.89123, ' ', 2);
+/// assert_eq!(formatted, "1 234 567.89"); // Un point ici
+/// ```
+pub fn format_number(value: f64, separator: char, decimals: usize) -> String {
+    // Formatage de base pour déléguer l'arrondi complexe à la lib standard.
+    let temp = format!("{:.*}", decimals, value);
+    
+    // 2Repérer les parties de la chaîne
+    let is_negative = temp.starts_with('-');
+    let int_start = if is_negative { 1 } else { 0 };
+    let dot_idx = temp.find('.').unwrap_or(temp.len());
+    
+    let int_len = dot_idx - int_start;
+    
+    // Si la partie entière est vide (cas marginaux), on retourne direct
+    if int_len == 0 {
+        return temp;
+    }
+    
+    // Calcul mathématique du nombre exact de séparateurs nécessaires
+    let sep_count = (int_len - 1) / 3;
+    
+    // Pré-allocation EXACTE de la chaîne finale
+    // Capacité = taille du texte d'origine + nombre de séparateurs
+    let mut result = String::with_capacity(temp.len() + sep_count);
+    
+    if is_negative {
+        result.push('-');
+    }
+    
+    // Injection de la partie entière avec les séparateurs
+    let int_part = &temp[int_start..dot_idx];
+    for (i, c) in int_part.chars().enumerate() {
+        // On insère le séparateur tous les 3 chiffres (en partant de la fin de la partie entière)
+        if i > 0 && (int_len - i) % 3 == 0 {
+            result.push(separator);
+        }
+        result.push(c);
+    }
+    
+    // Ajout de la fin de la chaîne (le point et les décimales) sans modification
+    result.push_str(&temp[dot_idx..]);
+    
+    result
+}
