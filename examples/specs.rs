@@ -65,9 +65,6 @@ fn main() -> isize {
     log(format!("Clearance:     {}", eadkp::sys::clearance_level()
         .map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:?}", v))));
 
-    log(format!("Slot A:        {}", eadkp::sys::is_slot_a()
-        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
-
     // ── Hardware ─────────────────────────────────────────────────────────────
     log(format!("Device:        {}", eadkp::sys::device_name()
         .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
@@ -91,19 +88,12 @@ fn main() -> isize {
     log(format!("App Flash:     {} B", eadkp::sys::ext_app_flash_size()
         .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
-    // ── Compilation flags ────────────────────────────────────────────────────
-    match eadkp::sys::compilation_flags() {
-        Ok(flags) => {
-            log(format!("API level:     {}", flags.api_level()));
-            log(format!("Security lvl:  {}", flags.security_level()));
-            log(format!("3rd party:     {}", flags.third_party_allowed()));
-        }
-        Err(e) => log(format!("Flags:         Err: {:?}", e)),
-    }
-
-    // ── Exam mode ────────────────────────────────────────────────────────────
+    // ── mode ────────────────────────────────────────────────────────────
     log(format!("Exam mode:     {}", eadkp::sys::exam_mode()
         .map_or_else(|e| format!("Err: {:?}", e), |m| format!("{:?} (active={})", m.ruleset, m.active))));
+
+	log(format!("Kernel debug:  {}", eadkp::sys::kernel_flags()
+		.map_or_else(|e| format!("Err: {:?}", e), |v| v.is_production_build().to_string())));
 
     log("Press Home to exit.".to_string());
 
