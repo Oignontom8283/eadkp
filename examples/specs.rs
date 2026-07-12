@@ -67,9 +67,6 @@ fn main() -> isize {
         .map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:?}", v))));
 
     // ── Hardware ─────────────────────────────────────────────────────────────
-    log(format!("Device:        {}", eadkp::sys::device_name()
-        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
-
     log(format!("Serial:        {}", eadkp::sys::serial_number()
         .map_or_else(|e| format!("Err: {:?}", e), |v| v)));
 
