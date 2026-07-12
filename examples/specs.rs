@@ -93,7 +93,7 @@ fn main() -> isize {
         .map_or_else(|e| format!("Err: {:?}", e), |m| format!("{:?} (active={})", m.ruleset, m.active))));
 
 	log(format!("Kernel debug:  {}", eadkp::sys::kernel_flags()
-		.map_or_else(|e| format!("Err: {:?}", e), |v| v.is_production_build().to_string())));
+		.map_or_else(|e| format!("Err: {:?}", e), |v| (!v.is_production_build()).to_string())));
 
     log("Press Home to exit.".to_string());
 
