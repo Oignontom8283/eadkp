@@ -3,6 +3,7 @@
 #[macro_use]
 extern crate eadkp;
 
+use eadkp::SoftwareError::NotAvailable;
 use heapless::Vec;
 use eadkp::storage;
 use alloc::string::{String, ToString};
@@ -72,8 +73,11 @@ fn main() -> isize {
     log(format!("Serial:        {}", eadkp::sys::serial_number()
         .map_or_else(|e| format!("Err: {:?}", e), |v| v)));
 
-    log(format!("FCC ID:        {}", eadkp::sys::fcc_id()
-        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
+    log(format!("FCC ID:        {}", match eadkp::sys::fcc_id() {
+        Ok(id) => id.to_string(),
+        Err(eadkp::GlobalError::Software(NotAvailable)) => "NA".to_string(),
+		Err(e) => format!("Err: {:?}", e),
+    }));
 
     log(format!("PCB version:   {}", eadkp::sys::pcb_version()
         .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
