@@ -54,6 +54,8 @@ pub enum SoftwareError {
     InvalidPointerRange { start: *const u8, end: *const u8 },
     /// Valeur vide rencontrée là où une valeur était attendue
     EmptyValue,
+    /// Élément non disponible ou non implémenté dans le contexte actuel
+    NotAvailable
 }
 
 #[derive(Debug)]
