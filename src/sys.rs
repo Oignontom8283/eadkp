@@ -10,7 +10,7 @@ version, numéro de série, drapeaux de compilation, type de reset, niveau d'aut
 
 use crate::{
     utils::{ptr_range_size_unchecked, ptr_range_size, str_from_fixed_buffer},
-    common::{Version, ResetType, ClearanceLevel, CompilationFlags, ExamMode},
+    common::{Version, ResetType, ClearanceLevel, KernelFlags, ExamMode},
     epsilon::{kernel_header, userland_header},
     GlobalError, SoftwareError,
     constant,
@@ -203,29 +203,16 @@ pub fn serial_number() -> Result<String, GlobalError> {
 }
 
 
-/// Obtenir les drapeaux de compilation du kernel et du userland.
-/// - Renvoie un objet [`CompilationFlags`] contenant les drapeaux de compilation.
-/// - SVC 56 retourne un pointeur vers une string hex en flash, parsée en [`CompilationFlags`].
-/// - Ce réfère a [`CompilationFlags`] et [`CompilationFlags::from_hex_ptr`] pour plus d'informations sur les drapeaux de compilation.
+/// Obtenir les flags de compilation du kernel.
+/// - Utilisez [`KernelFlags::is_production_build()`] pour vérifier que vous êtes sur un build standard de production (sans debug ni assertions activées).
 #[cfg(target_os = "none")]
-pub fn compilation_flags() -> Result<CompilationFlags, GlobalError> {
-
-    // Obtenir le pointeur vers la string hex des drapeaux de compilation via SVC
-    let ptr = svc_r0!(constant::SVC_COMPILATION_FLAGS, u32) as *const u8;
-
-    // Vérifier que le pointeur n'est pas null
-    if ptr.is_null() {
-        return Err(SoftwareError::NullPointer.into());
-    }
-
-    // Convertire en CompilationFlags
-    let flags = unsafe { CompilationFlags::from_hex_ptr(ptr)? };
-
-    Ok(flags)
+pub fn kernel_flags() -> Result<KernelFlags, GlobalError> {
+    let raw = svc_r0!(constant::SVC_COMPILATION_FLAGS, u32) as u16;
+    Ok(KernelFlags::from_raw(raw))
 }
 
 #[cfg(not(target_os = "none"))]
-pub fn compilation_flags() -> Result<CompilationFlags, GlobalError> {
+pub fn kernel_flags() -> Result<KernelFlags, GlobalError> {
     Err(SoftwareError::SimulatorNotSupported.into())
 }
 
