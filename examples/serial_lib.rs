@@ -241,18 +241,17 @@ pub fn run<const N: usize>(log_list: &Vec<String, N>) -> isize {
 
         // ── Rendu complet ─────────────────────────────────────────────────
         if full_redraw {
-            // En-tête : caret ↑ ou espace blanc
+            // En-tête : toujours effacer d'abord, puis dessiner caret et statut
+            eadkp::display::push_rect_uniform(
+                eadkp::Rect { x: 0, y: 0, width: eadkp::SCREEN_RECT.width, height: line_height as u16 },
+                eadkp::COLOR_WHITE,
+            );
             if show_caret {
                 eadkp::display::draw_string(
                     "^",
                     eadkp::Point { x: 5, y: 2 },
                     false,
                     eadkp::COLOR_BLACK,
-                    eadkp::COLOR_WHITE,
-                );
-            } else {
-                eadkp::display::push_rect_uniform(
-                    eadkp::Rect { x: 0, y: 0, width: eadkp::SCREEN_RECT.width, height: line_height as u16 },
                     eadkp::COLOR_WHITE,
                 );
             }
