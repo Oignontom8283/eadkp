@@ -218,7 +218,7 @@ pub fn kernel_flags() -> Result<KernelFlags, GlobalError> {
 
 
 /// Obtenir le FCC ID de l'appareil en cours d'utilisation.
-/// - Renvoie [`SoftwareError::SimulatorNotSupported`] si sur simulateur ou si le FCC ID n'est pas disponible (Ne devrait pas arriver).
+/// - Renvoie [`SoftwareError::NotAvailable`] si l'appareil n'a pas de certification FCC ou indisponible.
 /// 
 /// ## source
 /// - `FCC ID max length: grantee (max 5) + product code (max 14) = 19 chars + \0` -- Ref: [47 CFR § 2.926](https://www.law.cornell.edu/cfr/text/47/2.926)
@@ -245,7 +245,7 @@ pub fn fcc_id() -> Result<&'static str, GlobalError> {
 
     // "NA" = pas de certification FCC sur cet appareil
     if fcc_str == "NA" {
-        return Err(SoftwareError::SimulatorNotSupported.into());
+        return Err(SoftwareError::NotAvailable.into());
     }
 
     Ok(fcc_str)
