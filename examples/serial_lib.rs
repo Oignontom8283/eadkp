@@ -162,15 +162,14 @@ pub fn run<const N: usize>(log_list: &Vec<String, N>) -> isize {
 
         if just.key_down(eadkp::input::Key::Up) && total_lines > 0 {
             new_selected = Some(match new_selected {
-                None | Some(0) => 0,
+                None => total_lines - 1, // démarre en bas
+                Some(0) => 0,
                 Some(i) => i - 1,
             });
         }
         if just.key_down(eadkp::input::Key::Down) {
             if let Some(i) = new_selected {
-                if i + 1 < total_lines {
-                    new_selected = Some(i + 1);
-                }
+                new_selected = Some((i + 1).min(total_lines - 1));
             }
         }
 
