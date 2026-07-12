@@ -1,5 +1,7 @@
 
 use crate::{SoftwareError, GlobalError};
+use alloc::{format, string::String};
+use core::fmt::Write;
 
 
 /// Convertit un buffer d'octets brut en chain de caractères Rust (`&str`)
@@ -232,3 +234,40 @@ macro_rules! svc_buf {
     }};
 }
 
+
+/// Formate une taille en octets.
+/// - `is_ko`: **true** pour `Ko`, **false** pour `Mo`.
+/// - `decimals`: nombre de décimales à afficher après la virgule.
+/// 
+/// ## Exemple
+/// ```rust
+/// let formatted = format_size(1234567, true, 2);
+/// assert_eq!(formatted, "1205,63 Ko");
+/// ```
+pub fn format_size(bytes: usize, is_ko: bool, decimals: usize) -> String {
+    // Sélection du diviseur et du suffixe via le booléen
+    let (divisor, suffix) = if is_ko {
+        (1024.0, "Ko")
+    } else {
+        (1024.0 * 1024.0, "Mo") // 1024 * 1024
+    };
+
+    let value = (bytes as f64) / divisor;
+
+    // Pré-allocation pour éviter les réallocations mémoire
+    let mut result = String::with_capacity(32);
+
+    // Formatage direct dans le buffer
+    write!(&mut result, "{:.*}", decimals, value).unwrap();
+
+    // Remplacement du point par la virgule en place
+    if let Some(idx) = result.find('.') {
+        result.replace_range(idx..idx + 1, ",");
+    }
+
+    // Ajout de l'unité
+    result.push(' ');
+    result.push_str(suffix);
+
+    result
+}
