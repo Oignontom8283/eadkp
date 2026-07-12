@@ -80,13 +80,13 @@ fn main() -> isize {
         .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
     // ── Mémoire ──────────────────────────────────────────────────────────────
-    log(format!("FS size:       {} B", eadkp::sys::filesystem_size()
+    log(format!("FS size:       {}", eadkp::sys::filesystem_size()
         .map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(v, true, 2))));
 
-    log(format!("App RAM:       {} B", eadkp::sys::ext_app_ram_size()
+    log(format!("App RAM:       {}", eadkp::sys::ext_app_ram_size()
         .map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(v, true, 2))));
 
-    log(format!("App Flash:     {} B", eadkp::sys::ext_app_flash_size()
+    log(format!("App Flash:     {}", eadkp::sys::ext_app_flash_size()
         .map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(v, false, 2))));
 
     // ── mode ────────────────────────────────────────────────────────────
