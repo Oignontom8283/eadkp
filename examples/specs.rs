@@ -16,114 +16,96 @@ const DEFAULT_CONTENT: &str = "testing";
 
 #[unsafe(no_mangle)]
 fn main() -> isize {
-	_eadk_init_heap();
-	let mut log_list: Vec<String, 12> = Vec::new();
-	let mut total_log_bytes: usize = 0;
+    _eadk_init_heap();
+    let mut log_list: Vec<String, 20> = Vec::new();
+    let mut total_log_bytes: usize = 0;
 
-	let mut log = |message: String| {
-		let mut msg = message;
-		let max_total = 32 * 1024;
+    let mut log = |message: String| {
+        let mut msg = message;
+        let max_total = 32 * 1024;
 
-		if msg.len() > max_total {
-			let mut trimmed = String::new();
-			let keep = max_total.saturating_sub(3);
-			for (i, ch) in msg.chars().enumerate() {
-				if i >= keep {
-					break;
-				}
-				trimmed.push(ch);
-			}
-			trimmed.push_str("...");
-			msg = trimmed;
-		}
+        if msg.len() > max_total {
+            let mut trimmed = String::new();
+            let keep = max_total.saturating_sub(3);
+            for (i, ch) in msg.chars().enumerate() {
+                if i >= keep { break; }
+                trimmed.push(ch);
+            }
+            trimmed.push_str("...");
+            msg = trimmed;
+        }
 
-		while total_log_bytes + msg.len() > max_total && !log_list.is_empty() {
-			let removed = log_list.remove(0);
-			total_log_bytes = total_log_bytes.saturating_sub(removed.len());
-		}
+        while total_log_bytes + msg.len() > max_total && !log_list.is_empty() {
+            let removed = log_list.remove(0);
+            total_log_bytes = total_log_bytes.saturating_sub(removed.len());
+        }
 
-		if log_list.len() == log_list.capacity() {
-			let removed = log_list.remove(0);
-			total_log_bytes = total_log_bytes.saturating_sub(removed.len());
-		}
+        if log_list.len() == log_list.capacity() {
+            let removed = log_list.remove(0);
+            total_log_bytes = total_log_bytes.saturating_sub(removed.len());
+        }
 
-		total_log_bytes += msg.len();
-		let _ = log_list.push(msg);
-	};
+        total_log_bytes += msg.len();
+        let _ = log_list.push(msg);
+    };
 
-	log("Storage Init...".to_string());
+    // ── Système ──────────────────────────────────────────────────────────────
+    log(format!("Version:       {}", eadkp::sys::version()
+        .map_or_else(|_| "Unknown".to_string(), |v| v.to_string())));
 
-	let voltage = eadkp::battery::voltage();
-	let level = eadkp::battery::level();
-	log(format!("Battery: {:.2}V", voltage));
-	log(format!("Battery level: {}", level.to_str()));
+    log(format!("Commit:        {}", eadkp::sys::hash_commit()
+        .unwrap_or("Unknown")));
 
-	let is_existing = storage::file_exists(FILE_NAME);
+    log(format!("Expected ver:  {}", eadkp::sys::expected_version()
+        .map_or_else(|_| "Unknown".to_string(), |v| v.to_string())));
 
-	match is_existing {
-		Ok(true) => {
-			log(format!("'{}' Found !", FILE_NAME));
-			match storage::file_read_string(FILE_NAME) {
-				Ok(content) => log(format!("Content: {}", content)),
-				Err(e) => log(format!("Read error: {:?}", e)),
-			}
-		}
-		Ok(false) => {
-			log(format!("'{}' not found. Creating...", FILE_NAME));
-			match storage::file_write_string(FILE_NAME, DEFAULT_CONTENT) {
-				Ok(_) => log("File was created !".to_string()),
-				Err(e) => log(format!("Creation error: {:?}", e)),
-			}
-		}
-		Err(e) => log(format!("Storage error: {:?}", e)),
-	}
+    log(format!("Reset type:    {:?}", eadkp::sys::last_reset_type()
+        .map_or_else(|_| "Unknown".to_string(), |v| format!("{:?}", v))));
 
-	let random_file = format!("test_{}.py", eadkp::random::random_c());
-	match storage::file_write_string(&random_file, DEFAULT_CONTENT) {
-		Ok(_) => log("File created (forced).".to_string()),
-		Err(e) => log(format!("Create error: {:?}", e)),
-	}
+    log(format!("Clearance:     {:?}", eadkp::sys::clearance_level()
+        .map_or_else(|_| "Unknown".to_string(), |v| format!("{:?}", v))));
 
-	match storage::file_exists(&random_file) {
-		Ok(true) => log("File exists after create.".to_string()),
-		Ok(false) => log("File missing after create.".to_string()),
-		Err(e) => log(format!("Exists check error: {:?}", e)),
-	}
+    log(format!("Slot A:        {}", eadkp::sys::is_slot_a()
+        .map_or_else(|_| "Unknown".to_string(), |v| v.to_string())));
 
-	match unsafe { storage::file_erase(&random_file) } {
-		Ok(_) => log("File deleted.".to_string()),
-		Err(e) => log(format!("Delete error: {:?}", e)),
-	}
+    // ── Hardware ─────────────────────────────────────────────────────────────
+    log(format!("Device:        {}", eadkp::sys::device_name()
+        .unwrap_or("Unknown")));
 
-	match storage::file_exists(&random_file) {
-		Ok(true) => log("File still exists after delete.".to_string()),
-		Ok(false) => log("File deleted successfully.".to_string()),
-		Err(e) => log(format!("Exists check error: {:?}", e)),
-	}
+    log(format!("Serial:        {}", eadkp::sys::serial_number()
+        .unwrap_or_else(|_| "Unknown".to_string())));
 
-	eadkp::display::push_rect_uniform(eadkp::SCREEN_RECT, eadkp::COLOR_WHITE);
+    log(format!("FCC ID:        {}", eadkp::sys::fcc_id()
+        .unwrap_or("Unknown")));
 
-	#[cfg(target_os = "none")]
-	let footer_value = {
-		log("Reading footer value...".to_string());
-		unsafe { core::ptr::read_unaligned(eadkp::epsilon::storage().unwrap().footer_addr) }
-	};
+    log(format!("PCB version:   {}", eadkp::sys::pcb_version()
+        .map_or_else(|_| "Unknown".to_string(), |v| v.to_string())));
 
-	#[cfg(not(target_os = "none"))]
-	let footer_value = { 0x00000000 };
+    // ── Mémoire ──────────────────────────────────────────────────────────────
+    log(format!("FS size:       {} B", eadkp::sys::filesystem_size()
+        .map_or_else(|_| "Unknown".to_string(), |v| v.to_string())));
 
-	log(format!("Footer Value: 0x{:X}", footer_value));
+    log(format!("App RAM:       {} B", eadkp::sys::ext_app_ram_size()
+        .map_or_else(|_| "Unknown".to_string(), |v| v.to_string())));
 
-	log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee".to_string());
-	log("This is a long message that should be truncated in the log display to ensure it doesn't overflow the buffer.".to_string());
-	log("lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".to_string());
-	log("lorem ipsum dolor sit amet,".to_string());
-	log("consectetur adipiscing elit,".to_string());
-	log("sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".to_string());
-	log("consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim venia".to_string());
-	log("Bonjour\nle monde\ncomment ca va ?\n...".to_string());
+    log(format!("App Flash:     {} B", eadkp::sys::ext_app_flash_size()
+        .map_or_else(|_| "Unknown".to_string(), |v| v.to_string())));
 
-	log("Press Home to exit.".to_string());
+    // ── Compilation flags ────────────────────────────────────────────────────
+    match eadkp::sys::compilation_flags() {
+        Ok(flags) => {
+            log(format!("API level:     {}", flags.api_level()));
+            log(format!("Security lvl:  {}", flags.security_level()));
+            log(format!("3rd party:     {}", flags.third_party_allowed()));
+        }
+        Err(_) => log("Flags:         Unknown".to_string()),
+    }
 
-	serial_lib::run(&log_list)
+    // ── Exam mode ────────────────────────────────────────────────────────────
+    log(format!("Exam mode:     {}", eadkp::sys::exam_mode()
+        .map_or_else(|_| "Unknown".to_string(), |e| format!("{:?} (active={})", e.ruleset, e.active))));
+
+    log("Press Home to exit.".to_string());
+
+    serial_lib::run(&log_list)
 }
