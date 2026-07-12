@@ -120,176 +120,51 @@ pub enum ClearanceLevel {
     ThirdParty                = 2,
 }
 
-
-/// Représentation des drapeaux de compilation du kernel et du userland.
+/// Flags de compilation du kernel.
 /// 
-/// - Stocker sous leur forme d'origine (un entier 32 bits).
-/// 
+/// - Utilisé [`Self::is_production_build()`] au préalable pour vérifier si vous avez accès aux flags de debug et d'assertion du kernel.
+/// - Stocké sous leurs forme d'origne (un entier 16 bits).
+///
 /// ## Warning
-/// 
-/// ⚠️ Malgré le nom, certains flags sont dynamiques (runtime) :
-///   - [`CompilationFlags::is_slot_a()`] : état hardware au moment de l'appel
-///   - [`CompilationFlags::third_party_allowed()`] : dépend des apps installées
-///   - [`CompilationFlags::security_level()`] : niveau hardware courant
-/// 
-/// Les autres sont de vrais flags de compilation (connus au compile-time) :
-///   - `DEBUG`, `ASSERTIONS`, `API_LEVEL`, `IN_FACTORY`, `EMBED_EXTRA_DATA`
-/// 
+/// - ⚠️ A moins que vous ne soyez sur un OS compilé en debug mode, ces flags ne seront pas accessibles !
+/// - Seuls les flags kernel sont disponibles depuis une app externe,
+/// les flags userland (bits `0-15` du `u32` complet) ne sont pas accessibles via SVC.
+///
 /// ---
 /// 
-/// | Bit   | Nom                     | Type   | Description                                                          |
-/// | ----- | ----------------------- | ------ | -------------------------------------------------------------------- |
-/// | 0     | debug userland          | `bool` | Activer les messages de debug en userland                            |
-/// | 1     | assertions userland     | `bool` | Activer les assertions en userland                                   |
-/// | 2     | third-party autorisé    | `bool` | Autoriser les applications tierces                                   |
-/// | 3     | slot A actif            | `bool` | Vérifier si le slot A est actif                                      |
-/// | 4-7   | external apps API level | `u4`   | Niveau d'API pour les applications externes                          |
-/// | 8-11  | security level          | `u4`   | Niveau de sécurité hardware                                          |
-/// | 12-15 | unused                  | `None` | **Espace non utilisé**                                               |
-/// | 16    | debug kernel            | `bool` | Activer les messages de debug en kernel                              |
-/// | 17    | assertions kernel       | `bool` | Activer les assertions en kernel                                     |
-/// | 18    | in_factory              | `bool` | Indique si le device est en mode usine                               |
-/// | 19    | embed_extra_data        | `bool` | Indique si le kernel contient des données supplémentaires embarquées |
-/// | 20-31 | unused                  | `None` | **Espace non utilisé**                                               |
-/// ```
+/// Layout du `u16` retourné (avant décalage `<<16` dans le `u32` complet) :
 /// 
-/// CompilationFlasg : 32 bits (total)
-///       - UserLand : 12 bits (bas)
-///       - Unused   : 4 bits (milieu) 
-///       - Kernel   : 4 bits (milieu)
-///       - Unused   : 12 bits (haut)
-/// 
-/// ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-/// │                                                     UserLand (0-11)                                                   │
-/// ├────────────────┬─────────────────────┬──────────────────────┬──────────────┬─────────────────────────┬────────────────┤ ➔ ...
-/// │     bits 0     │       bites 1       │        bites 2       │    bites 3   │        bites 4-7        │    bites 8-11  │
-/// ├────────────────┼─────────────────────┼──────────────────────┼──────────────┼─────────────────────────┼────────────────┤
-/// │ debug userland │ assertions userland │ third-party autorisé │ slot A actif │ external apps API level │ security level │
-/// └────────────────┴─────────────────────┴──────────────────────┴──────────────┴─────────────────────────┴────────────────┘
-/// ┌────────────────┐
-/// │ Unused (12-15) │
-/// ├────────────────┤ ➔ ...
-/// │     4 bits     │
-/// ├────────────────┤
-/// │    No Data     │
-/// └────────────────┘
-/// ┌──────────────────────────────────────────────────────────────────┐
-/// │                          Kernel (16-19)                          │
-/// ├──────────────┬───────────────────┬────────────┬──────────────────┤ ➔ ...
-/// │    bits 16   │      bites 17     │  bites 18  │      bites 19    │
-/// ├──────────────┼───────────────────┼────────────┼──────────────────┤
-/// │ debug kernel │ assertions kernel │ in_factory │ embed_extra_data │
-/// └──────────────┴───────────────────┴────────────┴──────────────────┘
-/// ┌────────────────┐
-/// │ Unused (12-15) │
-/// ├────────────────┤
-/// │     4 bits     │
-/// ├────────────────┤
-/// │    No Data     │
-/// └────────────────┘
-/// ```
+/// | Bit    | Nom               | Type   | Description                                                          |
+/// | ------ | ----------------- | ------ | -------------------------------------------------------------------- |
+/// | `0`    | debug kernel      | `bool` | Activer les messages de debug en kernel                              |
+/// | `1`    | assertions kernel | `bool` | Activer les assertions en kernel                                     |
+/// | `2`    | in_factory        | `bool` | Indique si le device est en mode usine                               |
+/// | `3`    | embed_extra_data  | `bool` | Indique si le kernel contient des données supplémentaires embarquées |
+/// | `4-15` | unused            | `None` | **Espace non utilisé**                                               |
 /// 
 /// ## source
 /// - https://github.com/numworks/epsilon/blob/master/shared/ion/src/device/userland/drivers/compilation_flags.cpp#L18-L29
 /// - https://github.com/numworks/epsilon/blob/72c8306f4fe3adf3bfc9c79802a39b80afb8e988/shared/ion/src/device/userland/drivers/compilation_flags.cpp#L18-L29
 #[derive(Debug, Clone, Copy)]
-pub struct CompilationFlags(pub u32);
+pub struct KernelFlags(pub u16);
 
-impl CompilationFlags {
-
-    /// Parse un pointeur vers une string hex en [`CompilationFlags`].
-    ///
-    /// - Renvoie une erreur si le pointeur est null, si : **la string n'est pas au format hex**, ou si **aucun caractère nul n'est trouvé**.
-    /// - Parse la string hex en un entier 32 bits (format d'origine utiliser par Epsilon).
-    /// 
-    /// # Safety
-    /// - `ptr` doit être non-null
-    /// - `ptr` doit pointer vers une string ASCII hex valide, null-terminée
-    /// - En pratique : toujours le buffer RAM statique retourné par le SVC 56
-    pub unsafe fn from_hex_ptr(ptr: *const u8) -> Result<Self, GlobalError> {
-        let mut val: u32 = 0;
-        let mut null_found = false;
-
-        // Parcourir les 8 caractères hex de la string
-        for i in 0..8usize {
-            let b = *ptr.add(i);
-
-            if b == 0 {
-                null_found = true;
-                break;
-            }
-
-            let nibble = match b {
-                b'0'..=b'9' => b - b'0',
-                b'a'..=b'f' => b - b'a' + 10,
-                b'A'..=b'F' => b - b'A' + 10,
-                // Si le caractère n'est pas un hex valide, retourner une erreur
-                _ => return Err(SoftwareError::InvalidFormat { details: "expected hex string" }.into()),
-            };
-
-            // Décaler la valeur précédente de 4 bits et ajouter le nibble actuel
-            val = (val << 4) | nibble as u32;
-        }
-
-        // Vérifier si un caractère nul a été trouvé dans la string
-        if !null_found {
-            return Err(SoftwareError::NoNullTerminator.into());
-        }
-
-        Ok(Self(val))
+impl KernelFlags {
+    pub fn from_raw(raw: u16) -> Self {
+        Self(raw)
     }
 
-    /// Vérifie si le flag de compilation `userland_debug` est activé.
-    /// 
-    /// Build avec symboles de debug et comportements verbeux pour le userland. En prod = 0.
-    pub fn userland_debug(&self)      -> bool { self.0 & (1 << 0)  != 0 }
+    /// Vérifie si l'appareil est en mode production (aucun flag de debug ou d'assertion activé = `0x0000`).
+    /// - `true` = mode production
+    /// - `false` = mode debug ou assertions activées.
+    pub fn is_production_build(&self) -> bool {
+        self.0 == 0
+    }
 
-    /// Vérifie si le flag de compilation `userland_assertions` est activé.
-    /// 
-    /// Les `assert()` pour le userland sont actifs. Si une assertion fail -> crash contrôlé plutôt que comportement indéfini. En prod = 0.
-    pub fn userland_assertions(&self) -> bool { self.0 & (1 << 1)  != 0 }
-
-    /// Vérifie si le flag de compilation `third_party_allowed` est activé.
-    /// 
-    /// `ExternalApps::allowThirdParty()`: les apps tierces sont autorisées à tourner. Si 0, l'app ne se lance même pas.
-    pub fn third_party_allowed(&self) -> bool { self.0 & (1 << 2)  != 0 }
-
-    /// Vérifie si le flag de compilation `slot_a_active` est activé.
-    /// 
-    /// `Device::Board::isRunningSlotA()`: la NumWorks a deux slots flash (A et B) pour les mises à jour OTA atomiques. Ce bit dit lequel est actif.
-    pub fn is_slot_a(&self)           -> bool { self.0 & (1 << 3)  != 0 }
-
-    /// Récupère le niveau d'API
-    /// 
-    /// Version de l'API externe. l'application externe déclare l'API level qu'elle requiert, le kernel refuse de la lancer si ça ne correspond pas. C'est le mécanisme de compatibilité.
-    pub fn api_level(&self)           -> u32  { (self.0 >> 4) & 0xF     }
-
-    /// Récupère le niveau de sécurité
-    /// 
-    /// Niveau de sécurité du firmware. Détermine ce que le kernel autorise (accès DFU, debug, etc.).
-    pub fn security_level(&self)      -> u32  { (self.0 >> 8) & 0xF     }
-
-    /// Vérifie si le flag de compilation `kernel_debug` est activé.
-    /// 
-    /// Build avec symboles de debug et comportements verbeux pour le kernel. En prod = 0.²
-    pub fn kernel_debug(&self)        -> bool { self.0 & (1 << 16) != 0 }
-
-    /// Vérifie si le flag de compilation `kernel_assertions` est activé.
-    /// 
-    /// Les `assert()` pour le kernel sont actifs. Si une assertion fail -> crash contrôlé plutôt que comportement indéfini. En prod = 0.
-    pub fn kernel_assertions(&self)   -> bool { self.0 & (1 << 17) != 0 }
-
-    /// Vérifie si le flag de compilation `in_factory` est activé.
-    /// 
-    /// Le device est en mode usine, probablement utilisé par NumWorks pendant la fabrication/calibration. Active des fonctions internes de test.
-    pub fn in_factory(&self)          -> bool { self.0 & (1 << 18) != 0 }
-
-    /// Vérifie si le flag de compilation `embed_extra_data` est activé.
-    /// 
-    /// Le kernel contient des données supplémentaires embarquées (tables de calibration, certificats, etc.).
-    pub fn embed_extra_data(&self)    -> bool { self.0 & (1 << 19) != 0 }
+    pub fn debug(&self)            -> bool { self.0 & (1 << 0) != 0 }
+    pub fn assertions(&self)       -> bool { self.0 & (1 << 1) != 0 }
+    pub fn in_factory(&self)       -> bool { self.0 & (1 << 2) != 0 }
+    pub fn embed_extra_data(&self) -> bool { self.0 & (1 << 3) != 0 }
 }
-
 
 /// Ruleset du mode examen.
 /// 
