@@ -51,45 +51,45 @@ fn main() -> isize {
 
     // ── Système ──────────────────────────────────────────────────────────────
     log(format!("Version:       {}", eadkp::sys::version()
-        .map_or_else(|_| "Unknown".to_string(), |v| v.to_string())));
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
     log(format!("Commit:        {}", eadkp::sys::hash_commit()
-        .unwrap_or("Unknown")));
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
     log(format!("Expected ver:  {}", eadkp::sys::expected_version()
-        .map_or_else(|_| "Unknown".to_string(), |v| v.to_string())));
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
-    log(format!("Reset type:    {:?}", eadkp::sys::last_reset_type()
-        .map_or_else(|_| "Unknown".to_string(), |v| format!("{:?}", v))));
+    log(format!("Reset type:    {}", eadkp::sys::last_reset_type()
+        .map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:?}", v))));
 
-    log(format!("Clearance:     {:?}", eadkp::sys::clearance_level()
-        .map_or_else(|_| "Unknown".to_string(), |v| format!("{:?}", v))));
+    log(format!("Clearance:     {}", eadkp::sys::clearance_level()
+        .map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:?}", v))));
 
     log(format!("Slot A:        {}", eadkp::sys::is_slot_a()
-        .map_or_else(|_| "Unknown".to_string(), |v| v.to_string())));
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
     // ── Hardware ─────────────────────────────────────────────────────────────
     log(format!("Device:        {}", eadkp::sys::device_name()
-        .unwrap_or("Unknown")));
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
     log(format!("Serial:        {}", eadkp::sys::serial_number()
-        .unwrap_or_else(|_| "Unknown".to_string())));
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v)));
 
     log(format!("FCC ID:        {}", eadkp::sys::fcc_id()
-        .unwrap_or("Unknown")));
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
     log(format!("PCB version:   {}", eadkp::sys::pcb_version()
-        .map_or_else(|_| "Unknown".to_string(), |v| v.to_string())));
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
     // ── Mémoire ──────────────────────────────────────────────────────────────
     log(format!("FS size:       {} B", eadkp::sys::filesystem_size()
-        .map_or_else(|_| "Unknown".to_string(), |v| v.to_string())));
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
     log(format!("App RAM:       {} B", eadkp::sys::ext_app_ram_size()
-        .map_or_else(|_| "Unknown".to_string(), |v| v.to_string())));
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
     log(format!("App Flash:     {} B", eadkp::sys::ext_app_flash_size()
-        .map_or_else(|_| "Unknown".to_string(), |v| v.to_string())));
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
     // ── Compilation flags ────────────────────────────────────────────────────
     match eadkp::sys::compilation_flags() {
@@ -98,12 +98,12 @@ fn main() -> isize {
             log(format!("Security lvl:  {}", flags.security_level()));
             log(format!("3rd party:     {}", flags.third_party_allowed()));
         }
-        Err(_) => log("Flags:         Unknown".to_string()),
+        Err(e) => log(format!("Flags:         Err: {:?}", e)),
     }
 
     // ── Exam mode ────────────────────────────────────────────────────────────
     log(format!("Exam mode:     {}", eadkp::sys::exam_mode()
-        .map_or_else(|_| "Unknown".to_string(), |e| format!("{:?} (active={})", e.ruleset, e.active))));
+        .map_or_else(|e| format!("Err: {:?}", e), |m| format!("{:?} (active={})", m.ruleset, m.active))));
 
     log("Press Home to exit.".to_string());
 
