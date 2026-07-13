@@ -50,6 +50,10 @@ fn main() -> isize {
         let _ = log_list.push(msg);
     };
 
+    let fs_size = eadkp::sys::filesystem_size();
+    let app_ram = eadkp::sys::ext_app_ram_size();
+    let apps_flash = eadkp::sys::ext_app_flash_size();
+
     // ── Système ──────────────────────────────────────────────────────────────
     log(format!("Version:       {}", eadkp::sys::version()
         .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
@@ -80,14 +84,20 @@ fn main() -> isize {
         .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
     // ── Mémoire ──────────────────────────────────────────────────────────────
-    log(format!("FS size:       {}", eadkp::sys::filesystem_size()
-        .map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(v, true, 2))));
+    log(format!("FS size:       {} ({} B)",
+        fs_size.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(*v, true, 2)),
+        fs_size.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 0))
+    ));
 
-    log(format!("App RAM:       {}", eadkp::sys::ext_app_ram_size()
-        .map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(v, true, 2))));
+    log(format!("App RAM:       {} ({} B)",
+        app_ram.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(*v, true, 2)),
+        app_ram.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 0))
+    ));
 
-    log(format!("App Flash:     {}", eadkp::sys::ext_app_flash_size()
-        .map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(v, false, 2))));
+    log(format!("App Flash:     {} ({} B)",
+        apps_flash.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(*v, false, 2)),
+        apps_flash.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 0))
+    ));
 
     // ── mode ────────────────────────────────────────────────────────────
     log(format!("Exam mode:     {}", eadkp::sys::exam_mode()
