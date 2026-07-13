@@ -3,17 +3,11 @@
 #[macro_use]
 extern crate eadkp;
 
-use eadkp::SoftwareError::NotAvailable;
 use heapless::Vec;
-use eadkp::storage;
-use alloc::string::{String, ToString};
-use alloc::format;
+use alloc::{format, string::{String, ToString}};
 mod serial_lib;
 
 eadk_setup!(name = "Specs");
-
-const FILE_NAME: &str = "test.py";
-const DEFAULT_CONTENT: &str = "testing";
 
 #[unsafe(no_mangle)]
 fn main() -> isize {
@@ -76,7 +70,7 @@ fn main() -> isize {
 
     log(format!("FCC ID:        {}", match eadkp::sys::fcc_id() {
         Ok(id) => id.to_string(),
-        Err(eadkp::GlobalError::Software(NotAvailable)) => "NA".to_string(),
+        Err(eadkp::GlobalError::Software(eadkp::SoftwareError::NotAvailable)) => "NA".to_string(),
 		Err(e) => format!("Err: {:?}", e),
     }));
 
