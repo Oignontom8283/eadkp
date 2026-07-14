@@ -55,7 +55,7 @@ pub enum SoftwareError {
     /// Valeur vide rencontrée là où une valeur était attendue
     EmptyValue,
     /// Élément non disponible ou non implémenté dans le contexte actuel
-    NotAvailable
+    NotAvailable { details: &'static str }
 }
 
 #[derive(Debug)]
