@@ -26,6 +26,7 @@ pub mod storage;
 pub mod epsilon;
 pub mod constant;
 pub mod sys;
+pub mod allocator;
 mod errors;
 
 // Module builder uniquement disponible pour les build scripts (OS hôte, pas embarqué)
