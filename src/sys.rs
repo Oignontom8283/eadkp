@@ -246,7 +246,7 @@ pub fn fcc_id() -> Result<&'static str, GlobalError> {
 
     // "NA" = pas de certification FCC sur cet appareil
     if fcc_str == "NA" {
-        return Err(SoftwareError::NotAvailable.into());
+        return Err(SoftwareError::NotAvailable { details: "No FCC certification available for this device" }.into());
     }
 
     Ok(fcc_str)
