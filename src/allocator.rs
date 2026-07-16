@@ -26,3 +26,13 @@ static HEAP: Heap = Heap::empty();
 /// Indique si l'allocateur global a été initialisé.
 static INITIALIZED: AtomicBool = AtomicBool::new(false);
 
+
+/// Adresse de début du tas, fournie par le script de linkage.
+#[cfg(target_os = "none")]
+pub fn start() -> Result<*const u8, GlobalError> {
+    Ok(core::ptr::addr_of!(_heap_start))
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn start() -> Result<*const u8, GlobalError> { Err(SoftwareError::SimulatorNotSupported.into()) }
+
