@@ -52,3 +52,30 @@ pub fn total_size() -> Result<usize, GlobalError> {
     Ok(unsafe { end()?.offset_from(start()?) as usize } )
 }
 
+
+/// Initialise l'allocateur global.
+/// - Retourne [`SoftwareError::AlreadyInitialized`] si appelé plus d'une fois.
+/// 
+/// ## Warning
+/// - **À appeler une seule fois au démarrage !**
+#[cfg(target_os = "none")]
+pub fn init() -> Result<(), GlobalError> {
+    
+    // Vérifie si l'allocateur a déjà été initialisé
+    if INITIALIZED.swap(true, Ordering::SeqCst) {
+        return Err(SoftwareError::AlreadyInitialized { details: "allocator already initialized" }.into());
+    }
+
+    // Initialise l'allocateur avec les adresses de début et de fin de heap
+    unsafe {
+        HEAP.init(start()? as usize, total_size()?)
+    }
+    
+    Ok(())
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn init() -> Result<(), GlobalError> {
+    // En OS ne rien faire, l'allocateur est celui du std
+    Ok(())
+}
