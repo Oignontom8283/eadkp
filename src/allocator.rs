@@ -79,3 +79,13 @@ pub fn init() -> Result<(), GlobalError> {
     // En OS ne rien faire, l'allocateur est celui du std
     Ok(())
 }
+
+
+/// Vérifie si l'allocateur a déjà été initialisé.
+pub fn is_initialized() -> Result<(), GlobalError> {
+    if INITIALIZED.load(Ordering::SeqCst) {
+        Ok(())
+    } else {
+        Err(SoftwareError::NotAvailable { details: "allocator not initialized" }.into())
+    }
+}
