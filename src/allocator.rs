@@ -36,3 +36,12 @@ pub fn start() -> Result<*const u8, GlobalError> {
 #[cfg(not(target_os = "none"))]
 pub fn start() -> Result<*const u8, GlobalError> { Err(SoftwareError::SimulatorNotSupported.into()) }
 
+
+/// Adresse de fin du tas, fournie par le script de linkage.
+#[cfg(target_os = "none")]
+pub fn end() -> Result<*const u8, GlobalError> {
+    Ok(core::ptr::addr_of!(_heap_end))
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn end() -> Result<*const u8, GlobalError> { Err(SoftwareError::SimulatorNotSupported.into()) }
