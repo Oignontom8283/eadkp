@@ -16,3 +16,13 @@ unsafe extern "C" {
     /// Adresse de fin du tas, fournie par le script de linkage.
     static _heap_end: u8;
 }
+
+
+/// Allocateur global pour la heap.
+#[cfg(target_os = "none")]
+#[global_allocator]
+static HEAP: Heap = Heap::empty();
+
+/// Indique si l'allocateur global a été initialisé.
+static INITIALIZED: AtomicBool = AtomicBool::new(false);
+
