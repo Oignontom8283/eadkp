@@ -60,11 +60,21 @@ pub fn total_size() -> Result<usize, GlobalError> {
 /// - **À appeler une seule fois au démarrage !**
 #[cfg(target_os = "none")]
 pub fn init() -> Result<(), GlobalError> {
+
+    // ⚠️ IMPORTANT : L'instruction `AtomicBool.swap()` est volontairement évitée ici !
+    // Le compilateur transforme le `.swap()` en instructions assembleur LDREX/STREX.
+    // La section où se trouve l'application est probablement configurée en "Shareable" par l'OS via la MPU.
+    // PROBLÈME : Pour que des instructions LDREX/STREX fonctionnent sur une section "Shareable",
+    //            le bus système doit disposer d'un **Moniteur d'exclusivité global**, ce qui n'est pas le cas sur STM32.
+    // L'utilisation des instructions LDREX/STREX provoque donc un BusFault (Crash CPU) de la calculatrice.
     
     // Vérifie si l'allocateur a déjà été initialisé
-    if INITIALIZED.swap(true, Ordering::SeqCst) {
+    if INITIALIZED.load(Ordering::Relaxed) {
         return Err(SoftwareError::AlreadyInitialized { details: "allocator already initialized" }.into());
     }
+
+    // Marque l'allocateur comme initialisé
+    INITIALIZED.store(true, Ordering::Relaxed);
 
     // Initialise l'allocateur avec les adresses de début et de fin de heap
     unsafe {
