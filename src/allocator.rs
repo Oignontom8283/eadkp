@@ -45,3 +45,10 @@ pub fn end() -> Result<*const u8, GlobalError> {
 
 #[cfg(not(target_os = "none"))]
 pub fn end() -> Result<*const u8, GlobalError> { Err(SoftwareError::SimulatorNotSupported.into()) }
+
+
+/// Taille totale du tas en bytes (fixe, définie par le linker script).
+pub fn total_size() -> Result<usize, GlobalError> {
+    Ok(unsafe { end()?.offset_from(start()?) as usize } )
+}
+
