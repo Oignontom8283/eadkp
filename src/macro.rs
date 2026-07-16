@@ -7,14 +7,6 @@ macro_rules! eadk_setup {
         eadk_setup!(name = $app_name, icon = concat!(env!("OUT_DIR"), "/icon.nwi"), api_level = 0);
     };
     (name = $app_name:expr, icon = $icon_path:expr, api_level = $api_level:expr) => {
-        // Importer les crates nécessaires pour les cibles embarquées
-        #[cfg(target_os = "none")]
-        use embedded_alloc::LlffHeap as Heap;
-
-        // Configurer l'allocateur global
-        #[global_allocator]
-        #[cfg(target_os = "none")]
-        static HEAP: Heap = Heap::empty();
 
         // Importer alloc pour les allocations sur le tas
         extern crate alloc;
@@ -100,9 +92,8 @@ macro_rules! eadk_setup {
         #[cfg(target_os = "none")]
         #[inline]
         fn _eadk_init_heap() {
-            use eadkp::heap_size;
-            let heap_size_val: usize = heap_size();
-            unsafe { HEAP.init(eadkp::HEAP_START as usize, heap_size_val) }
+            // Initialiser l'allocateur global
+            eadkp::allocator::init().unwrap();
         }
 
         // Fonction vide pour les cibles non-embarquées

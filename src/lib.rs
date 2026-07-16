@@ -26,6 +26,7 @@ pub mod storage;
 pub mod epsilon;
 pub mod constant;
 pub mod sys;
+pub mod allocator;
 mod errors;
 
 // Module builder uniquement disponible pour les build scripts (OS hôte, pas embarqué)
@@ -41,20 +42,6 @@ pub use errors::*;
 
 
 
-// ~~   Déclarations des symboles de début et de fin du heap, définis dans le script de linkage   ~~
-// En gros, le début des trucs compliqués, mais obligatoire sinon, bah ça marche pas.
-
-unsafe extern "C" {
-    pub static mut _heap_start: u8;
-    pub static mut _heap_end: u8;
-}
-
-pub static mut HEAP_START: *mut u8 = core::ptr::addr_of_mut!(_heap_start);
-pub static mut HEAP_END: *mut u8 = core::ptr::addr_of_mut!(_heap_end);
-
-pub fn heap_size() -> usize {
-    (unsafe { HEAP_END.offset_from(HEAP_START) }) as usize
-}
 
 // Stub requis par l'ARM EABI pour le unwinding de pile (inutilisé en no_std)
 #[cfg(target_os = "none")]
