@@ -142,6 +142,12 @@ pub fn run<const N: usize>(log_list: &Vec<String, N>) -> isize {
         let now  = eadkp::input::KeyboardState::scan();
         let just = now.get_just_pressed(prev);
 
+        // ── TEST PANIC (Appui sur SHIFT) ──────────────────────────────────
+        if just.key_down(eadkp::input::Key::Shift) {
+            panic!("Crash test: Panic triggered by pressing SHIFT key.");
+        }
+        // ──────────────────────────────────────────────────────────────────
+
         if just.key_down(eadkp::input::Key::Home) {
             return 0;
         }
