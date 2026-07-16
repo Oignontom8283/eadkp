@@ -89,3 +89,17 @@ pub fn is_initialized() -> Result<(), GlobalError> {
         Err(SoftwareError::NotAvailable { details: "allocator not initialized" }.into())
     }
 }
+
+
+
+/// Bytes actuellement alloués sur le tas.
+#[cfg(target_os = "none")]
+pub fn used() -> Result<usize, GlobalError> {
+    is_initialized()?;
+
+    Ok(HEAP.used())
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn used() -> Result<usize, GlobalError> { Err(SoftwareError::SimulatorNotSupported.into()) }
+
