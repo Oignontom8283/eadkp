@@ -103,3 +103,14 @@ pub fn used() -> Result<usize, GlobalError> {
 #[cfg(not(target_os = "none"))]
 pub fn used() -> Result<usize, GlobalError> { Err(SoftwareError::SimulatorNotSupported.into()) }
 
+
+/// Bytes encore libres sur le tas.
+#[cfg(target_os = "none")]
+pub fn free() -> Result<usize, GlobalError> {
+    is_initialized()?;
+
+    Ok(HEAP.free())
+}
+
+#[cfg(not(target_os = "none"))]
+pub fn free() -> Result<usize, GlobalError> { Err(SoftwareError::SimulatorNotSupported.into()) }
