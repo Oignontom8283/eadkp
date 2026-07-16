@@ -7,3 +7,12 @@ use crate::{GlobalError, SoftwareError};
 
 #[cfg(target_os = "none")]
 use embedded_alloc::LlffHeap as Heap;
+
+
+// Déclarations des symboles externes
+unsafe extern "C" {
+    /// Adresse de début du tas, fournie par le script de linkage.
+    static _heap_start: u8;
+    /// Adresse de fin du tas, fournie par le script de linkage.
+    static _heap_end: u8;
+}
