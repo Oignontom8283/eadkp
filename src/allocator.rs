@@ -114,3 +114,18 @@ pub fn free() -> Result<usize, GlobalError> {
 
 #[cfg(not(target_os = "none"))]
 pub fn free() -> Result<usize, GlobalError> { Err(SoftwareError::SimulatorNotSupported.into()) }
+
+
+/// Pourcentage d'utilisation du tas (0.0 à 100.0).
+pub fn usage_percent() -> Result<f32, GlobalError> {
+    is_initialized()?;
+
+    let used = used()?;
+    let total = total_size()?;
+
+    if total == 0 { // Évite la division par zéro
+        return Err(SoftwareError::EmptyValue.into());
+    }
+
+    Ok((used as f32 / total as f32) * 100.0)
+}
