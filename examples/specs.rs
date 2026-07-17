@@ -70,7 +70,7 @@ fn main() -> isize {
 
     log(format!("FCC ID:        {}", match eadkp::sys::fcc_id() {
         Ok(id) => id.to_string(),
-        Err(eadkp::GlobalError::Software(eadkp::SoftwareError::NotAvailable)) => "NA".to_string(),
+        Err(eadkp::GlobalError::Software(eadkp::SoftwareError::NotAvailable { .. })) => "NA".to_string(),
 		Err(e) => format!("Err: {:?}", e),
     }));
 
