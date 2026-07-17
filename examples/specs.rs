@@ -50,6 +50,7 @@ fn main() -> isize {
     let heap_size = eadkp::allocator::total_size();
     let heap_used = eadkp::allocator::used();
     let heap_used_percent = eadkp::allocator::usage_percent();
+    let heap_free = eadkp::allocator::free();
 
     // ── Système ──────────────────────────────────────────────────────────────
     log(format!("Version:       {}", eadkp::sys::version()
@@ -105,6 +106,11 @@ fn main() -> isize {
         heap_used.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(*v, true, 2)),
         heap_used.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 0)),
         heap_used_percent.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 2))
+    ));
+
+    log(format!("Heap free:     {} ({} B)",
+        heap_free.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(*v, true, 2)),
+        heap_free.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 0))
     ));
 
     // ── mode ────────────────────────────────────────────────────────────
