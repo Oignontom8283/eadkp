@@ -58,7 +58,6 @@ Demo: https://www.youtube.com/watch?v=KNKvgqE-Wmg
 - [ ] C and C++ file support (Undocumented) (Major issue)
 - [x] Official NumWorks simulator support
 - [ ] Support for embedding data files in NWA applications
-- [ ] Advanced graphics support
 - [ ] USB debugging (feasibility not yet evaluated)
 
 ## Create your own eadkp-powered project

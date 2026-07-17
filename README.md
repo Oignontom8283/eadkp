@@ -61,7 +61,6 @@ Démo : https://www.youtube.com/watch?v=KNKvgqE-Wmg
 - [ ] Support des fichiers C et C++ (Non documenté) (Problème majeur)
 - [x] Support du simulateur officiel Numworks
 - [ ] Support des fichiers données a l'inclusion dans les applications NWA
-- [ ] Support des graphiques avancés
 - [ ] Débogage via USB (Pas encore évaluée la faisabilité)
 
 ## Créer votre propre application propulsée par eadkp
