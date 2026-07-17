@@ -49,12 +49,14 @@ Demo: https://www.youtube.com/watch?v=KNKvgqE-Wmg
 ## Features
 
 - [x] Rust handlers for the Epsilon ABI
+- [x] Implement global allocator
 - [x] Basic display management
 - [x] User input handling (keyboard)
 - [x] Battery management
 - [x] Storage management (file read/write)
 - [x] Macros to declare NWA application properties
 - [x] Simple image handling (inclusion and rendering) via macro
+- [x] Access to system and hardware information (OS version, RAM, model, etc.)
 - [ ] C and C++ file support (Undocumented) (Major issue)
 - [x] Official NumWorks simulator support
 - [ ] Support for embedding data files in NWA applications
