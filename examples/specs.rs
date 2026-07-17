@@ -96,6 +96,11 @@ fn main() -> isize {
         apps_flash.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 0))
     ));
 
+    log(format!("Heap size:     {} ({} B)",
+        heap_size.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(*v, true, 2)),
+        heap_size.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 0))
+    ));
+
     // ── mode ────────────────────────────────────────────────────────────
     log(format!("Exam mode:     {}", eadkp::sys::exam_mode()
         .map_or_else(|e| format!("Err: {:?}", e), |m| format!("{:?} (active={})", m.ruleset, m.active))));
