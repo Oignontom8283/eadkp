@@ -47,6 +47,9 @@ fn main() -> isize {
     let fs_size = eadkp::sys::filesystem_size();
     let app_ram = eadkp::sys::ext_app_ram_size();
     let apps_flash = eadkp::sys::ext_app_flash_size();
+    let heap_size = eadkp::allocator::total_size();
+    let heap_used = eadkp::allocator::used();
+    let heap_used_percent = eadkp::allocator::usage_percent();
 
     // ── Système ──────────────────────────────────────────────────────────────
     log(format!("Version:       {}", eadkp::sys::version()
