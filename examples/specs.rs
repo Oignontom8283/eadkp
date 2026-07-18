@@ -4,7 +4,7 @@
 extern crate eadkp;
 
 use heapless::Vec;
-use alloc::{format, string::{String, ToString}};
+use alloc::{fmt::format, format, string::{String, ToString}};
 mod serial_lib;
 
 eadk_setup!(name = "Specs");
@@ -51,6 +51,8 @@ fn main() -> isize {
     let heap_used = eadkp::allocator::used();
     let heap_used_percent = eadkp::allocator::usage_percent();
     let heap_free = eadkp::allocator::free();
+    let heap_start = eadkp::allocator::start();
+    let heap_end = eadkp::allocator::end();
 
     // ── Système ──────────────────────────────────────────────────────────────
     log(format!("Version:       {}", eadkp::sys::version()
@@ -111,6 +113,16 @@ fn main() -> isize {
     log(format!("Heap free:     {} ({} B)",
         heap_free.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(*v, true, 2)),
         heap_free.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 0))
+    )); 
+
+    log(format!("Heap start:    {} ({})",
+        heap_start.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:p}", *v)),
+        heap_start.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as usize as f64, ',', 0))
+    )); 
+
+    log(format!("Heap end:      {} ({})",
+        heap_end.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:p}", *v)),
+        heap_end.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as usize as f64, ',', 0))
     ));
 
     // ── mode ────────────────────────────────────────────────────────────
