@@ -92,7 +92,7 @@ pub fn expected_version() -> Result<Version, GlobalError> {
 
 /// Obtenir la taille du système de fichiers (storage).
 /// - Taille en bytes (octets).
-/// ### Attention
+/// ## Warning
 /// - ⚠️ Comprend **TOUT** la zone du FS, y compris les zone non utilisables pour stocker des fichiers (ex: magic number).
 #[cfg(target_os = "none")]
 pub fn filesystem_size() -> Result<usize, GlobalError> {
@@ -105,12 +105,36 @@ pub fn filesystem_size() -> Result<usize, GlobalError> {
 }
 
 
+/// Obtenir l'adresse de début de la zone mémoire allouée aux applications externes (RAM).
+#[cfg(target_os = "none")]
+pub fn ext_app_ram_start() -> Result<*const u8, GlobalError> {
+    Ok(userland_header().external_apps_ram_start)
+}
+
+#[cfg(not(target_os = "none"))] // Version dummy
+pub fn ext_app_ram_start() -> Result<*const u8, GlobalError> {
+    Err(SoftwareError::SimulatorNotSupported.into())
+}
+
+
+/// Obtenir l'adresse de fin de la zone mémoire allouée aux applications externes (RAM).
+#[cfg(target_os = "none")]
+pub fn ext_app_ram_end() -> Result<*const u8, GlobalError> {
+    Ok(userland_header().external_apps_ram_end)
+}
+
+#[cfg(not(target_os = "none"))] // Version dummy
+pub fn ext_app_ram_end() -> Result<*const u8, GlobalError> {
+    Err(SoftwareError::SimulatorNotSupported.into())
+}
+
+
 /// Obtenir la taille de la zone mémoire allouée aux applications externes (RAM).
 /// - Taille en bytes (octets).
 #[cfg(target_os = "none")]
 pub fn ext_app_ram_size() -> Result<usize, GlobalError> {
-    let start_ptr = userland_header().external_apps_ram_start;
-    let end_ptr = userland_header().external_apps_ram_end;
+    let start_ptr = ext_app_ram_start()?;
+    let end_ptr = ext_app_ram_end()?;
 
     // Calculer la taille de la plage mémoire
     Ok(unsafe { ptr_range_size_unchecked(start_ptr, end_ptr) })
@@ -122,12 +146,36 @@ pub fn ext_app_ram_size() -> Result<usize, GlobalError> {
 }
 
 
+/// Obtenir l'adresse de début de la zone flash allouée aux binaires des applications externes.
+#[cfg(target_os = "none")]
+pub fn ext_app_flash_start() -> Result<*const u8, GlobalError> {
+    Ok(userland_header().external_apps_flash_start)
+}
+
+#[cfg(not(target_os = "none"))] // Version dummy
+pub fn ext_app_flash_start() -> Result<*const u8, GlobalError> {
+    Err(SoftwareError::SimulatorNotSupported.into())
+}
+
+
+/// Obtenir l'adresse de fin de la zone flash allouée aux binaires des applications externes.
+#[cfg(target_os = "none")]
+pub fn ext_app_flash_end() -> Result<*const u8, GlobalError> {
+    Ok(userland_header().external_apps_flash_end)
+}
+
+#[cfg(not(target_os = "none"))] // Version dummy
+pub fn ext_app_flash_end() -> Result<*const u8, GlobalError> {
+    Err(SoftwareError::SimulatorNotSupported.into())
+}
+
+
 /// Obtenir la taille de la zone de mémoire flash allouée aux stockages des binaires des applications externes.
 /// - Taille en bytes (octets).
 #[cfg(target_os = "none")]
 pub fn ext_app_flash_size() -> Result<usize, GlobalError> {
-    let start_ptr = userland_header().external_apps_flash_start;
-    let end_ptr = userland_header().external_apps_flash_end;
+    let start_ptr = ext_app_flash_start()?;
+    let end_ptr = ext_app_flash_end()?;
 
     // Calculer la taille de la plage mémoire
     Ok(unsafe { ptr_range_size_unchecked(start_ptr, end_ptr) })
