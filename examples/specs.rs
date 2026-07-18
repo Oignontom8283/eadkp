@@ -53,6 +53,8 @@ fn main() -> isize {
     let heap_free = eadkp::allocator::free();
     let heap_start = eadkp::allocator::start();
     let heap_end = eadkp::allocator::end();
+    let ram_start = eadkp::sys::ext_app_ram_start();
+    let ram_end = eadkp::sys::ext_app_ram_end();
 
     // ── Système ──────────────────────────────────────────────────────────────
     log(format!("Version:       {}", eadkp::sys::version()
@@ -123,6 +125,16 @@ fn main() -> isize {
     log(format!("Heap end:      {} ({})",
         heap_end.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:p}", *v)),
         heap_end.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as usize as f64, ',', 0))
+    ));
+
+    log(format!("App RAM start: {} ({})",
+        ram_start.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:p}", *v)),
+        ram_start.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as usize as f64, ',', 0))
+    ));
+
+    log(format!("App RAM end:   {} ({})",
+        ram_end.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:p}", *v)),
+        ram_end.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as usize as f64, ',', 0))
     ));
 
     // ── mode ────────────────────────────────────────────────────────────
