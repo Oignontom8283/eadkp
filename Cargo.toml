@@ -1,7 +1,7 @@
 
 [package]
 name = "eadkp"
-version = "0.24.1"
+version = "0.25.0"
 authors = ["Oignontom8283 <www.github.com/Oignontom8283>"]
 edition = "2021"
 description = "Rust library for developing applications for NumWorks calculators running Epsilon OS. Provides low-level hardware interaction and high-level abstractions for display, input, battery, storage, and more."
