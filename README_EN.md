@@ -43,8 +43,6 @@ It provides both low-level access to the calculator's hardware (display, keyboar
 
 This repository contains the `eadkp` library, the core of the project. It can be used independently, but the official project template is recommended to simplify project setup.
 
-Demo: https://www.youtube.com/watch?v=KNKvgqE-Wmg
-
 
 ## Features
 
