@@ -4,126 +4,147 @@
 extern crate eadkp;
 
 use heapless::Vec;
-use eadkp::storage;
-use alloc::string::{String, ToString};
-use alloc::format;
+use alloc::{format, string::{String, ToString}};
 mod serial_lib;
 
 eadk_setup!(name = "Specs");
 
-const FILE_NAME: &str = "test.py";
-const DEFAULT_CONTENT: &str = "testing";
-
 #[unsafe(no_mangle)]
 fn main() -> isize {
-	_eadk_init_heap();
-	let mut log_list: Vec<String, 12> = Vec::new();
-	let mut total_log_bytes: usize = 0;
+    _eadk_init_heap();
+    let mut log_list: Vec<String, 20> = Vec::new();
+    let mut total_log_bytes: usize = 0;
 
-	let mut log = |message: String| {
-		let mut msg = message;
-		let max_total = 32 * 1024;
+    let mut log = |message: String| {
+        let mut msg = message;
+        let max_total = 32 * 1024;
 
-		if msg.len() > max_total {
-			let mut trimmed = String::new();
-			let keep = max_total.saturating_sub(3);
-			for (i, ch) in msg.chars().enumerate() {
-				if i >= keep {
-					break;
-				}
-				trimmed.push(ch);
-			}
-			trimmed.push_str("...");
-			msg = trimmed;
-		}
+        if msg.len() > max_total {
+            let mut trimmed = String::new();
+            let keep = max_total.saturating_sub(3);
+            for (i, ch) in msg.chars().enumerate() {
+                if i >= keep { break; }
+                trimmed.push(ch);
+            }
+            trimmed.push_str("...");
+            msg = trimmed;
+        }
 
-		while total_log_bytes + msg.len() > max_total && !log_list.is_empty() {
-			let removed = log_list.remove(0);
-			total_log_bytes = total_log_bytes.saturating_sub(removed.len());
-		}
+        while total_log_bytes + msg.len() > max_total && !log_list.is_empty() {
+            let removed = log_list.remove(0);
+            total_log_bytes = total_log_bytes.saturating_sub(removed.len());
+        }
 
-		if log_list.len() == log_list.capacity() {
-			let removed = log_list.remove(0);
-			total_log_bytes = total_log_bytes.saturating_sub(removed.len());
-		}
+        if log_list.len() == log_list.capacity() {
+            let removed = log_list.remove(0);
+            total_log_bytes = total_log_bytes.saturating_sub(removed.len());
+        }
 
-		total_log_bytes += msg.len();
-		let _ = log_list.push(msg);
-	};
+        total_log_bytes += msg.len();
+        let _ = log_list.push(msg);
+    };
 
-	log("Storage Init...".to_string());
+    let fs_size = eadkp::sys::filesystem_size();
+    let app_ram = eadkp::sys::ext_app_ram_size();
+    let apps_flash = eadkp::sys::ext_app_flash_size();
+    let heap_size = eadkp::allocator::total_size();
+    let heap_used = eadkp::allocator::used();
+    let heap_used_percent = eadkp::allocator::usage_percent();
+    let heap_free = eadkp::allocator::free();
+    let heap_start = eadkp::allocator::start();
+    let heap_end = eadkp::allocator::end();
+    let ram_start = eadkp::sys::ext_app_ram_start();
+    let ram_end = eadkp::sys::ext_app_ram_end();
 
-	let voltage = eadkp::battery::voltage();
-	let level = eadkp::battery::level();
-	log(format!("Battery: {:.2}V", voltage));
-	log(format!("Battery level: {}", level.to_str()));
+    // ── Système ──────────────────────────────────────────────────────────────
+    log(format!("Version:       {}", eadkp::sys::version()
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
-	let is_existing = storage::file_exists(FILE_NAME);
+    log(format!("Commit:        {}", eadkp::sys::hash_commit()
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
-	match is_existing {
-		Ok(true) => {
-			log(format!("'{}' Found !", FILE_NAME));
-			match storage::file_read_string(FILE_NAME) {
-				Ok(content) => log(format!("Content: {}", content)),
-				Err(e) => log(format!("Read error: {:?}", e)),
-			}
-		}
-		Ok(false) => {
-			log(format!("'{}' not found. Creating...", FILE_NAME));
-			match storage::file_write_string(FILE_NAME, DEFAULT_CONTENT) {
-				Ok(_) => log("File was created !".to_string()),
-				Err(e) => log(format!("Creation error: {:?}", e)),
-			}
-		}
-		Err(e) => log(format!("Storage error: {:?}", e)),
-	}
+    log(format!("Expected ver:  {}", eadkp::sys::expected_version()
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
-	let random_file = format!("test_{}.py", eadkp::random::random_c());
-	match storage::file_write_string(&random_file, DEFAULT_CONTENT) {
-		Ok(_) => log("File created (forced).".to_string()),
-		Err(e) => log(format!("Create error: {:?}", e)),
-	}
+    log(format!("Reset type:    {}", eadkp::sys::last_reset_type()
+        .map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:?}", v))));
 
-	match storage::file_exists(&random_file) {
-		Ok(true) => log("File exists after create.".to_string()),
-		Ok(false) => log("File missing after create.".to_string()),
-		Err(e) => log(format!("Exists check error: {:?}", e)),
-	}
+    log(format!("Clearance:     {}", eadkp::sys::clearance_level()
+        .map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:?}", v))));
 
-	match unsafe { storage::file_erase(&random_file) } {
-		Ok(_) => log("File deleted.".to_string()),
-		Err(e) => log(format!("Delete error: {:?}", e)),
-	}
+    // ── Hardware ─────────────────────────────────────────────────────────────
+    log(format!("Serial:        {}", eadkp::sys::serial_number()
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v)));
 
-	match storage::file_exists(&random_file) {
-		Ok(true) => log("File still exists after delete.".to_string()),
-		Ok(false) => log("File deleted successfully.".to_string()),
-		Err(e) => log(format!("Exists check error: {:?}", e)),
-	}
+    log(format!("FCC ID:        {}", match eadkp::sys::fcc_id() {
+        Ok(id) => id.to_string(),
+        Err(eadkp::GlobalError::Software(eadkp::SoftwareError::NotAvailable { .. })) => "NA".to_string(),
+		Err(e) => format!("Err: {:?}", e),
+    }));
 
-	eadkp::display::push_rect_uniform(eadkp::SCREEN_RECT, eadkp::COLOR_WHITE);
+    log(format!("PCB version:   {}", eadkp::sys::pcb_version()
+        .map_or_else(|e| format!("Err: {:?}", e), |v| v.to_string())));
 
-	#[cfg(target_os = "none")]
-	let footer_value = {
-		log("Reading footer value...".to_string());
-		unsafe { core::ptr::read_unaligned(eadkp::epsilon::storage().unwrap().footer_addr) }
-	};
+    // ── Mémoire ──────────────────────────────────────────────────────────────
+    log(format!("FS size:       {} ({} B)",
+        fs_size.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(*v, true, 2)),
+        fs_size.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 0))
+    ));
 
-	#[cfg(not(target_os = "none"))]
-	let footer_value = { 0x00000000 };
+    log(format!("App RAM:       {} ({} B)",
+        app_ram.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(*v, true, 2)),
+        app_ram.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 0))
+    ));
 
-	log(format!("Footer Value: 0x{:X}", footer_value));
+    log(format!("App Flash:     {} ({} B)",
+        apps_flash.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(*v, false, 2)),
+        apps_flash.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 0))
+    ));
 
-	log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee".to_string());
-	log("This is a long message that should be truncated in the log display to ensure it doesn't overflow the buffer.".to_string());
-	log("lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".to_string());
-	log("lorem ipsum dolor sit amet,".to_string());
-	log("consectetur adipiscing elit,".to_string());
-	log("sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.".to_string());
-	log("consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim venia".to_string());
-	log("Bonjour\nle monde\ncomment ca va ?\n...".to_string());
+    log(format!("Heap size:     {} ({} B)",
+        heap_size.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(*v, true, 2)),
+        heap_size.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 0))
+    ));
 
-	log("Press Home to exit.".to_string());
+    log(format!("Heap used:     {} ({} B) ({}%)",
+        heap_used.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(*v, true, 2)),
+        heap_used.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 0)),
+        heap_used_percent.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 2))
+    ));
 
-	serial_lib::run(&log_list)
+    log(format!("Heap free:     {} ({} B)",
+        heap_free.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| eadkp::utils::format_size(*v, true, 2)),
+        heap_free.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as f64, ',', 0))
+    )); 
+
+    log(format!("Heap start:    {} ({})",
+        heap_start.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:p}", *v)),
+        heap_start.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as usize as f64, ',', 0))
+    )); 
+
+    log(format!("Heap end:      {} ({})",
+        heap_end.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:p}", *v)),
+        heap_end.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as usize as f64, ',', 0))
+    ));
+
+    log(format!("App RAM start: {} ({})",
+        ram_start.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:p}", *v)),
+        ram_start.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as usize as f64, ',', 0))
+    ));
+
+    log(format!("App RAM end:   {} ({})",
+        ram_end.as_ref().map_or_else(|e| format!("Err: {:?}", e), |v| format!("{:p}", *v)),
+        ram_end.as_ref().map_or_else(|_| format!("None"), |v| eadkp::utils::format_number(*v as usize as f64, ',', 0))
+    ));
+
+    // ── mode ────────────────────────────────────────────────────────────
+    log(format!("Exam mode:     {}", eadkp::sys::exam_mode()
+        .map_or_else(|e| format!("Err: {:?}", e), |m| format!("{:?} (active={})", m.ruleset, m.active))));
+
+	log(format!("Kernel debug:  {}", eadkp::sys::kernel_flags()
+		.map_or_else(|e| format!("Err: {:?}", e), |v| (!v.is_production_build()).to_string())));
+
+    log("Press Home to exit.".to_string());
+
+    serial_lib::run(&log_list)
 }
