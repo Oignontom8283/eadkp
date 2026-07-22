@@ -176,12 +176,9 @@ flowchart LR
 
 ## Contribution
 
-Les contributions sont les bienvenues ! N'hésitez pas à ouvrir des issues ou à soumettre des pull requests.
+Les contributions sont les bienvenues (: N'hésitez pas à ouvrir une issue, pull request, ou discussion !
 
-Pour apprendre comment contribuer, consultez les guides suivants :
-- [Guide de setup du projet](docs/SETUPS/Setup.md)
-- [Guide de compilation de l'exemple de test](docs/SETUPS/BuildExample.md)
-- [Guide d'utilisation du simulateur](docs/SETUPS/Simulator.md)
+Consultez le [guide de contribution](./CONTRIBUTING.md) pour plus d'informations sur la manière de contribuer au projet.
 
 ## Pourquoi en Francais ?
 
@@ -220,7 +217,7 @@ Elle est fournie indépendamment du code source et n’est pas soumise à la lic
 
 Un grand merci aux développeurs suivants pour leurs travails dans la communauté NumWorks  :
 - [Yannis300307](https://github.com/yannis300307)
-- [Yaya Cout](https://framagit.org/Yaya.Cout) (*Special thanks*)
+- [Yaya Cout](https://framagit.org/Yaya.Cout)
 
 ## Informations légales
 

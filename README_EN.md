@@ -173,12 +173,9 @@ flowchart LR
 
 ## Contribution
 
-Contributions are welcome. Feel free to open issues or submit pull requests.
+Contributions are welcome (: Feel free to open an issue, pull request, or discussion!
 
-To learn how to use the project, check these guides:
-- [Project setup guide](docs/SETUPS/Setup.md)
-- [Test example build guide](docs/SETUPS/BuildExample.md)
-- [Simulator usage guide](docs/SETUPS/Simulator.md)
+Check out the [contribution guide](./CONTRIBUTING.md) for more information on how to contribute to the project.
 
 ## Why in French?
 
@@ -215,7 +212,7 @@ to allow better interoperability of the library with other projects.
 
 Many thanks to the following developers for their work in the NumWorks community:
 - [Yannis300307](https://github.com/yannis300307)
-- [Yaya Cout](https://framagit.org/Yaya.Cout) (*Special thanks*)
+- [Yaya Cout](https://framagit.org/Yaya.Cout)
 
 ## Legal Information
 
