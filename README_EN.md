@@ -37,7 +37,7 @@
   <strong>English</strong> | <a href="./README.md">Français</a>
 </p>
 
-**eadkp** is a Rust HAL / framework for developing applications for **NumWorks** calculators running **Epsilon**.
+eadkp is a **SDK**, a **HAL**, and, to some extent, a Rust **framework** for developing external applications for **NumWorks** calculators running **Epsilon**.
 
 It provides both low-level access to the calculator's hardware (display, keyboard, battery, and storage) and a set of abstractions and tools that hide the platform's complexity, making Rust application development easier.
 
@@ -64,7 +64,7 @@ This repository contains the `eadkp` library, the core of the project. It can be
 
 Eadkp requires a specific environment to function properly.
 
-Check out the [Quick Start on the wiki](https://github.com/Oignontom8283/eadkp/wiki#getting-started) to create your own eadkp-powered application.
+Check out the [Quick Start on the wiki](https://oignontom8283.github.io/eadkp/guide/) to create your own eadkp-powered application.
 
 ## How It Works
 
