@@ -46,6 +46,10 @@ et un ensemble d'abstractions et d'outils qui masquent la complexité de la plat
 Ce dépôt contient la bibliothèque `eadkp`, cœur du projet. Elle peut être utilisée indépendamment,
 mais la *template* officielle est recommandée pour simplifier la mise en place d'un projet.
 
+> [!CAUTION]
+> Ce projet est encore en développement actif ! Des **changements majeurs** peuvent survenir à chaque mise à jour.
+> 
+> Des adaptations du code ou des scripts peuvent être nécessaires entre chaque version !
 
 ## Fonctionnalités
 
