@@ -305,7 +305,6 @@ canvas {
   flex: 1 1 240px;
   flex-direction: column;
   min-width: 0;
-  max-width: 280px;
   height: 240px;
   overflow: hidden;
   border: 1px solid var(--picker-border);
@@ -413,6 +412,10 @@ canvas {
   .history-panel {
     width: 100%;
     max-width: none;
+  }
+
+  .canvas-wrap {
+    flex: 0 0 auto;
   }
 
   .history-panel {
