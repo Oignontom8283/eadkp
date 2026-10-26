@@ -19,6 +19,19 @@ export default withMermaid({
 
     sidebar: [
       {
+        text: 'Documentation',
+        items: [
+          { text: 'Home', link: '/documentation/' },
+          { text: 'Links', link: '/documentation/links' },
+        ]
+      },
+      {
+        text: 'Tools',
+        items: [
+          { text: 'Object Picker', link: '/tool/object-picker' },
+        ]
+      },
+      {
         text: 'Guide',
         items: [
           { text: 'Getting Started ', link: '/guide/' },
@@ -30,13 +43,6 @@ export default withMermaid({
           // { text: 'Filesystem', link: '/guide/filesystem' },
         ]
       },
-      {
-        text: 'Documentation',
-        items: [
-          { text: 'Home', link: '/documentation/' },
-          { text: 'Links', link: '/documentation/links' },
-        ]
-      }
     ],
 
     socialLinks: [
