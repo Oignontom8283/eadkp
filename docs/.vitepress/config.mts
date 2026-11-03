@@ -35,9 +35,18 @@ export default withMermaid({
         ]
       },
       {
+        text: 'Formats',
+        items: [
+          { text: 'Format EIF', link: '/reference/formats/eif' },
+          { text: 'EIF1', link: '/reference/formats/eif-v1' },
+          { text: 'RGB 565', link: '/reference/formats/rgb565' },
+        ]
+      },
+      {
         text: 'Outils',
         items: [
           { text: 'Object Picker', link: '/tool/object-picker' },
+          { text: 'Redimensionner une image', link: '/tool/image-resizing' },
         ]
       },
     ],
