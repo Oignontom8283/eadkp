@@ -174,7 +174,7 @@ impl CalculatorModel {
         return slot_info_ref;
     }
 
-    /// Detection du modèle de la calculatrice.
+    /// Détection du modèle de la calculatrice.
     pub fn detect() -> Self {
 
         let flag = 0;
@@ -183,11 +183,15 @@ impl CalculatorModel {
         // Sur les N0120, la RAM de la puce commence à l'adresse 576 Mio, alors que sur les autres, elle commence à 512 Mio.
         // Comme il y a une différence de 64 Mio entre les deux et que la RAM ne fait que 256 Kio,
         // si l'adresse d'un élément dans l'espace RAM du programme est inférieure à 576 Mio, on est sur une N0115 ou N0110.
-        if adresse > RAM_BASE_N0120 {
+        let model = if adresse >= RAM_BASE_N0120 {
             Self::N0120
         } else {
             Self::N0110_N0115
-        }
+        };
+
+        model.slotinfo_address().is_valid().expect("Invalid or missing SlotInfo.");
+
+        model
     }
 }
 
