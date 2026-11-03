@@ -5,9 +5,8 @@ avec les composants essentiels d'Epsilon en mêmoire.
 
 use crate::{
     constant::{
-        SLOTINFO_MAGIC, USERLAND_HEADER_MAGIC, KERNEL_HEADER_MAGIC,EXTERNAL_APPS_MAGIC, FILESYSTEM_MAGIC,
-        RAM_BASE_N0110_OR_N0115, RAM_BASE_N0120,
-        SLOTS_N0110_OR_N0115, SLOTS_N0120
+        SLOTINFO_MAGIC, USERLAND_HEADER_MAGIC, KERNEL_HEADER_MAGIC, FILESYSTEM_MAGIC,
+        RAM_BASE_N0110_OR_N0115, RAM_BASE_N0120
     },
     SoftwareError
 };
@@ -175,19 +174,19 @@ impl CalculatorModel {
         return slot_info_ref;
     }
 
-    /// Modèle détecté à partir des slots magic
+    /// Detection du modèle de la calculatrice.
     pub fn detect() -> Self {
-        unsafe {
-            // Compter les slots valides pour chaque modèle
-            let count_n0110_n0115 = SLOTS_N0110_OR_N0115.iter().filter(|&&slot| ptr::read_unaligned(slot) == EXTERNAL_APPS_MAGIC).count();
-            let count_n0120 = SLOTS_N0120.iter().filter(|&&slot| ptr::read_unaligned(slot) == EXTERNAL_APPS_MAGIC).count();
-            
-            // Déterminer le modèle avec le plus de slots valides
-            if count_n0110_n0115 > count_n0120 {
-                Self::N0110_N0115
-            } else {
-                Self::N0120
-            }
+
+        let flag = 0;
+        let adresse = ptr::from_ref(&flag).addr(); // Adresse de la variable locale
+
+        // Sur les N0120, la RAM de la puce commence à l'adresse 576 Mio, alors que sur les autres, elle commence à 512 Mio.
+        // Comme il y a une différence de 64 Mio entre les deux et que la RAM ne fait que 256 Kio,
+        // si l'adresse d'un élément dans l'espace RAM du programme est inférieure à 576 Mio, on est sur une N0115 ou N0110.
+        if adresse > RAM_BASE_N0120 {
+            Self::N0120
+        } else {
+            Self::N0110_N0115
         }
     }
 }
