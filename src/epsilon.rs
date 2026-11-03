@@ -98,10 +98,10 @@ impl UserlandHeader {
 /// 
 /// Emplacement :
 /// - Juste après la signature (8 bytes) au début du slot actif
-/// - N0110/N0115 Slot A : 0x90000008
-/// - N0110/N0115 Slot B : 0x90400008
-/// - N0120 Slot A       : 0x90000008
-/// - N0120 Slot B       : 0x90400008
+/// ```
+/// Slot A : 0x90000008
+/// Slot B : 0x90400008
+/// ```
 /// 
 /// ## src
 /// https://github.com/numworks/epsilon/blob/master/shared/ion/src/device/shared/drivers/kernel_header.h
