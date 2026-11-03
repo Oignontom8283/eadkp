@@ -12,25 +12,12 @@ export default withMermaid({
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
-      { text: "Guide", link: '/guide/' },
-      { text: 'Documentation', link: '/documentation/' },
-      { text: 'Links', link: '/documentation/links' }
+      { text: 'Guide', link: '/guide/' },
+      { text: 'Référence', link: '/reference/links' },
+      { text: 'Outils', link: '/tool/object-picker' }
     ],
 
     sidebar: [
-      {
-        text: 'Documentation',
-        items: [
-          { text: 'Home', link: '/documentation/' },
-          { text: 'Links', link: '/documentation/links' },
-        ]
-      },
-      {
-        text: 'Tools',
-        items: [
-          { text: 'Object Picker', link: '/tool/object-picker' },
-        ]
-      },
       {
         text: 'Guide',
         items: [
@@ -39,8 +26,18 @@ export default withMermaid({
           { text: 'Application Structure', link: '/guide/structure' },
           { text: "Simulator", link: '/guide/simulator' },
           { text: "Commands & Export", link: '/guide/commands' },
-          // { text: 'Images', link: '/guide/images' },
-          // { text: 'Filesystem', link: '/guide/filesystem' },
+        ]
+      },
+      {
+        text: 'Référence',
+        items: [
+          { text: 'Liens', link: '/reference/links' },
+        ]
+      },
+      {
+        text: 'Outils',
+        items: [
+          { text: 'Object Picker', link: '/tool/object-picker' },
         ]
       },
     ],
