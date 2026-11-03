@@ -28,8 +28,8 @@ pub const FILESYSTEM_MAGIC: u32 = 0xBADD0BEEu32.swap_bytes();
 pub const EXTERNAL_APPS_MAGIC: u32 = 0xDEC0EDFE;
 
 // Memory layout constants for different hardware versions
-pub const RAM_BASE_N0110_OR_N0115: u32 = 0x20000000;
-pub const RAM_BASE_N0120: u32 = 0x24000000;
+pub const RAM_BASE_N0110_OR_N0115: usize = 0x20000000; // 512 Mio
+pub const RAM_BASE_N0120: usize = 0x24000000; // 576 Mio
 
 // Memory slot addresses for different hardware versions
 pub const SLOTS_N0110_OR_N0115: [*const u32; 2] = [0x90010000 as *const u32, 0x90410000 as *const u32];
