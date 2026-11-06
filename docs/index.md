@@ -14,7 +14,7 @@ hero:
       text: Quick Start
       link: /guide/
     - theme: alt
-      text: Links
+      text: Reference >:3
       link: /reference/links
 
 

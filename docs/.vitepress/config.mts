@@ -17,8 +17,8 @@ export default withMermaid({
       { text: 'Outils', link: '/tool/object-picker' }
     ],
 
-    sidebar: [
-      {
+    sidebar: {
+      '/guide/': {
         text: 'Guide',
         items: [
           { text: 'Getting Started ', link: '/guide/' },
@@ -28,28 +28,30 @@ export default withMermaid({
           { text: "Commands & Export", link: '/guide/commands' },
         ]
       },
-      {
-        text: 'Référence',
-        items: [
-          { text: 'Liens', link: '/reference/links' },
-        ]
-      },
-      {
-        text: 'Formats',
-        items: [
-          { text: 'Format EIF', link: '/reference/formats/eif' },
-          { text: 'EIF1', link: '/reference/formats/eif-v1' },
-          { text: 'RGB 565', link: '/reference/formats/rgb565' },
-        ]
-      },
-      {
+      '/reference/': [
+        {
+          text: 'Référence',
+          items: [
+            { text: 'Liens', link: '/reference/links' },
+          ]
+        },
+        {
+          text: 'Formats',
+          items: [
+            { text: 'Format EIF', link: '/reference/formats/eif' },
+            { text: 'EIF1', link: '/reference/formats/eif-v1' },
+            { text: 'RGB 565', link: '/reference/formats/rgb565' },
+          ]
+        }
+      ],
+      '/tool/': {
         text: 'Outils',
         items: [
           { text: 'Object Picker', link: '/tool/object-picker' },
           { text: 'Redimensionner une image', link: '/tool/image-resizing' },
         ]
       },
-    ],
+    },
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/Oignontom8283/eadkp/tree/dev/docs' },
