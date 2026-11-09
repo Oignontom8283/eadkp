@@ -12,26 +12,13 @@ export default withMermaid({
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
-      { text: "Guide", link: '/guide/' },
-      { text: 'Documentation', link: '/documentation/' },
-      { text: 'Links', link: '/documentation/links' }
+      { text: 'Guide', link: '/guide/' },
+      { text: 'Référence', link: '/reference/links' },
+      { text: 'Outils', link: '/tool/object-picker' }
     ],
 
-    sidebar: [
-      {
-        text: 'Documentation',
-        items: [
-          { text: 'Home', link: '/documentation/' },
-          { text: 'Links', link: '/documentation/links' },
-        ]
-      },
-      {
-        text: 'Tools',
-        items: [
-          { text: 'Object Picker', link: '/tool/object-picker' },
-        ]
-      },
-      {
+    sidebar: {
+      '/guide/': {
         text: 'Guide',
         items: [
           { text: 'Getting Started ', link: '/guide/' },
@@ -39,11 +26,32 @@ export default withMermaid({
           { text: 'Application Structure', link: '/guide/structure' },
           { text: "Simulator", link: '/guide/simulator' },
           { text: "Commands & Export", link: '/guide/commands' },
-          // { text: 'Images', link: '/guide/images' },
-          // { text: 'Filesystem', link: '/guide/filesystem' },
         ]
       },
-    ],
+      '/reference/': [
+        {
+          text: 'Référence',
+          items: [
+            { text: 'Liens', link: '/reference/links' },
+          ]
+        },
+        {
+          text: 'Formats',
+          items: [
+            { text: 'Format EIF', link: '/reference/formats/eif' },
+            { text: 'EIF1', link: '/reference/formats/eif-v1' },
+            { text: 'RGB 565', link: '/reference/formats/rgb565' },
+          ]
+        }
+      ],
+      '/tool/': {
+        text: 'Outils',
+        items: [
+          { text: 'Object Picker', link: '/tool/object-picker' },
+          { text: 'Redimensionner une image', link: '/tool/image-resizing' },
+        ]
+      },
+    },
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/Oignontom8283/eadkp/tree/dev/docs' },
