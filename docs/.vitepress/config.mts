@@ -14,7 +14,7 @@ export default withMermaid({
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/' },
       { text: 'Référence', link: '/reference/links' },
-      { text: 'Outils', link: '/tool/object-picker' }
+      { text: 'Outils', link: '/tool' }
     ],
 
     sidebar: {
